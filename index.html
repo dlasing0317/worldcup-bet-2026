@@ -8,8 +8,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', -apple-system, sans-serif; background-color: #000000; }
-        .tab-active { color: #fff; border-bottom: 2px solid #10b981; }
-        .tab-inactive { color: #6b7280; border-bottom: 2px solid transparent; }
         .glass-panel { background: #1c1c1e; border: 1px solid #2c2c2e; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
@@ -17,7 +15,7 @@
 </head>
 <body class="text-gray-100 min-h-screen pb-28">
 
-    <header class="pt-6 pb-4 px-5 bg-black sticky top-0 z-20 border-b border-gray-800">
+    <header class="pt-6 pb-4 px-5 bg-black sticky top-0 z-20 border-b border-gray-800 shadow-md shadow-black">
         <div class="flex justify-between items-center">
             <div class="flex items-center space-x-3">
                 <img src="https://firebasestorage.googleapis.com/v0/b/worldcup-bet-2026-8a617.firebasestorage.app/o/Screenshot%202026-06-02%20at%202.34.34%E2%80%AFPM.png?alt=media&token=1de9e34d-18ba-4354-ba8d-5e5f1bcab852" alt="WC2026 Official Logo" class="h-14 w-auto object-contain drop-shadow-2xl">
@@ -46,7 +44,7 @@
     <main class="p-4 space-y-6">
         
         <div id="view-matches">
-            <div id="date-selector" class="flex overflow-x-auto space-x-6 scrollbar-hide border-b border-gray-800 mb-4">
+            <div id="date-selector" class="flex overflow-x-auto space-x-3 scrollbar-hide py-2 mb-2 items-center">
                 <p class="text-sm text-gray-500 pb-2">連線至資料庫中...</p>
             </div>
             
@@ -154,44 +152,73 @@
         window.selectedDate = null; 
         const weekdaysCH = ['日', '一', '二', '三', '四', '五', '六'];
 
-        // 更新咗最新嘅 2026 參賽國旗
         const getFlag = (teamName) => {
             const flags = { "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦", "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿", "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺", "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭", "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪", "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹", "剛果":"🇨🇩" };
             for(let key in flags) { if(teamName.includes(key)) return flags[key]; }
             return "⚽"; 
         };
 
-        // 🛠️ 雙軌並行開關：目前設定為 false (使用下方 Mock Data)，API 正式上線時改為 true 即可
         const USE_LIVE_API = false; 
 
         async function loadMatches() {
             if (!USE_LIVE_API) {
-                console.log("🛠️ 載入 2026 真實 Mock 賽程...");
+                console.log("🛠️ 載入 2026 世界盃全賽程 Mock Data (共 104 場)...");
                 
-                // 📝 真實嘅 2026 首 22 場分組賽資料 (使用你當地 PDT 時區)
+                // 🚨 已完美修復：利用原生 JS Date Object 計算日期，徹底杜絕 NaN 同溢位問題
                 const mockJSON = [
-                    { id: "2001", home: "墨西哥", away: "南非", date: "2026-06-11T12:00:00-07:00", status: "NS" },
-                    { id: "2002", home: "韓國", away: "捷克", date: "2026-06-11T19:00:00-07:00", status: "NS" },
-                    { id: "2003", home: "加拿大", away: "波斯尼亞", date: "2026-06-12T12:00:00-07:00", status: "NS" },
-                    { id: "2004", home: "美國", away: "巴拉圭", date: "2026-06-12T18:00:00-07:00", status: "NS" },
-                    { id: "2005", home: "卡塔爾", away: "瑞士", date: "2026-06-13T12:00:00-07:00", status: "NS" },
-                    { id: "2006", home: "巴西", away: "摩洛哥", date: "2026-06-13T15:00:00-07:00", status: "NS" },
-                    { id: "2007", home: "海地", away: "蘇格蘭", date: "2026-06-13T18:00:00-07:00", status: "NS" },
-                    { id: "2008", home: "澳洲", away: "土耳其", date: "2026-06-13T21:00:00-07:00", status: "NS" },
-                    { id: "2009", home: "德國", away: "庫拉索", date: "2026-06-14T10:00:00-07:00", status: "NS" },
-                    { id: "2010", home: "荷蘭", away: "日本", date: "2026-06-14T13:00:00-07:00", status: "NS" },
-                    { id: "2011", home: "科特迪瓦", away: "厄瓜多爾", date: "2026-06-14T16:00:00-07:00", status: "NS" },
-                    { id: "2012", home: "瑞典", away: "突尼西亞", date: "2026-06-14T19:00:00-07:00", status: "NS" },
-                    { id: "2013", home: "西班牙", away: "佛得角", date: "2026-06-15T09:00:00-07:00", status: "NS" },
-                    { id: "2014", home: "比利時", away: "埃及", date: "2026-06-15T12:00:00-07:00", status: "NS" },
-                    { id: "2015", home: "沙特", away: "烏拉圭", date: "2026-06-15T15:00:00-07:00", status: "NS" },
-                    { id: "2016", home: "伊朗", away: "新西蘭", date: "2026-06-15T18:00:00-07:00", status: "NS" },
-                    { id: "2017", home: "法國", away: "塞內加爾", date: "2026-06-16T12:00:00-07:00", status: "NS" },
-                    { id: "2018", home: "伊拉克", away: "挪威", date: "2026-06-16T15:00:00-07:00", status: "NS" },
-                    { id: "2019", home: "阿根廷", away: "阿爾及利亞", date: "2026-06-16T18:00:00-07:00", status: "NS" },
-                    { id: "2020", home: "奧地利", away: "約旦", date: "2026-06-16T21:00:00-07:00", status: "NS" },
-                    { id: "2021", home: "葡萄牙", away: "剛果", date: "2026-06-17T10:00:00-07:00", status: "NS" },
-                    { id: "2022", home: "英格蘭", away: "克羅地亞", date: "2026-06-17T13:00:00-07:00", status: "NS" }
+                    // 第一輪分組賽 (Match 1-24)
+                    { id: "2001", home: "墨西哥", away: "南非", date: new Date(2026, 5, 11, 12, 0, 0).toISOString(), status: "NS" },
+                    { id: "2002", home: "韓國", away: "捷克", date: new Date(2026, 5, 11, 19, 0, 0).toISOString(), status: "NS" },
+                    { id: "2003", home: "加拿大", away: "波斯尼亞", date: new Date(2026, 5, 12, 12, 0, 0).toISOString(), status: "NS" },
+                    { id: "2004", home: "美國", away: "巴拉圭", date: new Date(2026, 5, 12, 18, 0, 0).toISOString(), status: "NS" },
+                    { id: "2005", home: "卡塔爾", away: "瑞士", date: new Date(2026, 5, 13, 12, 0, 0).toISOString(), status: "NS" },
+                    { id: "2006", home: "巴西", away: "摩洛哥", date: new Date(2026, 5, 13, 15, 0, 0).toISOString(), status: "NS" },
+                    { id: "2007", home: "海地", away: "蘇格蘭", date: new Date(2026, 5, 13, 18, 0, 0).toISOString(), status: "NS" },
+                    { id: "2008", home: "澳洲", away: "土耳其", date: new Date(2026, 5, 13, 21, 0, 0).toISOString(), status: "NS" },
+                    { id: "2009", home: "德國", away: "庫拉索", date: new Date(2026, 5, 14, 10, 0, 0).toISOString(), status: "NS" },
+                    { id: "2010", home: "荷蘭", away: "日本", date: new Date(2026, 5, 14, 13, 0, 0).toISOString(), status: "NS" },
+                    { id: "2011", home: "科特迪瓦", away: "厄瓜多爾", date: new Date(2026, 5, 14, 16, 0, 0).toISOString(), status: "NS" },
+                    { id: "2012", home: "瑞典", away: "突尼西亞", date: new Date(2026, 5, 14, 19, 0, 0).toISOString(), status: "NS" },
+                    { id: "2013", home: "西班牙", away: "佛得角", date: new Date(2026, 5, 15, 9, 0, 0).toISOString(), status: "NS" },
+                    { id: "2014", home: "比利時", away: "埃及", date: new Date(2026, 5, 15, 12, 0, 0).toISOString(), status: "NS" },
+                    { id: "2015", home: "沙特", away: "烏拉圭", date: new Date(2026, 5, 15, 15, 0, 0).toISOString(), status: "NS" },
+                    { id: "2016", home: "伊朗", away: "新西蘭", date: new Date(2026, 5, 15, 18, 0, 0).toISOString(), status: "NS" },
+                    { id: "2017", home: "法國", away: "塞內加爾", date: new Date(2026, 5, 16, 12, 0, 0).toISOString(), status: "NS" },
+                    { id: "2018", home: "伊拉克", away: "挪威", date: new Date(2026, 5, 16, 15, 0, 0).toISOString(), status: "NS" },
+                    { id: "2019", home: "阿根廷", away: "阿爾及利亞", date: new Date(2026, 5, 16, 18, 0, 0).toISOString(), status: "NS" },
+                    { id: "2020", home: "奧地利", away: "約旦", date: new Date(2026, 5, 16, 21, 0, 0).toISOString(), status: "NS" },
+                    { id: "2021", home: "葡萄牙", away: "剛果", date: new Date(2026, 5, 17, 10, 0, 0).toISOString(), status: "NS" },
+                    { id: "2022", home: "英格蘭", away: "克羅地亞", date: new Date(2026, 5, 17, 13, 0, 0).toISOString(), status: "NS" },
+                    { id: "2023", home: "威爾斯", away: "丹麥", date: new Date(2026, 5, 17, 16, 0, 0).toISOString(), status: "NS" },
+                    { id: "2024", home: "加納", away: "塞爾維亞", date: new Date(2026, 5, 17, 19, 0, 0).toISOString(), status: "NS" },
+
+                    // 第二輪分組賽 (Match 25-48)
+                    ...Array.from({length: 24}, (_, i) => ({ id: `20${25+i}`, home: `組別${String.fromCharCode(65+Math.floor(i/2))} 隊伍1`, away: `組別${String.fromCharCode(65+Math.floor(i/2))} 隊伍3`, date: new Date(2026, 5, 18 + Math.floor(i/4), 12 + (i%4)*3, 0, 0).toISOString(), status: "NS" })),
+
+                    // 第三輪分組賽 (Match 49-72)
+                    ...Array.from({length: 24}, (_, i) => ({ id: `20${49+i}`, home: `組別${String.fromCharCode(65+Math.floor(i/2))} 隊伍1`, away: `組別${String.fromCharCode(65+Math.floor(i/2))} 隊伍4`, date: new Date(2026, 5, 24 + Math.floor(i/4), 12 + (i%4)*3, 0, 0).toISOString(), status: "NS" })),
+
+                    // 淘汰賽: 32強 (Match 73-88)
+                    ...Array.from({length: 16}, (_, i) => ({ id: `20${73+i}`, home: `首名出線 (場${i+1})`, away: `次/季名 (場${i+1})`, date: new Date(2026, 5, 28 + Math.floor(i/3), 12 + (i%3)*3, 0, 0).toISOString(), status: "NS" })),
+
+                    // 淘汰賽: 16強 (Match 89-96)
+                    ...Array.from({length: 8}, (_, i) => ({ id: `20${89+i}`, home: `16強晉級A (場${i+1})`, away: `16強晉級B (場${i+1})`, date: new Date(2026, 6, 4 + Math.floor(i/2), 12 + (i%2)*4, 0, 0).toISOString(), status: "NS" })), // 注意 JS Date 中 6 = 7月
+
+                    // 淘汰賽: 8強 (Match 97-100)
+                    { id: "2097", home: "8強晉級A", away: "8強晉級B", date: new Date(2026, 6, 9, 12, 0, 0).toISOString(), status: "NS" },
+                    { id: "2098", home: "8強晉級C", away: "8強晉級D", date: new Date(2026, 6, 9, 16, 0, 0).toISOString(), status: "NS" },
+                    { id: "2099", home: "8強晉級E", away: "8強晉級F", date: new Date(2026, 6, 10, 12, 0, 0).toISOString(), status: "NS" },
+                    { id: "2100", home: "8強晉級G", away: "8強晉級H", date: new Date(2026, 6, 10, 16, 0, 0).toISOString(), status: "NS" },
+
+                    // 淘汰賽: 4強 (Match 101-102)
+                    { id: "2101", home: "4強晉級 1", away: "4強晉級 2", date: new Date(2026, 6, 14, 16, 0, 0).toISOString(), status: "NS" },
+                    { id: "2102", home: "4強晉級 3", away: "4強晉級 4", date: new Date(2026, 6, 15, 16, 0, 0).toISOString(), status: "NS" },
+
+                    // 季軍戰 (Match 103)
+                    { id: "2103", home: "4強落敗方 A", away: "4強落敗方 B", date: new Date(2026, 6, 18, 16, 0, 0).toISOString(), status: "NS" },
+
+                    // 🏆 決賽 (Match 104)
+                    { id: "2104", home: "決賽球隊 A", away: "決賽球隊 B", date: new Date(2026, 6, 19, 12, 0, 0).toISOString(), status: "NS" }
                 ];
 
                 globalMatches = mockJSON.map(item => {
@@ -205,7 +232,7 @@
                 });
 
                 renderDateFilter(); renderMatches(); listenToOdds();
-                return; // 🛑 終止執行，截斷對外 API 呼叫
+                return; 
             }
 
             try {
@@ -235,26 +262,38 @@
             }
         }
 
+        // 🚨 已更新：日曆卡片 (Calendar Widget) 介面設計，包含中文星期
         function renderDateFilter() {
             let uniqueDatesMap = new Map();
-            globalMatches.forEach(m => { if(!uniqueDatesMap.has(m.dateStr)) uniqueDatesMap.set(m.dateStr, { dateStr: m.dateStr, dateNum: m.dateNum, month: m.month }); });
+            globalMatches.forEach(m => { 
+                if(!uniqueDatesMap.has(m.dateStr)) {
+                    uniqueDatesMap.set(m.dateStr, { dateStr: m.dateStr, dateNum: m.dateNum, month: m.month, weekday: m.weekday }); 
+                }
+            });
             const uniqueDates = Array.from(uniqueDatesMap.values());
             if (!window.selectedDate && uniqueDates.length > 0) window.selectedDate = uniqueDates[0].dateStr;
-            const selectorContainer = document.getElementById('date-selector'); selectorContainer.innerHTML = '';
+            
+            const selectorContainer = document.getElementById('date-selector'); 
+            selectorContainer.innerHTML = '';
             
             const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
             uniqueDates.forEach((dateObj, idx) => {
                 const isActive = dateObj.dateStr === window.selectedDate;
-                const activeClass = isActive ? 'tab-active' : 'tab-inactive';
-                
                 let monthEng = monthNames[dateObj.month - 1] || 'MTH';
-                let label = `(${dateObj.dateNum} ${monthEng})`;
                 
-                if (idx === 0) label = `第 1 日 ${label}`;
-                else if (idx === 1) label = `第 2 日 ${label}`;
-                
-                selectorContainer.innerHTML += `<button onclick="window.filterByDate('${dateObj.dateStr}')" class="pb-2 text-sm font-bold tracking-wide whitespace-nowrap transition-colors ${activeClass}">${label}</button>`;
+                // 動態 CSS，模擬日曆卡片被選中/未選中嘅立體感
+                let btnClass = isActive 
+                    ? "bg-green-600 text-white shadow-md shadow-green-900/40 border-green-500" 
+                    : "bg-[#1a1a1c] text-gray-500 hover:bg-[#2c2c2e] border-gray-800";
+
+                selectorContainer.innerHTML += `
+                    <button onclick="window.filterByDate('${dateObj.dateStr}')" class="flex flex-col items-center justify-center min-w-[65px] px-2 py-2 rounded-xl border transition-all duration-200 cursor-pointer flex-shrink-0 ${btnClass}">
+                        <span class="text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-green-100' : 'text-gray-600'}">${monthEng}</span>
+                        <span class="text-xl font-black leading-none my-1 ${isActive ? 'text-white' : 'text-gray-300'}">${dateObj.dateNum}</span>
+                        <span class="text-[11px] font-medium ${isActive ? 'text-white' : 'text-gray-500'}">${dateObj.weekday}</span>
+                    </button>
+                `;
             });
         }
 
