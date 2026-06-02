@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorldCup 2026 大茶飯</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body { font-family: 'Inter', -apple-system, sans-serif; background-color: #000000; }
+        .tab-active { color: #fff; border-bottom: 2px solid #10b981; }
+        .tab-inactive { color: #6b7280; border-bottom: 2px solid transparent; }
+        .glass-panel { background: #1c1c1e; border: 1px solid #2c2c2e; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen pb-28">
+
+    <header class="pt-6 pb-4 px-5 bg-black sticky top-0 z-20 border-b border-gray-800">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="https://firebasestorage.googleapis.com/v0/b/worldcup-bet-2026-8a617.firebasestorage.app/o/Screenshot%202026-06-01%20at%2010.18.32%E2%80%AFPM.png?alt=media&token=a11b8071-3285-4a87-8ed1-e103096fba83" alt="WC2026 Official Logo" class="h-14 w-auto object-contain drop-shadow-2xl">
+                <div class="leading-tight">
+                    <h1 class="text-xl font-black text-white tracking-wide">WorldCup 2026</h1>
+                    <h2 class="text-sm font-bold text-green-500 tracking-widest mt-0.5">大茶飯</h2>
+                </div>
+            </div>
+            <div class="flex flex-col items-end">
+                <div class="flex items-center space-x-2 mb-1">
+                    <span class="text-sm font-bold text-green-500" id="header-balance">+$0.0 HKD</span>
+                    <div class="w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold text-white shadow-md border border-gray-500">D</div>
+                </div>
+                <select id="player-select" class="bg-transparent text-gray-500 text-xs focus:outline-none text-right appearance-none cursor-pointer hover:text-gray-300 transition-colors">
+                    <option value="Dennis">👤 Dennis</option>
+                    <option value="Samuel">👤 Samuel</option>
+                    <option value="Charles">👤 Charles</option>
+                    <option value="Michael">👤 Michael</option>
+                    <option value="Sha">👤 Sha</option>
+                    <option value="Travis">👤 Travis</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="p-4 space-y-6">
+        
+        <div id="view-matches">
+            <div id="date-selector" class="flex overflow-x-auto space-x-6 scrollbar-hide border-b border-gray-800 mb-4">
+                <p class="text-sm text-gray-500 pb-2">連線至 API 中...</p>
+            </div>
+            
+            <div id="match-container" class="space-y-5">
+                <p class="text-center text-gray-500 py-10">📡 載入真實賽程中...</p>
+            </div>
+
+            <details class="group mt-10">
+                <summary class="cursor-pointer text-gray-700 text-xs font-bold text-center hover:text-gray-500 transition-colors mb-4">
+                    🔧 展開管理員及派彩專區
+                </summary>
+                <div class="glass-panel rounded-xl p-5 space-y-5">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">1. 選擇賽事</label>
+                        <select id="admin-match-select" class="w-full bg-[#111] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-green-500"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">2. 同步讓球盤</label>
+                        <div class="flex space-x-2">
+                            <input type="text" id="admin-odds-text" class="flex-1 bg-[#111] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-green-500 text-sm" placeholder="盤口 [-0.5/-1] 主 1.87 客 1.89">
+                            <button onclick="window.smartPasteOdds()" class="bg-blue-600 text-white font-bold px-4 rounded-lg">同步</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">3. 完場派彩 (90分鐘內比數)</label>
+                        <div class="bg-red-900/30 border border-red-800 rounded p-2 mb-3">
+                            <p class="text-[11px] text-red-400 font-bold leading-tight">⚠️ 派彩注意：所有注單只計算「90分鐘及補時」之法定賽果。加時 (ET) 及十二碼 (PEN) 入球絕對不計算在內！</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" id="score-home" min="0" class="w-16 bg-[#111] text-white p-3 rounded-lg border border-gray-700 text-center font-bold outline-none focus:border-red-500" placeholder="主">
+                            <span class="text-gray-500 font-bold">:</span>
+                            <input type="number" id="score-away" min="0" class="w-16 bg-[#111] text-white p-3 rounded-lg border border-gray-700 text-center font-bold outline-none focus:border-red-500" placeholder="客">
+                            <button onclick="window.settleMatch()" class="flex-1 bg-red-600 text-white font-bold px-4 rounded-lg">結算派彩</button>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div id="view-leaderboard" class="hidden">
+            <h2 class="text-lg font-bold text-white mb-4 pl-1 uppercase tracking-wider flex items-center">
+                <span class="text-yellow-500 mr-2">🏆</span> 戰績總結
+            </h2>
+            <div id="leaderboard" class="glass-panel rounded-xl p-4 space-y-2">
+                <p class="text-gray-600 text-sm text-center">計算中...</p>
+            </div>
+        </div>
+
+        <div id="view-bets" class="hidden">
+            <h2 class="text-lg font-bold text-white mb-4 pl-1 uppercase tracking-wider flex items-center">
+                <span class="text-blue-500 mr-2">📜</span> 最新注單
+            </h2>
+            <div id="bets-list" class="space-y-3">
+                <p class="text-gray-600 text-sm text-center">載入中...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <nav class="fixed bottom-0 w-full bg-[#1c1c1e] border-t border-gray-800 p-3 flex justify-around items-center z-50 pb-safe">
+        <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/3">
+            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0 1 1 0 01-2 0zM7 9a1 1 0 100 2 1 1 0 000-2zm6 0a1 1 0 100 2 1 1 0 000-2zm-3 3a1 1 0 100 2 1 1 0 000-2z"></path></svg>
+            <span class="text-[10px] font-bold">賽事</span>
+        </div>
+        <div id="tab-leaderboard" onclick="window.switchTab('leaderboard')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/3">
+            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
+            <span class="text-[10px] font-bold">排行榜</span>
+        </div>
+        <div id="tab-bets" onclick="window.switchTab('bets')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/3">
+            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+            <span class="text-[10px] font-bold">最新注單</span>
+        </div>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, updateDoc, doc, setDoc, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyDuBW9UnNW63zrXJz_8dnpujyHPi8bPTTg", authDomain: "worldcup-bet-2026-8a617.firebaseapp.com", projectId: "worldcup-bet-2026-8a617", storageBucket: "worldcup-bet-2026-8a617.firebasestorage.app", messagingSenderId: "833504479945", appId: "1:833504479945:web:a062125e752a6824589b18" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.switchTab = (tabName) => {
+            document.getElementById('view-matches').classList.add('hidden');
+            document.getElementById('view-leaderboard').classList.add('hidden');
+            document.getElementById('view-bets').classList.add('hidden');
+
+            document.getElementById('tab-matches').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/3";
+            document.getElementById('tab-leaderboard').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/3";
+            document.getElementById('tab-bets').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/3";
+
+            if (tabName === 'matches') {
+                document.getElementById('view-matches').classList.remove('hidden');
+                document.getElementById('tab-matches').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/3";
+            } else if (tabName === 'leaderboard') {
+                document.getElementById('view-leaderboard').classList.remove('hidden');
+                document.getElementById('tab-leaderboard').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/3";
+            } else if (tabName === 'bets') {
+                document.getElementById('view-bets').classList.remove('hidden');
+                document.getElementById('tab-bets').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/3";
+            }
+        };
+
+        let globalMatches = [];
+        window.selectedDate = null; 
+        const weekdaysCH = ['日', '一', '二', '三', '四', '五', '六'];
+
+        const getFlag = (teamName) => {
+            const flags = { "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦", "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿", "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺", "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭", "塞爾維亞":"🇷🇸", "加納":"🇬🇭" };
+            for(let key in flags) { if(teamName.includes(key)) return flags[key]; }
+            return "⚽"; 
+        };
+
+        async function loadMatches() {
+            try {
+                console.log("正在連接 api-sports.io (Season: 2022)...");
+                const response = await fetch("https://v3.football.api-sports.io/fixtures?league=1&season=2022", { 
+                    method: "GET", 
+                    headers: { "x-apisports-key": "c97d7ade3c22173f1ec6623c7ef91c23" } 
+                });
+                
+                const data = await response.json();
+                console.log("✅ API 原始數據:", data);
+
+                if (data.errors && Object.keys(data.errors).length > 0) {
+                    throw new Error("API 存取被拒: " + Object.values(data.errors)[0]);
+                }
+
+                if (!data.response || data.response.length === 0) {
+                    throw new Error("API 返回空白數據。");
+                }
+                
+                globalMatches = data.response.map(item => {
+                    const dateObj = new Date(item.fixture.date);
+                    let cleanHome = item.teams.home.name.replace(/[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g, '').trim();
+                    let cleanAway = item.teams.away.name.replace(/[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g, '').trim();
+                    return { 
+                        id: item.fixture.id.toString(), 
+                        home: cleanHome, 
+                        away: cleanAway, 
+                        status: item.fixture.status.short, 
+                        scoreHome: item.goals.home, 
+                        scoreAway: item.goals.away, 
+                        dateStr: dateObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' }), 
+                        month: dateObj.getMonth() + 1, 
+                        dateNum: dateObj.getDate(), 
+                        weekday: '星期' + weekdaysCH[dateObj.getDay()], 
+                        kickoff: dateObj.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' }), 
+                        odds: { handicapStr: "", home: 0.00, away: 0.00 } 
+                    };
+                });
+
+                renderDateFilter(); 
+                renderMatches(); 
+                listenToOdds(); 
+
+            } catch (error) {
+                console.error("🚨 賽程載入中斷:", error);
+                document.getElementById('date-selector').innerHTML = '';
+                document.getElementById('match-container').innerHTML = `
+                    <div class="glass-panel rounded-2xl p-6 text-center border-red-900/50 mt-4 mx-2">
+                        <span class="text-4xl mb-3 block">⚠️</span>
+                        <h3 class="text-red-500 font-bold text-lg mb-2">API 載入失敗</h3>
+                        <p class="text-gray-300 text-sm mb-4 leading-relaxed">${error.message}</p>
+                    </div>`;
+                listenToOdds();
+            }
+        }
+
+        function renderDateFilter() {
+            let uniqueDatesMap = new Map();
+            globalMatches.forEach(m => { if(!uniqueDatesMap.has(m.dateStr)) uniqueDatesMap.set(m.dateStr, { dateStr: m.dateStr, dateNum: m.dateNum, month: m.month }); });
+            const uniqueDates = Array.from(uniqueDatesMap.values());
+            if (!window.selectedDate && uniqueDates.length > 0) window.selectedDate = uniqueDates[0].dateStr;
+            const selectorContainer = document.getElementById('date-selector'); selectorContainer.innerHTML = '';
+            
+            const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+            uniqueDates.forEach((dateObj, idx) => {
+                const isActive = dateObj.dateStr === window.selectedDate;
+                const activeClass = isActive ? 'tab-active' : 'tab-inactive';
+                
+                let monthEng = monthNames[dateObj.month - 1] || 'MTH';
+                let label = `(${dateObj.dateNum} ${monthEng})`;
+                
+                if (idx === 0) label = `第 1 日 ${label}`;
+                else if (idx === 1) label = `第 2 日 ${label}`;
+                
+                selectorContainer.innerHTML += `<button onclick="window.filterByDate('${dateObj.dateStr}')" class="pb-2 text-sm font-bold tracking-wide whitespace-nowrap transition-colors ${activeClass}">${label}</button>`;
+            });
+        }
+
+        window.filterByDate = (dateStr) => { window.selectedDate = dateStr; renderDateFilter(); renderMatches(); };
+
+        function renderMatches() {
+            const container = document.getElementById('match-container'), adminSelect = document.getElementById('admin-match-select');
+            container.innerHTML = ''; adminSelect.innerHTML = ''; 
+            
+            if (globalMatches.length === 0) return;
+
+            const matchesToShow = globalMatches.filter(m => m.dateStr === window.selectedDate);
+            if(matchesToShow.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 py-10">此日無賽事</p>'; return; }
+            
+            matchesToShow.forEach(match => {
+                adminSelect.innerHTML += `<option value="${match.id}">${match.home} VS ${match.away}</option>`;
+                
+                let isOddsReady = match.odds.home > 0;
+                let isStarted = match.status !== 'NS' && match.status !== 'TBD';
+                let isFinished = ['FT', 'AET', 'PEN'].includes(match.status);
+                let canBet = isOddsReady && !isStarted;
+
+                let statusBadge = '', statusText = '';
+                if (isFinished) {
+                    statusBadge = '<span class="bg-gray-700/50 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">LOCKED</span>';
+                    statusText = '<span class="text-gray-400">🚫 賽事已完結</span>';
+                } else if (isStarted) {
+                    statusBadge = '<span class="bg-gray-700/50 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">LOCKED</span>';
+                    statusText = '<span class="text-red-500 animate-pulse">🚩 賽事進行中 (LOCKED)</span>';
+                } else if (isOddsReady) {
+                    statusBadge = '<span class="bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">ACTIVE</span>';
+                    statusText = `<span class="text-gray-400">📅 ${match.kickoff} 開賽</span>`;
+                } else {
+                    statusBadge = '<span class="bg-yellow-500/20 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">WAITING</span>';
+                    statusText = `<span class="text-gray-400">📅 ${match.kickoff} 開賽 | 盤口未開</span>`;
+                }
+                
+                let homeHandicapStr = match.odds.handicapStr || "";
+                let awayHandicapStr = "";
+                if(homeHandicapStr && homeHandicapStr !== "[0]") {
+                    let parts = homeHandicapStr.replace('[','').replace(']','').split('/');
+                    awayHandicapStr = "[" + parts.map(p => { let n = parseFloat(p) * -1; return n > 0 ? "+" + n : n.toString(); }).join('/') + "]";
+                } else if (homeHandicapStr === "[0]") { awayHandicapStr = "[0]"; }
+
+                let homeHandicapDisplay = homeHandicapStr ? `<span class="text-[10px] text-yellow-500 ml-2 font-mono">${homeHandicapStr}</span>` : '';
+                let awayHandicapDisplay = awayHandicapStr ? `<span class="text-[10px] text-yellow-500 mr-2 font-mono">${awayHandicapStr}</span>` : '';
+                
+                let flagH = getFlag(match.home), flagA = getFlag(match.away);
+
+                let scoreDisplay = '';
+                if (match.scoreHome !== null && match.scoreAway !== null) {
+                    scoreDisplay = `<p class="text-sm font-bold mt-1 text-gray-200">比分: ${match.home} <span class="${isFinished?'text-yellow-500':'text-red-500'}">${match.scoreHome} - ${match.scoreAway}</span> ${match.away}</p>`;
+                }
+
+                let btnClass = canBet ? "bg-[#2c2c2e] hover:bg-[#3c3c3e] cursor-pointer" : "bg-[#1a1a1c] text-gray-600 cursor-not-allowed";
+                let oddsColor = canBet ? "text-white" : "text-gray-600";
+                
+                container.innerHTML += `
+                    <div class="glass-panel rounded-2xl p-4 relative overflow-hidden transition-all">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-gray-400 text-xs font-semibold tracking-wide uppercase">Upcoming</span>
+                            ${statusBadge}
+                        </div>
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center space-x-2 w-2/5">
+                                <span class="text-2xl">${flagH}</span>
+                                <span class="font-bold text-lg text-white whitespace-nowrap">${match.home}</span>
+                            </div>
+                            <div class="w-1/5 text-center text-gray-500 text-xs font-bold uppercase">VS</div>
+                            <div class="flex items-center justify-end space-x-2 w-2/5">
+                                <span class="font-bold text-lg text-white whitespace-nowrap">${match.away}</span>
+                                <span class="text-2xl">${flagA}</span>
+                            </div>
+                        </div>
+                        <div class="text-xs mb-3 space-y-1">
+                            <p>${statusText}</p>
+                            ${scoreDisplay}
+                        </div>
+                        <div class="bg-[#111] p-1 rounded-xl flex space-x-1 mb-2">
+                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${match.home}', ${match.odds.home})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors">
+                                <span class="font-bold ${oddsColor}">${match.odds.home > 0 ? match.odds.home.toFixed(2) : '-'}</span>
+                                <div class="flex flex-col items-start leading-none">
+                                    <span class="text-[10px] ${canBet?'text-gray-400':'text-gray-600'}">${flagH} 勝</span>
+                                    ${homeHandicapDisplay}
+                                </div>
+                            </button>
+                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${match.away}', ${match.odds.away})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors">
+                                <span class="font-bold ${oddsColor}">${match.odds.away > 0 ? match.odds.away.toFixed(2) : '-'}</span>
+                                <div class="flex flex-col items-start leading-none">
+                                    <span class="text-[10px] ${canBet?'text-gray-400':'text-gray-600'}">${flagA} 勝</span>
+                                    ${awayHandicapDisplay}
+                                </div>
+                            </button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function listenToOdds() { 
+            onSnapshot(collection(db, "odds"), (snapshot) => { 
+                if(globalMatches.length === 0) return;
+                let needsRender = false; 
+                snapshot.forEach((doc) => { 
+                    const newOdds = doc.data(); 
+                    const matchIndex = globalMatches.findIndex(m => m.id === doc.id); 
+                    if(matchIndex !== -1) { 
+                        globalMatches[matchIndex].odds = { handicapStr: newOdds.handicapStr || "", home: newOdds.home, away: newOdds.away }; 
+                        needsRender = true; 
+                    } 
+                }); 
+                if(needsRender) renderMatches(); 
+            }); 
+        }
+        
+        loadMatches();
+
+        window.smartPasteOdds = async () => {
+            const pwd = prompt("🔐 請輸入莊家密碼："); if (pwd !== "1971") { alert("❌ 密碼錯誤"); return; }
+            const matchId = document.getElementById('admin-match-select').value, text = document.getElementById('admin-odds-text').value;
+            if(!text) return;
+            const matchHcap = text.match(/\[(.*?)\]/), matchHome = text.match(/主[^0-9]*([0-9.]+)/), matchAway = text.match(/客[^0-9]*([0-9.]+)/);
+            if(matchHcap && matchHome && matchAway) {
+                const hStr = `[${matchHcap[1]}]`;
+                if(confirm(`🎯 破解成功！盤口: ${hStr}\n確定同步？`)) {
+                    await setDoc(doc(db, "odds", matchId), { handicapStr: hStr, home: parseFloat(matchHome[1]), away: parseFloat(matchAway[1]), updatedAt: serverTimestamp() }); 
+                    document.getElementById('admin-odds-text').value = ''; 
+                }
+            } else alert("❌ 格式錯誤");
+        };
+
+        window.settleMatch = async () => {
+            const pwd = prompt("🔐 密碼："); if (pwd !== "1971") return;
+            const matchId = document.getElementById('admin-match-select').value, scoreHome = parseInt(document.getElementById('score-home').value), scoreAway = parseInt(document.getElementById('score-away').value);
+            if(isNaN(scoreHome) || isNaN(scoreAway)) return;
+            const match = globalMatches.find(m => m.id === matchId); if (!match) return;
+            if(!confirm(`⚠️ 確定賽果 ${scoreHome}:${scoreAway} (90分鐘內)？`)) return;
+
+            let hcapStr = match.odds.handicapStr.replace('[', '').replace(']', '').replace('+', ''), hcapVal = 0;
+            if(hcapStr.includes('/')) { let parts = hcapStr.split('/'); hcapVal = (parseFloat(parts[0]) + parseFloat(parts[1])) / 2; } else { hcapVal = parseFloat(hcapStr) || 0; }
+            let netHomeScore = scoreHome - scoreAway + hcapVal;
+
+            try {
+                const snapshot = await getDocs(query(collection(db, "bets"), where("matchId", "==", matchId), where("settled", "==", false)));
+                snapshot.forEach(async (document) => { 
+                    const bet = document.data(); let profit = 0; let betNetScore = bet.selection === match.home ? netHomeScore : -netHomeScore;
+                    if (betNetScore >= 0.5) profit = bet.amount * (bet.odds - 1); else if (betNetScore === 0.25) profit = (bet.amount / 2) * (bet.odds - 1); else if (betNetScore === 0) profit = 0; else if (betNetScore === -0.25) profit = -(bet.amount / 2); else profit = -bet.amount;
+                    let detailMsg = `賽果 ${scoreHome}:${scoreAway} | 盤口 ${match.odds.handicapStr||"[0]"} | 淨勝 ${betNetScore>0?'+'+betNetScore:betNetScore}球`;
+                    await updateDoc(doc(db, "bets", document.id), { settled: true, profit: profit, settleDetail: detailMsg }); 
+                });
+                alert("✅ 派彩完成"); document.getElementById('score-home').value = ''; document.getElementById('score-away').value = '';
+            } catch(e) { alert("❌ 失敗"); }
+        };
+
+        window.placeBet = async (matchId, selection, odds) => {
+            if(odds === 0) return;
+            const currentPlayer = document.getElementById('player-select').value, betAmount = prompt(`以「${currentPlayer}」落注\n買 ${selection} (賠率: ${odds})\n輸入注碼：`, "100");
+            if (betAmount && !isNaN(betAmount) && Number(betAmount) > 0) { 
+                await addDoc(collection(db, "bets"), { player: currentPlayer, matchId: matchId, selection: selection, odds: odds, amount: Number(betAmount), settled: false, profit: 0, timestamp: serverTimestamp() }); 
+            }
+        };
+
+        onSnapshot(query(collection(db, "bets"), orderBy("timestamp", "desc")), (snapshot) => {
+            const betsList = document.getElementById('bets-list'), leaderboardDiv = document.getElementById('leaderboard');
+            betsList.innerHTML = ''; let balances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
+            if (snapshot.empty) { betsList.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; leaderboardDiv.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; return; }
+            
+            snapshot.forEach((doc) => {
+                const bet = doc.data(); let resTxt = "等待開彩", resCol = "text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded";
+                if (bet.settled) {
+                    if (bet.profit > 0 && bet.profit < (bet.amount * (bet.odds - 1))) { resTxt = `贏半 +$${bet.profit.toFixed(1)}`; resCol = "text-green-400 bg-green-500/10 px-2 py-1 rounded"; }
+                    else if (bet.profit > 0) { resTxt = `贏全 +$${bet.profit.toFixed(1)}`; resCol = "text-green-500 font-bold bg-green-500/10 px-2 py-1 rounded"; }
+                    else if (bet.profit === 0) { resTxt = `走水 $0`; resCol = "text-gray-400 bg-gray-600/20 px-2 py-1 rounded"; }
+                    else if (bet.profit < 0 && bet.profit > -bet.amount) { resTxt = `輸半 -$${Math.abs(bet.profit).toFixed(1)}`; resCol = "text-red-400 bg-red-500/10 px-2 py-1 rounded"; }
+                    else { resTxt = `輸全 -$${Math.abs(bet.profit).toFixed(1)}`; resCol = "text-red-500 font-bold bg-red-500/10 px-2 py-1 rounded"; }
+                }
+                betsList.innerHTML += `
+                    <div class="glass-panel p-4 rounded-xl flex justify-between items-center mb-3">
+                        <div>
+                            <p class="font-bold text-gray-200 text-sm mb-1">${bet.player}</p>
+                            <p class="text-xs text-gray-400">買: ${bet.selection} <span class="font-mono text-gray-300">($${bet.amount})</span></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs ${resCol}">${resTxt}</span>
+                            <span class="block text-[10px] text-gray-500 mt-2 font-mono tracking-tighter">${bet.settleDetail||''}</span>
+                        </div>
+                    </div>`;
+                if (bet.settled && balances[bet.player] !== undefined) balances[bet.player] += bet.profit;
+            });
+            
+            leaderboardDiv.innerHTML = '';
+            
+            const updateHeaderBalance = () => {
+                let currentUser = document.getElementById('player-select').value;
+                let bal = balances[currentUser] || 0;
+                let headerBal = document.getElementById('header-balance');
+                headerBal.innerText = `${bal > 0 ? '+' : ''}$${bal.toFixed(1)} HKD`;
+                headerBal.className = `text-sm font-bold ${bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400')}`;
+            };
+            updateHeaderBalance();
+            document.getElementById('player-select').addEventListener('change', updateHeaderBalance);
+
+            Object.keys(balances).sort((a, b) => balances[b] - balances[a]).forEach((p, i) => {
+                let bal = balances[p], cClass = bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400');
+                let medal = i===0?'🥇':(i===1?'🥈':(i===2?'🥉':'👤'));
+                leaderboardDiv.innerHTML += `
+                    <div class="flex justify-between items-center py-2 border-b border-gray-800 last:border-0">
+                        <span class="text-gray-300 text-sm"><span class="mr-2 text-lg">${medal}</span>${p}</span>
+                        <span class="font-bold font-mono ${cClass}">${bal>0?'+':''}$${bal.toFixed(1)}</span>
+                    </div>`;
+            });
+        });
+    </script>
+</body>
+</html>
