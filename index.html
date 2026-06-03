@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WorldCup 2026 大茶飯</title>
+    
+    <!-- 📱 PWA (Progressive Web App) 設定 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
@@ -13,6 +19,7 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* 🗺️ 晉級形勢圖完美折線 CSS */
         .bracket-pair { position: relative; display: flex; flex-direction: column; gap: 1rem; justify-content: center; }
         .bracket-pair::after {
             content: ''; position: absolute; right: -24px; top: 32px; bottom: 32px;
@@ -287,11 +294,8 @@
             }
         }
 
-        // 🚨 智能落注助手：自動尋找該隊伍嘅最新一場賽事
         window.betOnTeam = (teamName) => {
-            // 優先搵未完場嘅賽事
             let match = globalMatches.find(m => (m.home === teamName || m.away === teamName) && !['FT', 'AET', 'PEN'].includes(m.status));
-            // 搵唔到就 fallback 返第一場搵到嘅
             if (!match) match = globalMatches.find(m => m.home === teamName || m.away === teamName);
             
             if(match) {
@@ -310,8 +314,6 @@
             const bracketDiv = document.getElementById('bracket-content');
             let html = '<div class="flex space-x-12 min-w-max p-4 h-[1200px]">';
 
-            // 第一列：分組賽 (Group Stage)
-            // 🚨 已修正：寬度強制與淘汰賽統一 (w-48)，並加入右側 Padding 以容納折線
             html += '<div class="flex flex-col justify-around w-48 pr-6 border-r border-gray-800">';
             html += '<div class="text-xs font-bold text-gray-500 text-center mb-2">分組賽 (GS)</div>';
             
@@ -325,7 +327,6 @@
             };
 
             Object.keys(groupTeams).forEach(g => {
-                // 🚨 每個國家依家都變成可點擊，並顯示動態賠率
                 let teamsHtml = groupTeams[g].map(team => {
                     let m = globalMatches.find(x => (x.home === team || x.away === team) && !['FT', 'AET', 'PEN'].includes(x.status));
                     if(!m) m = globalMatches.find(x => x.home === team || x.away === team);
@@ -345,7 +346,6 @@
                     </div>`;
                 }).join('<div class="border-b border-gray-700 w-full my-0.5"></div>');
                 
-                // 🚨 統一外框風格
                 html += `<div class="rounded-lg border border-gray-700 bg-[#1c1c1e] flex flex-col justify-center px-2 py-1.5 mb-6 shadow-sm relative">
                             <div class="text-gray-400 text-[10px] font-bold mb-1 border-b border-gray-700 pb-1 text-center">Group ${g}</div>
                             ${teamsHtml}
@@ -353,7 +353,6 @@
             });
             html += '</div>';
 
-            // 第二列之後：淘汰賽 (Knockout Phase)
             const rounds = [
                 { name: "32 強 (R32)", matchIds: Array.from({length:16}, (_,i)=> `20${73+i}`) },
                 { name: "16 強 (R16)", matchIds: Array.from({length:8}, (_,i)=> `20${89+i}`) },
@@ -364,7 +363,6 @@
 
             rounds.forEach((round, colIndex) => {
                 let isFinal = colIndex === rounds.length - 1;
-                // 🚨 左邊留 Padding 等折線有位伸入去
                 html += `<div class="flex flex-col justify-around w-48 pl-6 relative">`;
                 html += `<div class="text-xs font-bold ${isFinal ? 'text-yellow-500' : 'text-gray-500'} text-center absolute -top-4 w-full">${round.name}</div>`;
 
