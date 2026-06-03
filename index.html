@@ -27,7 +27,7 @@
             <div class="flex flex-col items-end">
                 <div class="flex items-center space-x-2 mb-1">
                     <span class="text-sm font-bold text-green-500" id="header-balance">+$0.0 HKD</span>
-                    <div class="w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold text-white shadow-md border border-gray-500">D</div>
+                    <div id="header-avatar" class="w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center text-xs font-bold text-white shadow-md border border-gray-500">D</div>
                 </div>
                 <select id="player-select" class="bg-transparent text-gray-500 text-xs focus:outline-none text-right appearance-none cursor-pointer hover:text-gray-300 transition-colors">
                     <option value="Dennis">👤 Dennis</option>
@@ -121,12 +121,16 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        // 🚨 引入咗 getDoc，用嚟讀取單一 Document 嘅數據
         import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, updateDoc, doc, setDoc, where, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDuBW9UnNW63zrXJz_8dnpujyHPi8bPTTg", authDomain: "worldcup-bet-2026-8a617.firebaseapp.com", projectId: "worldcup-bet-2026-8a617", storageBucket: "worldcup-bet-2026-8a617.firebasestorage.app", messagingSenderId: "833504479945", appId: "1:833504479945:web:a062125e752a6824589b18" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        // 🚨 狀態管理 (State Management)：確保使用者驗證流程順暢
+        window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
+        window.authenticatedUser = null; 
+        window.previousUser = "Dennis"; // 預設首個顯示嘅玩家
 
         window.switchTab = (tabName) => {
             document.getElementById('view-matches').classList.add('hidden');
@@ -427,38 +431,95 @@
             } catch(e) { alert("❌ 失敗"); }
         };
 
-        // 🚨 已更新：真正嘅 Database Security！即時連接 Firebase 核對密碼，徹底隱藏於 Code 之外
+        // 🚨 修正 1：抽出獨立嘅 UI 更新函數，支援動態 Avatar 轉換
+        window.updateHeaderBalance = () => {
+            let currentUser = document.getElementById('player-select').value;
+            let bal = window.playerBalances[currentUser] || 0;
+            let headerBal = document.getElementById('header-balance');
+            headerBal.innerText = `${bal > 0 ? '+' : ''}$${bal.toFixed(1)} HKD`;
+            headerBal.className = `text-sm font-bold ${bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400')}`;
+            // 更新圓形 Avatar 第一個英文字母
+            document.getElementById('header-avatar').innerText = currentUser.charAt(0);
+        };
+
+        // 🚨 修正 2：將密碼驗證綁定喺「Dropdown 轉換玩家」事件
+        document.getElementById('player-select').addEventListener('change', async (e) => {
+            const selectedUser = e.target.value;
+            
+            const enteredPin = prompt(`🔐 切換帳號驗證\n請輸入「${selectedUser}」嘅專屬 4 位 PIN 碼：`);
+            
+            if (!enteredPin) {
+                // 如果撳取消，強制退回原本嘅玩家
+                e.target.value = window.previousUser;
+                return;
+            }
+
+            try {
+                // 去 Firebase 提取密碼核對
+                const playerDocRef = doc(db, "players", selectedUser);
+                const playerDocSnap = await getDoc(playerDocRef);
+
+                if (playerDocSnap.exists() && playerDocSnap.data().pin === enteredPin) {
+                    window.authenticatedUser = selectedUser;
+                    window.previousUser = selectedUser; // 記錄成功登入嘅身分
+                    alert(`✅ 切換成功！目前登入為 ${selectedUser}。`);
+                    window.updateHeaderBalance();
+                } else {
+                    alert("❌ 密碼錯誤！無權切換至此帳號。");
+                    e.target.value = window.previousUser; // 撞錯密碼，退回原本玩家
+                }
+            } catch (error) {
+                console.error(error);
+                alert("🚨 系統錯誤：無法連接至伺服器驗證密碼。");
+                e.target.value = window.previousUser;
+            }
+        });
+
+        // 🚨 修正 3：落注只需檢查係咪已經登入，唔使次次入密碼
         window.placeBet = async (matchId, selection, odds) => {
             if(odds === 0) return;
             const currentPlayer = document.getElementById('player-select').value;
             
-            const enteredPin = prompt(`🔐 安全驗證\n請輸入「${currentPlayer}」嘅專屬 4 位 PIN 碼：`);
-            if (!enteredPin) return; // 使用者按取消
+            // 如果從未驗證過 (例如啱啱 Load 網頁未郁過 Dropdown)，先迫佢入一次密碼
+            if (window.authenticatedUser !== currentPlayer) {
+                const enteredPin = prompt(`🔐 安全驗證\n請輸入「${currentPlayer}」嘅專屬 4 位 PIN 碼：`);
+                if (!enteredPin) return; 
 
-            try {
-                // 📡 即時去 Firebase Firestore 提取該玩家嘅密碼進行核對
-                const playerDocRef = doc(db, "players", currentPlayer);
-                const playerDocSnap = await getDoc(playerDocRef);
+                try {
+                    const playerDocRef = doc(db, "players", currentPlayer);
+                    const playerDocSnap = await getDoc(playerDocRef);
 
-                if (playerDocSnap.exists() && playerDocSnap.data().pin === enteredPin) {
-                    const betAmount = prompt(`✅ 驗證成功！\n以「${currentPlayer}」落注\n買 ${selection} (賠率: ${odds})\n輸入注碼：`, "100");
-                    
-                    if (betAmount && !isNaN(betAmount) && Number(betAmount) > 0) { 
-                        await addDoc(collection(db, "bets"), { player: currentPlayer, matchId: matchId, selection: selection, odds: odds, amount: Number(betAmount), settled: false, profit: 0, timestamp: serverTimestamp() }); 
-                        alert("✅ 落注成功！");
+                    if (playerDocSnap.exists() && playerDocSnap.data().pin === enteredPin) {
+                        window.authenticatedUser = currentPlayer;
+                        window.previousUser = currentPlayer;
+                    } else {
+                        alert("❌ 密碼錯誤！嚴禁代人落注！");
+                        return;
                     }
-                } else {
-                    alert("❌ 密碼錯誤！嚴禁代人落注！");
+                } catch (error) {
+                    console.error("驗證錯誤: ", error);
+                    alert("🚨 系統錯誤：無法連接至伺服器驗證密碼。");
+                    return;
                 }
-            } catch (error) {
-                console.error("驗證錯誤: ", error);
-                alert("🚨 系統錯誤：無法連接至伺服器驗證密碼，請確保 Firebase 已經建立對應嘅 Document。");
+            }
+
+            // 已經成功驗證過，直接彈出輸入注碼框
+            const betAmount = prompt(`✅ 以「${currentPlayer}」身份落注\n買 ${selection} (賠率: ${odds})\n輸入注碼：`, "100");
+            
+            if (betAmount && !isNaN(betAmount) && Number(betAmount) > 0) { 
+                await addDoc(collection(db, "bets"), { player: currentPlayer, matchId: matchId, selection: selection, odds: odds, amount: Number(betAmount), settled: false, profit: 0, timestamp: serverTimestamp() }); 
+                alert("✅ 落注成功！");
             }
         };
 
+        // 🚨 修正 4：修復 Memory Leak 問題，將狀態儲存改為 Global Window Object
         onSnapshot(query(collection(db, "bets"), orderBy("timestamp", "desc")), (snapshot) => {
             const betsList = document.getElementById('bets-list'), leaderboardDiv = document.getElementById('leaderboard');
-            betsList.innerHTML = ''; let balances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
+            betsList.innerHTML = ''; 
+            
+            // 每次資料庫更新，重置餘額計算
+            window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
+            
             if (snapshot.empty) { betsList.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; leaderboardDiv.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; return; }
             
             snapshot.forEach((doc) => {
@@ -481,23 +542,16 @@
                             <span class="block text-[10px] text-gray-500 mt-2 font-mono tracking-tighter">${bet.settleDetail||''}</span>
                         </div>
                     </div>`;
-                if (bet.settled && balances[bet.player] !== undefined) balances[bet.player] += bet.profit;
+                if (bet.settled && window.playerBalances[bet.player] !== undefined) window.playerBalances[bet.player] += bet.profit;
             });
             
             leaderboardDiv.innerHTML = '';
             
-            const updateHeaderBalance = () => {
-                let currentUser = document.getElementById('player-select').value;
-                let bal = balances[currentUser] || 0;
-                let headerBal = document.getElementById('header-balance');
-                headerBal.innerText = `${bal > 0 ? '+' : ''}$${bal.toFixed(1)} HKD`;
-                headerBal.className = `text-sm font-bold ${bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400')}`;
-            };
-            updateHeaderBalance();
-            document.getElementById('player-select').addEventListener('change', updateHeaderBalance);
+            // 呼叫獨立嘅 UI 更新函數 (唔再重複綁定 Event Listener)
+            window.updateHeaderBalance();
 
-            Object.keys(balances).sort((a, b) => balances[b] - balances[a]).forEach((p, i) => {
-                let bal = balances[p], cClass = bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400');
+            Object.keys(window.playerBalances).sort((a, b) => window.playerBalances[b] - window.playerBalances[a]).forEach((p, i) => {
+                let bal = window.playerBalances[p], cClass = bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400');
                 let medal = i===0?'🥇':(i===1?'🥈':(i===2?'🥉':'👤'));
                 leaderboardDiv.innerHTML += `
                     <div class="flex justify-between items-center py-2 border-b border-gray-800 last:border-0">
