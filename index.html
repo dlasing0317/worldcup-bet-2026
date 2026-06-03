@@ -2,9 +2,11 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 🚨 已加入 maximum-scale=1.0, user-scalable=no 徹底鎖死畫面縮放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>大茶飯</title>
     
+    <!-- 📱 PWA 終極設定 -->
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoi5aSn6Iy26aOvIiwic2hvcnRfbmFtZSI6IuWkp+iMtumjryIsInN0YXJ0X3VybCI6Ii4vaW5kZXguaHRtbCIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwMDAwMDAiLCJ0aGVtZV9jb2xvciI6IiMwMDAwMDAiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi93b3JsZGN1cC1iZXQtMjAyNi04YTYxNy5maXJlYmFzZXN0b3JhZ2UuYXBwL28vU2NyZWVuc2hvdCUyMDIwMjYtMDYtMDIlMjBhdCUyMDIuMzQuMzQlRTIlODAlQUZQTS5wbmc/YWx0PW1lZGlhJnRva2VuPTFkZTllMzRkLTE4YmEtNDM1NC1iYThkLTVlNWYxYmNhYjg1MiIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmcifSx7InNyYyI6Imh0dHBzOi8vZmlyZWJhc2VzdG9yYWdlLmdvb2dsZWFwaXMuY29tL3YwL2Ivd29ybGRjdXAtYmV0LTIwMjYtOGE2MTcuZmlyZWJhc2VzdG9yYWdlLmFwcC9vL1NjcmVlbnNob3QlMjAyMDI2LTA2LTAyJTIwYXQlMjAyLjM0LjM0JUUyJTgwJUFGUE0ucG5nP2FsdD1tZWRpYSZ0b2tlbj0xZGU5ZTM0ZC0xOGJhLTQzNTQtYmE4ZC01ZTVmMWJjYWI4NTIiLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn1dfQ==">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -32,7 +34,6 @@
         }
         .bracket-card { height: 64px; position: relative; z-index: 10; background: #1c1c1e; box-sizing: border-box; }
         
-        /* 隱藏原生 number input 嘅箭咀 */
         input[type="number"]::-webkit-inner-spin-button, 
         input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
@@ -77,7 +78,7 @@
             </div>
 
             <details id="admin-section" class="group mt-10">
-                <summary class="cursor-pointer text-gray-700 text-xs font-bold text-center hover:text-gray-500 transition-colors mb-4">
+                <summary class="cursor-pointer text-gray-700 text-xs font-bold text-center hover:text-gray-500 transition-colors mb-4 touch-manipulation">
                     🔧 展開管理員及派彩專區
                 </summary>
                 <div class="glass-panel rounded-xl p-5 space-y-5">
@@ -89,7 +90,7 @@
                         <label class="block text-xs text-gray-400 mb-1">2. 同步讓球盤</label>
                         <div class="flex space-x-2">
                             <input type="text" id="admin-odds-text" class="flex-1 bg-[#111] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-green-500 text-sm" placeholder="盤口 [-0.5/-1] 主 1.87 客 1.89">
-                            <button onclick="window.smartPasteOdds()" class="bg-blue-600 text-white font-bold px-4 rounded-lg">同步</button>
+                            <button onclick="window.smartPasteOdds()" class="bg-blue-600 text-white font-bold px-4 rounded-lg touch-manipulation">同步</button>
                         </div>
                     </div>
                     <div>
@@ -101,7 +102,7 @@
                             <input type="number" id="score-home" min="0" class="w-16 bg-[#111] text-white p-3 rounded-lg border border-gray-700 text-center font-bold outline-none focus:border-red-500" placeholder="主">
                             <span class="text-gray-500 font-bold">:</span>
                             <input type="number" id="score-away" min="0" class="w-16 bg-[#111] text-white p-3 rounded-lg border border-gray-700 text-center font-bold outline-none focus:border-red-500" placeholder="客">
-                            <button onclick="window.settleMatch()" class="flex-1 bg-red-600 text-white font-bold px-4 rounded-lg">結算派彩</button>
+                            <button onclick="window.settleMatch()" class="flex-1 bg-red-600 text-white font-bold px-4 rounded-lg touch-manipulation">結算派彩</button>
                         </div>
                     </div>
                 </div>
@@ -139,6 +140,7 @@
 
     </main>
 
+    <!-- 落注視窗 -->
     <div id="bet-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="bet-modal-content">
             <h3 class="text-white font-black text-xl mb-2 flex items-center tracking-wide"><span class="mr-2 text-2xl">⚽</span> 確認落注</h3>
@@ -150,38 +152,41 @@
             <div class="bg-[#0a0a0c] rounded-2xl p-5 mb-6 border border-gray-800 shadow-inner">
                 <label class="block text-center text-gray-500 text-[11px] font-bold uppercase tracking-widest mb-4">輸入注碼 ($5 - $100)</label>
                 <div class="flex items-center justify-between px-2">
-                    <button onclick="window.adjustBet(-5)" class="w-12 h-12 rounded-full bg-gray-800 text-gray-300 font-bold text-3xl flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 active:scale-90 transition-all border border-gray-600 shadow-lg">&minus;</button>
+                    <!-- 🚨 加入 touch-manipulation 防止連撳放大 -->
+                    <button onclick="window.adjustBet(-5)" class="w-12 h-12 rounded-full bg-gray-800 text-gray-300 font-bold text-3xl flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 active:scale-90 transition-all border border-gray-600 shadow-lg touch-manipulation">&minus;</button>
                     
                     <div class="flex items-baseline space-x-1">
                         <span class="text-gray-500 font-bold text-xl">$</span>
                         <input type="number" id="bet-amount-input" min="5" max="100" value="10" readonly class="w-16 bg-transparent text-white text-5xl font-black text-center outline-none pointer-events-none p-0 m-0">
                     </div>
 
-                    <button onclick="window.adjustBet(5)" class="w-12 h-12 rounded-full bg-blue-600 text-white font-bold text-3xl flex items-center justify-center hover:bg-blue-500 active:bg-blue-400 active:scale-90 transition-all shadow-lg shadow-blue-900/50">+</button>
+                    <!-- 🚨 加入 touch-manipulation 防止連撳放大 -->
+                    <button onclick="window.adjustBet(5)" class="w-12 h-12 rounded-full bg-blue-600 text-white font-bold text-3xl flex items-center justify-center hover:bg-blue-500 active:bg-blue-400 active:scale-90 transition-all shadow-lg shadow-blue-900/50 touch-manipulation">+</button>
                 </div>
             </div>
 
             <div class="flex space-x-3">
-                <button onclick="window.closeBetModal()" class="flex-1 py-3.5 rounded-xl bg-[#1c1c1e] text-gray-400 font-bold text-sm hover:bg-gray-800 border border-gray-700 transition-colors">取消</button>
-                <button onclick="window.confirmBet()" class="flex-1 py-3.5 rounded-xl bg-green-600 text-white font-bold text-sm hover:bg-green-500 shadow-lg shadow-green-900/30 transition-colors">確定落注</button>
+                <button onclick="window.closeBetModal()" class="flex-1 py-3.5 rounded-xl bg-[#1c1c1e] text-gray-400 font-bold text-sm hover:bg-gray-800 border border-gray-700 transition-colors touch-manipulation">取消</button>
+                <button onclick="window.confirmBet()" class="flex-1 py-3.5 rounded-xl bg-green-600 text-white font-bold text-sm hover:bg-green-500 shadow-lg shadow-green-900/30 transition-colors touch-manipulation">確定落注</button>
             </div>
         </div>
     </div>
 
+    <!-- 🚨 底部按鈕全部加上 touch-manipulation 令反應更爽快 -->
     <nav class="fixed bottom-0 w-full bg-[#1c1c1e] border-t border-gray-800 p-3 flex justify-around items-center z-50 pb-safe">
-        <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4">
+        <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0 1 1 0 01-2 0zM7 9a1 1 0 100 2 1 1 0 000-2zm6 0a1 1 0 100 2 1 1 0 000-2zm-3 3a1 1 0 100 2 1 1 0 000-2z"></path></svg>
             <span class="text-[10px] font-bold">賽事</span>
         </div>
-        <div id="tab-bracket" onclick="window.switchTab('bracket')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4">
+        <div id="tab-bracket" onclick="window.switchTab('bracket')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H4v-2h3a2 2 0 002-2V1m0 18v-6a2 2 0 012-2h3v-2h-3a2 2 0 01-2-2V1m6 10h4"></path></svg>
             <span class="text-[10px] font-bold">晉級表</span>
         </div>
-        <div id="tab-leaderboard" onclick="window.switchTab('leaderboard')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4">
+        <div id="tab-leaderboard" onclick="window.switchTab('leaderboard')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
             <span class="text-[10px] font-bold">排行榜</span>
         </div>
-        <div id="tab-bets" onclick="window.switchTab('bets')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4">
+        <div id="tab-bets" onclick="window.switchTab('bets')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
             <span class="text-[10px] font-bold">最新注單</span>
         </div>
@@ -198,7 +203,7 @@
         window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
         window.authenticatedUser = null; 
         window.previousUser = "Dennis"; 
-        window.pendingBet = null; // 用嚟裝住準備要買嗰一注嘅資料
+        window.pendingBet = null; 
 
         const avatarColors = {
             "Dennis": "bg-blue-600",
@@ -215,23 +220,23 @@
             document.getElementById('view-leaderboard').classList.add('hidden');
             document.getElementById('view-bets').classList.add('hidden');
 
-            document.getElementById('tab-matches').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4";
-            document.getElementById('tab-bracket').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4";
-            document.getElementById('tab-leaderboard').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4";
-            document.getElementById('tab-bets').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4";
+            document.getElementById('tab-matches').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation";
+            document.getElementById('tab-bracket').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation";
+            document.getElementById('tab-leaderboard').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation";
+            document.getElementById('tab-bets').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation";
 
             if (tabName === 'matches') {
                 document.getElementById('view-matches').classList.remove('hidden');
-                document.getElementById('tab-matches').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4";
+                document.getElementById('tab-matches').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4 touch-manipulation";
             } else if (tabName === 'bracket') {
                 document.getElementById('view-bracket').classList.remove('hidden');
-                document.getElementById('tab-bracket').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4";
+                document.getElementById('tab-bracket').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4 touch-manipulation";
             } else if (tabName === 'leaderboard') {
                 document.getElementById('view-leaderboard').classList.remove('hidden');
-                document.getElementById('tab-leaderboard').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4";
+                document.getElementById('tab-leaderboard').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4 touch-manipulation";
             } else if (tabName === 'bets') {
                 document.getElementById('view-bets').classList.remove('hidden');
-                document.getElementById('tab-bets').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4";
+                document.getElementById('tab-bets').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4 touch-manipulation";
             }
         };
 
@@ -371,7 +376,7 @@
                     }
 
                     return `
-                    <div onclick="window.betOnTeam('${team}')" class="flex justify-between items-center py-1.5 hover:bg-gray-700/50 rounded px-1 cursor-pointer transition-colors">
+                    <div onclick="window.betOnTeam('${team}')" class="flex justify-between items-center py-1.5 hover:bg-gray-700/50 rounded px-1 cursor-pointer transition-colors touch-manipulation">
                         <div class="flex items-center space-x-2">
                             <span class="text-[12px]">${getFlag(team)}</span>
                             <span class="font-bold text-xs text-white">${team}</span>
@@ -441,13 +446,13 @@
             let awayClick = match.odds.away > 0 ? `onclick="window.placeBet('${match.id}', '${match.away}', ${match.odds.away})"` : `onclick="alert('⚠️ ${match.away} 莊家尚未開盤。')";`;
 
             return `
-            <div class="bracket-card rounded-lg border ${borderClass} flex flex-col justify-center px-2 cursor-pointer transition-colors">
-                <div ${homeClick} class="flex justify-between items-center py-1 hover:bg-gray-700/50 rounded px-1">
+            <div class="bracket-card rounded-lg border ${borderClass} flex flex-col justify-center px-2 cursor-pointer transition-colors touch-manipulation">
+                <div ${homeClick} class="flex justify-between items-center py-1 hover:bg-gray-700/50 rounded px-1 touch-manipulation">
                     <span class="font-bold text-xs ${textClass}">${match.home}</span>
                     <span class="font-normal text-xs ${scoreClass}">${homeScore}</span>
                 </div>
                 <div class="border-b ${isFinal ? 'border-yellow-700/50' : 'border-gray-700'} w-full my-0.5"></div>
-                <div ${awayClick} class="flex justify-between items-center py-1 hover:bg-gray-700/50 rounded px-1">
+                <div ${awayClick} class="flex justify-between items-center py-1 hover:bg-gray-700/50 rounded px-1 touch-manipulation">
                     <span class="font-bold text-xs ${textClass}">${match.away}</span>
                     <span class="font-normal text-xs ${scoreClass}">${awayScore}</span>
                 </div>
@@ -471,7 +476,7 @@
                 let monthEng = monthNames[dateObj.month - 1] || 'MTH';
                 let btnClass = isActive ? "bg-green-600 text-white shadow-md shadow-green-900/40 border-green-500" : "bg-[#1a1a1c] text-gray-500 hover:bg-[#2c2c2e] border-gray-800";
                 selectorContainer.innerHTML += `
-                    <button onclick="window.filterByDate('${dateObj.dateStr}')" class="flex flex-col items-center justify-center min-w-[65px] px-2 py-2 rounded-xl border transition-all duration-200 cursor-pointer flex-shrink-0 ${btnClass}">
+                    <button onclick="window.filterByDate('${dateObj.dateStr}')" class="flex flex-col items-center justify-center min-w-[65px] px-2 py-2 rounded-xl border transition-all duration-200 cursor-pointer flex-shrink-0 touch-manipulation ${btnClass}">
                         <span class="text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-green-100' : 'text-gray-600'}">${monthEng}</span>
                         <span class="text-xl font-black leading-none my-1 ${isActive ? 'text-white' : 'text-gray-300'}">${dateObj.dateNum}</span>
                         <span class="text-[11px] font-medium ${isActive ? 'text-white' : 'text-gray-500'}">${dateObj.weekday}</span>
@@ -541,14 +546,14 @@
                             ${scoreDisplay}
                         </div>
                         <div class="bg-[#111] p-1 rounded-xl flex space-x-1 mb-2">
-                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${match.home}', ${match.odds.home})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors">
+                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${match.home}', ${match.odds.home})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
                                 <span class="font-bold ${oddsColor}">${match.odds.home > 0 ? match.odds.home.toFixed(2) : '-'}</span>
                                 <div class="flex flex-col items-start leading-none">
                                     <span class="text-[10px] ${canBet?'text-gray-400':'text-gray-600'}">${flagH} 勝</span>
                                     ${homeHandicapDisplay}
                                 </div>
                             </button>
-                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${match.away}', ${match.odds.away})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors">
+                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${match.away}', ${match.odds.away})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
                                 <span class="font-bold ${oddsColor}">${match.odds.away > 0 ? match.odds.away.toFixed(2) : '-'}</span>
                                 <div class="flex flex-col items-start leading-none">
                                     <span class="text-[10px] ${canBet?'text-gray-400':'text-gray-600'}">${flagA} 勝</span>
@@ -615,7 +620,6 @@
             } catch(e) { alert("❌ 失敗"); }
         };
 
-        // 🚨 確保 Avatar 與權限 100% 同步
         window.updateHeaderBalance = () => {
             let currentUser = document.getElementById('player-select').value;
             let bal = window.playerBalances[currentUser] || 0;
@@ -663,7 +667,6 @@
             }
         });
 
-        // 💰 智能 Modal 控制邏輯
         window.placeBet = async (matchId, selection, odds) => {
             if(odds === 0) { alert("⚠️ 莊家尚未開盤，暫時無法落注。"); return; }
             const currentPlayer = document.getElementById('player-select').value;
@@ -772,7 +775,7 @@
             });
             
             leaderboardDiv.innerHTML = '';
-            window.updateHeaderBalance(); // 初始化及每次資料更新都會跑呢句，確保 Avatar 同步
+            window.updateHeaderBalance(); 
 
             Object.keys(window.playerBalances).sort((a, b) => window.playerBalances[b] - window.playerBalances[a]).forEach((p, i) => {
                 let bal = window.playerBalances[p], cClass = bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400');
