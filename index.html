@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorldCup 2026 大茶飯</title>
+    <title>大茶飯</title>
     
-    <!-- 📱 PWA (Progressive Web App) 設定 -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoi5aSn6Iy26aOvIiwic2hvcnRfbmFtZSI6IuWkp+iMtumjryIsInN0YXJ0X3VybCI6Ii4vaW5kZXguaHRtbCIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwMDAwMDAiLCJ0aGVtZV9jb2xvciI6IiMwMDAwMDAiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9maXJlYmFzZXN0b3JhZ2UuZ29vZ2xlYXBpcy5jb20vdjAvYi93b3JsZGN1cC1iZXQtMjAyNi04YTYxNy5maXJlYmFzZXN0b3JhZ2UuYXBwL28vU2NyZWVuc2hvdCUyMDIwMjYtMDYtMDIlMjBhdCUyMDIuMzQuMzQlRTIlODAlQUZQTS5wbmc/YWx0PW1lZGlhJnRva2VuPTFkZTllMzRkLTE4YmEtNDM1NC1iYThkLTVlNWYxYmNhYjg1MiIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmcifSx7InNyYyI6Imh0dHBzOi8vZmlyZWJhc2VzdG9yYWdlLmdvb2dsZWFwaXMuY29tL3YwL2Ivd29ybGRjdXAtYmV0LTIwMjYtOGE2MTcuZmlyZWJhc2VzdG9yYWdlLmFwcC9vL1NjcmVlbnNob3QlMjAyMDI2LTA2LTAyJTIwYXQlMjAyLjM0LjM0JUUyJTgwJUFGUE0ucG5nP2FsdD1tZWRpYSZ0b2tlbj0xZGU5ZTM0ZC0xOGJhLTQzNTQtYmE4ZC01ZTVmMWJjYWI4NTIiLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn1dfQ==">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="大茶飯">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/worldcup-bet-2026-8a617.firebasestorage.app/o/Screenshot%202026-06-02%20at%202.34.34%E2%80%AFPM.png?alt=media&token=1de9e34d-18ba-4354-ba8d-5e5f1bcab852">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -19,7 +20,6 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 🗺️ 晉級形勢圖完美折線 CSS */
         .bracket-pair { position: relative; display: flex; flex-direction: column; gap: 1rem; justify-content: center; }
         .bracket-pair::after {
             content: ''; position: absolute; right: -24px; top: 32px; bottom: 32px;
@@ -72,7 +72,7 @@
                 <p class="text-center text-gray-500 py-10">📡 載入賽程中...</p>
             </div>
 
-            <details class="group mt-10">
+            <details id="admin-section" class="group mt-10">
                 <summary class="cursor-pointer text-gray-700 text-xs font-bold text-center hover:text-gray-500 transition-colors mb-4">
                     🔧 展開管理員及派彩專區
                 </summary>
@@ -206,7 +206,7 @@
         const weekdaysCH = ['日', '一', '二', '三', '四', '五', '六'];
 
         const getFlag = (teamName) => {
-            const flags = { "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦", "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿", "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺", "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭", "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪", "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹", "剛果":"🇨🇩" };
+            const flags = { "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦", "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿", "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺", "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭", "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪", "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩Z", "約旦":"🇯🇴", "奧地利":"🇦🇹", "剛果":"🇨🇩" };
             for(let key in flags) { if(teamName.includes(key)) return flags[key]; }
             return "⚽"; 
         };
@@ -581,6 +581,7 @@
             } catch(e) { alert("❌ 失敗"); }
         };
 
+        // 🚨 更新 UI 介面，並嚴格執行管理員權限控制
         window.updateHeaderBalance = () => {
             let currentUser = document.getElementById('player-select').value;
             let bal = window.playerBalances[currentUser] || 0;
@@ -592,6 +593,16 @@
             let newColor = avatarColors[currentUser] || 'bg-gray-600';
             avatarEl.className = `w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md border border-gray-700 transition-colors duration-300 ${newColor}`;
             avatarEl.innerText = currentUser.charAt(0);
+
+            // 👑 權限控制：只有 Dennis 可以睇到管理員及派彩專區
+            let adminSec = document.getElementById('admin-section');
+            if (adminSec) {
+                if (currentUser === 'Dennis') {
+                    adminSec.classList.remove('hidden');
+                } else {
+                    adminSec.classList.add('hidden');
+                }
+            }
         };
 
         document.getElementById('player-select').addEventListener('change', async (e) => {
