@@ -31,9 +31,6 @@
             border-top: 2px solid #374151; width: 24px; z-index: 0; pointer-events: none;
         }
         .bracket-card { height: 64px; position: relative; z-index: 10; background: #1c1c1e; box-sizing: border-box; }
-        
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="text-gray-100 min-h-screen pb-28">
@@ -157,7 +154,6 @@
 
     </main>
 
-    <!-- 落注視窗 -->
     <div id="bet-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="bet-modal-content">
             <h3 class="text-white font-black text-xl mb-2 flex items-center tracking-wide"><span class="mr-2 text-2xl">⚽</span> 確認落注</h3>
@@ -169,12 +165,14 @@
             <div class="bg-[#0a0a0c] rounded-2xl p-5 mb-6 border border-gray-800 shadow-inner">
                 <label class="block text-center text-gray-500 text-[11px] font-bold uppercase tracking-widest mb-4">輸入注碼 ($5 - $100)</label>
                 <div class="flex items-center justify-between px-2">
-                    <button onclick="window.adjustBet(-5)" class="w-12 h-12 rounded-full bg-gray-800 text-gray-300 font-bold text-3xl flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 active:scale-90 transition-all border border-gray-600 shadow-lg touch-manipulation">&minus;</button>
-                    <div class="flex items-baseline space-x-1">
-                        <span class="text-gray-500 font-bold text-xl">$</span>
-                        <input type="number" id="bet-amount-input" min="5" max="100" value="10" readonly class="w-16 bg-transparent text-white text-5xl font-black text-center outline-none pointer-events-none p-0 m-0">
+                    <button onclick="window.adjustBet(-5)" class="w-12 h-12 flex-shrink-0 rounded-full bg-gray-800 text-gray-300 font-bold text-3xl flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 active:scale-90 transition-all border border-gray-600 shadow-lg touch-manipulation">&minus;</button>
+                    
+                    <div class="flex-1 flex items-baseline justify-center">
+                        <span class="text-gray-500 font-bold text-2xl mr-1">$</span>
+                        <span id="bet-amount-input" class="text-white text-[52px] tracking-tighter font-black">10</span>
                     </div>
-                    <button onclick="window.adjustBet(5)" class="w-12 h-12 rounded-full bg-blue-600 text-white font-bold text-3xl flex items-center justify-center hover:bg-blue-500 active:bg-blue-400 active:scale-90 transition-all shadow-lg shadow-blue-900/50 touch-manipulation">+</button>
+
+                    <button onclick="window.adjustBet(5)" class="w-12 h-12 flex-shrink-0 rounded-full bg-blue-600 text-white font-bold text-3xl flex items-center justify-center hover:bg-blue-500 active:bg-blue-400 active:scale-90 transition-all shadow-lg shadow-blue-900/50 touch-manipulation">+</button>
                 </div>
             </div>
 
@@ -185,7 +183,6 @@
         </div>
     </div>
 
-    <!-- 底部導航列 -->
     <nav class="fixed bottom-0 w-full bg-[#1c1c1e] border-t border-gray-800 p-3 flex justify-around items-center z-50 pb-safe">
         <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors flex-1 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0 1 1 0 01-2 0zM7 9a1 1 0 100 2 1 1 0 000-2zm6 0a1 1 0 100 2 1 1 0 000-2zm-3 3a1 1 0 100 2 1 1 0 000-2z"></path></svg>
@@ -329,7 +326,17 @@
                     let detailMsg = `賽果 ${scoreHome}:${scoreAway} | 盤口 ${match.odds.handicapStr||"[0]"} | 淨勝 ${betNetScore>0?'+'+betNetScore:betNetScore}球`;
                     await updateDoc(doc(db, "bets", document.id), { settled: true, profit: profit, settleDetail: detailMsg }); 
                 });
-                alert("✅ 派彩完成"); document.getElementById('score-home').value = ''; document.getElementById('score-away').value = '';
+
+                await setDoc(doc(db, "matches_live", matchId), {
+                    status: 'FT',
+                    scoreHome: scoreHome,
+                    scoreAway: scoreAway,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                alert("✅ 派彩完成，場次已鎖定！"); 
+                document.getElementById('score-home').value = ''; 
+                document.getElementById('score-away').value = '';
             } catch(e) { alert("❌ 失敗"); }
         };
 
@@ -371,7 +378,9 @@
             window.pendingBet = { matchId, selection, odds, player: currentPlayer };
             document.getElementById('bet-modal-player').innerText = currentPlayer;
             document.getElementById('bet-modal-selection').innerText = `${selection} (賠率 ${odds})`;
-            document.getElementById('bet-amount-input').value = 10; 
+            
+            // 🚨 配合新 UI，使用 innerText
+            document.getElementById('bet-amount-input').innerText = "10"; 
             
             const modal = document.getElementById('bet-modal');
             const modalContent = document.getElementById('bet-modal-content');
@@ -381,11 +390,13 @@
 
         window.adjustBet = (amount) => {
             const input = document.getElementById('bet-amount-input');
-            let current = parseInt(input.value) || 10;
+            // 🚨 配合新 UI，使用 innerText 讀取
+            let current = parseInt(input.innerText) || 10; 
             current += amount;
             if (current < 5) current = 5;
             if (current > 100) current = 100;
-            input.value = current;
+            // 🚨 配合新 UI，使用 innerText 寫入
+            input.innerText = current; 
         };
 
         window.closeBetModal = () => {
@@ -398,7 +409,8 @@
 
         window.confirmBet = async () => {
             if (!window.pendingBet) return;
-            const amount = parseInt(document.getElementById('bet-amount-input').value);
+            // 🚨 配合新 UI，使用 innerText
+            const amount = parseInt(document.getElementById('bet-amount-input').innerText);
             
             if (amount >= 5 && amount <= 100) {
                 try {
@@ -497,6 +509,9 @@
             }
         };
 
+        // ==========================================
+        // 3. 系統渲染與內部邏輯
+        // ==========================================
         const getFlag = (teamName) => {
             const flags = { "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦", "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿", "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺", "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭", "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪", "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹", "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴" };
             for(let key in flags) { if(teamName.includes(key)) return flags[key]; }
@@ -535,12 +550,16 @@
             const matchesToShow = globalMatches.filter(m => m.dateStr === window.selectedDate);
             if(matchesToShow.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 py-10">此日無賽事</p>'; return; }
             
+            const now = new Date();
+
             matchesToShow.forEach(match => {
                 adminSelect.innerHTML += `<option value="${match.id}">${match.home} VS ${match.away}</option>`;
+                
+                let matchDateObj = new Date(match.date);
                 let isOddsReady = match.odds.home > 0;
-                let isStarted = match.status !== 'NS' && match.status !== 'TBD';
+                let isStarted = (match.status !== 'NS' && match.status !== 'TBD') || (now >= matchDateObj);
                 let isFinished = ['FT', 'AET', 'PEN'].includes(match.status);
-                let canBet = isOddsReady && !isStarted;
+                let canBet = isOddsReady && !isStarted && !isFinished;
 
                 let dynamicCalendarIcon = `
                     <div class="flex flex-col items-center justify-start w-3.5 h-4 bg-[#1c1c1e] rounded-[3px] border border-gray-600 overflow-hidden mr-1.5 flex-shrink-0">
@@ -558,11 +577,11 @@
                 } 
                 else if (isStarted) { 
                     statusBadge = '<span class="bg-gray-700/50 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">LOCKED</span>'; 
-                    statusText = `<div class="flex items-center text-red-500 animate-pulse"><span class="mr-1.5 text-[12px]">🚩</span><span class="pt-[1px]">賽事進行中 (LOCKED)</span></div>`; 
+                    statusText = `<div class="flex items-center text-red-500 animate-pulse"><span class="mr-1.5 text-[12px]">🚩</span><span class="pt-[1px]">賽事進行中或已截飛 (LOCKED)</span></div>`; 
                 } 
                 else if (isOddsReady) { 
                     statusBadge = '<span class="bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">ACTIVE</span>'; 
-                    statusText = `<div class="flex items-center text-gray-400">${dynamicCalendarIcon} <span class="pt-[1px]">${match.kickoff} 開賽</span></div>`; 
+                    statusText = `<div class="flex items-center text-gray-400">${dynamicCalendarIcon} <span class="pt-[1px]">${match.kickoff} 準時截飛</span></div>`; 
                 } 
                 else { 
                     statusBadge = '<span class="bg-yellow-500/20 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">WAITING</span>'; 
@@ -579,15 +598,16 @@
                 let awayHandicapDisplay = awayHandicapStr ? `<span class="text-[10px] text-yellow-500 font-mono mt-0.5">${awayHandicapStr}</span>` : '';
                 
                 let flagH = getFlag(match.home), flagA = getFlag(match.away);
-                let scoreDisplay = '';
+
+                let middleElement = `<div class="w-1/5 text-center text-gray-500 text-lg font-black uppercase tracking-wider">VS</div>`;
                 if (match.scoreHome !== null && match.scoreAway !== null) {
-                    scoreDisplay = `<p class="text-sm font-bold mt-1 text-gray-200">比分: ${match.home} <span class="${isFinished?'text-yellow-500':'text-red-500'}">${match.scoreHome} - ${match.scoreAway}</span> ${match.away}</p>`;
+                    let scoreColor = isFinished ? 'text-yellow-500' : 'text-red-500';
+                    middleElement = `<div class="w-1/5 text-center ${scoreColor} text-xl font-black tracking-widest">${match.scoreHome} - ${match.scoreAway}</div>`;
                 }
 
                 let btnClass = canBet ? "bg-[#2c2c2e] hover:bg-[#3c3c3e] cursor-pointer" : "bg-[#1a1a1c] text-gray-600 cursor-not-allowed";
                 let oddsColor = canBet ? "text-white" : "text-gray-600";
                 
-                // 🚨 改動位：<div class="w-1/5 text-center text-gray-500 text-lg font-black uppercase tracking-wider">VS</div>
                 container.innerHTML += `
                     <div class="glass-panel rounded-2xl p-4 relative overflow-hidden transition-all">
                         <div class="flex justify-between items-center mb-4">
@@ -599,7 +619,7 @@
                                 <span class="text-2xl">${flagH}</span>
                                 <span class="font-bold text-lg text-white whitespace-nowrap">${match.home}</span>
                             </div>
-                            <div class="w-1/5 text-center text-gray-500 text-lg font-black uppercase tracking-wider">VS</div>
+                            ${middleElement}
                             <div class="flex items-center justify-end space-x-2 w-2/5">
                                 <span class="font-bold text-lg text-white whitespace-nowrap">${match.away}</span>
                                 <span class="text-2xl">${flagA}</span>
@@ -607,7 +627,6 @@
                         </div>
                         <div class="text-xs mb-3 space-y-1">
                             ${statusText}
-                            ${scoreDisplay}
                         </div>
                         <div class="bg-[#111] p-1 rounded-xl flex space-x-1 mb-2">
                             <button onclick="${canBet ? `window.placeBet('${match.id}', '${match.home}', ${match.odds.home})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
@@ -804,6 +823,9 @@
         initMatches(); 
         window.updateHeaderBalance();
 
+        // ==========================================
+        // 5. Firebase 事件監聽器
+        // ==========================================
         onSnapshot(collection(db, "matches_live"), (snapshot) => { 
             let needsRender = false;
             snapshot.forEach((doc) => { 
