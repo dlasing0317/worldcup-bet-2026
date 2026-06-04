@@ -52,7 +52,7 @@
                     <span class="text-sm font-bold text-green-500" id="header-balance">+$0.0 HKD</span>
                     <div id="header-avatar" class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md border border-gray-600 transition-colors duration-300 bg-blue-600">D</div>
                 </div>
-                <select id="player-select" class="bg-transparent text-gray-500 text-xs focus:outline-none text-right appearance-none cursor-pointer hover:text-gray-300 transition-colors">
+                <select id="player-select" onchange="window.handleUserChange(this)" class="bg-transparent text-gray-500 text-xs focus:outline-none text-right appearance-none cursor-pointer hover:text-gray-300 transition-colors">
                     <option value="Dennis">👤 Dennis</option>
                     <option value="Samuel">👤 Samuel</option>
                     <option value="Charles">👤 Charles</option>
@@ -74,48 +74,6 @@
             <div id="match-container" class="space-y-5">
                 <p class="text-center text-gray-500 py-10">📡 載入賽程中...</p>
             </div>
-
-            <!-- 管理員專區 -->
-            <details id="admin-section" class="group mt-10">
-                <summary class="cursor-pointer text-gray-700 text-xs font-bold text-center hover:text-gray-500 transition-colors mb-4 touch-manipulation">
-                    🔧 展開管理員專區
-                </summary>
-                <div class="glass-panel rounded-xl p-5 space-y-6">
-                    
-                    <div class="bg-blue-900/10 border border-blue-800/50 p-4 rounded-xl shadow-inner">
-                        <label class="block text-sm text-blue-400 font-bold mb-2">🤖 全自動 API 同步 (賽程/比數/賠率)</label>
-                        <p class="text-xs text-gray-400 mb-4 leading-relaxed">一鍵連接 API 獲取全球最新賽況及盤口，並快取至 Firebase 供所有人讀取，完美避開 API 收費限制。</p>
-                        <button onclick="window.autoSyncAPI()" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-lg hover:bg-blue-500 shadow-lg shadow-blue-900/50 transition-all touch-manipulation flex items-center justify-center">
-                            <span class="mr-2 text-lg">⚡</span> 一鍵同步至資料庫
-                        </button>
-                    </div>
-
-                    <div class="border-t border-gray-800 my-4"></div>
-
-                    <div>
-                        <label class="block text-xs text-gray-500 mb-1">手動輸入：同步讓球盤</label>
-                        <div class="flex space-x-2">
-                            <input type="text" id="admin-odds-text" class="flex-1 bg-[#111] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-green-500 text-sm" placeholder="盤口 [-0.5/-1] 主 1.87 客 1.89">
-                            <button onclick="window.smartPasteOdds()" class="bg-blue-600 text-white font-bold px-4 rounded-lg touch-manipulation">同步</button>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-gray-800 my-4"></div>
-
-                    <div>
-                        <label class="block text-xs text-gray-500 mb-1">手動輸入：完場派彩 (90分鐘內比數)</label>
-                        <div class="flex flex-col space-y-3">
-                            <select id="admin-match-select" class="w-full bg-[#111] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-red-500"></select>
-                            <div class="flex items-center space-x-2">
-                                <input type="number" id="score-home" min="0" class="w-16 bg-[#111] text-white p-3 rounded-lg border border-gray-700 text-center font-bold outline-none focus:border-red-500" placeholder="主">
-                                <span class="text-gray-500 font-bold">:</span>
-                                <input type="number" id="score-away" min="0" class="w-16 bg-[#111] text-white p-3 rounded-lg border border-gray-700 text-center font-bold outline-none focus:border-red-500" placeholder="客">
-                                <button onclick="window.settleMatch()" class="flex-1 bg-red-600 text-white font-bold px-4 rounded-lg py-3 touch-manipulation">手動結算派彩</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </details>
         </div>
 
         <div id="view-bracket" class="hidden">
@@ -144,6 +102,56 @@
             </h2>
             <div id="bets-list" class="space-y-3">
                 <p class="text-gray-600 text-sm text-center">載入中...</p>
+            </div>
+        </div>
+
+        <div id="view-admin" class="hidden">
+            <h2 class="text-lg font-bold text-white mb-4 pl-1 uppercase tracking-wider flex items-center">
+                <span class="text-gray-400 mr-2">🔧</span> 莊家管理專區
+            </h2>
+            
+            <div class="glass-panel rounded-xl p-5 space-y-6">
+                <div class="bg-blue-900/10 border border-blue-800/50 p-4 rounded-xl shadow-inner">
+                    <label class="block text-sm text-blue-400 font-bold mb-2">🤖 全自動 API 同步 (賽程/比數/賠率)</label>
+                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">一鍵連接 API 獲取全球最新賽況及盤口，並快取至 Firebase 供所有人讀取，完美避開 API 收費限制。</p>
+                    <button onclick="window.autoSyncAPI()" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-lg hover:bg-blue-500 shadow-lg shadow-blue-900/50 transition-all touch-manipulation flex items-center justify-center">
+                        <span class="mr-2 text-lg">⚡</span> 一鍵同步至資料庫
+                    </button>
+                </div>
+
+                <div class="border-t border-gray-800 my-4"></div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">手動輸入：同步讓球盤</label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="admin-odds-text" class="flex-1 bg-[#111] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-green-500 text-sm" placeholder="盤口 [-0.5/-1] 主 1.87 客 1.89">
+                        <button onclick="window.smartPasteOdds()" class="bg-blue-600 text-white font-bold px-4 rounded-lg touch-manipulation">同步</button>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-800 my-4"></div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">手動輸入：完場派彩 (90分鐘內比數)</label>
+                    <div class="flex flex-col space-y-3">
+                        <select id="admin-match-select" class="w-full bg-[#111] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-red-500"></select>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" id="score-home" min="0" class="w-16 bg-[#111] text-white p-3 rounded-lg border border-gray-700 text-center font-bold outline-none focus:border-red-500" placeholder="主">
+                            <span class="text-gray-500 font-bold">:</span>
+                            <input type="number" id="score-away" min="0" class="w-16 bg-[#111] text-white p-3 rounded-lg border border-gray-700 text-center font-bold outline-none focus:border-red-500" placeholder="客">
+                            <button onclick="window.settleMatch()" class="flex-1 bg-red-600 text-white font-bold px-4 rounded-lg py-3 touch-manipulation">手動結算派彩</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-800 my-4"></div>
+                <div class="bg-red-900/10 border border-red-800/50 p-4 rounded-xl shadow-inner">
+                    <label class="block text-sm text-red-500 font-bold mb-2">⚠️ 危險操作：一鍵洗底</label>
+                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">刪除 Firebase 內所有注單紀錄。所有人嘅結餘將瞬間歸零，適合 UAT 測試後正式上線前使用。</p>
+                    <button onclick="window.resetAllBets()" class="w-full bg-red-600 text-white font-bold py-3.5 rounded-lg hover:bg-red-500 shadow-lg shadow-red-900/50 transition-all touch-manipulation flex items-center justify-center">
+                        <span class="mr-2 text-lg">🗑️</span> 一鍵清空所有注單
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -177,40 +185,42 @@
         </div>
     </div>
 
+    <!-- 底部導航列 -->
     <nav class="fixed bottom-0 w-full bg-[#1c1c1e] border-t border-gray-800 p-3 flex justify-around items-center z-50 pb-safe">
-        <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4 touch-manipulation">
+        <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors flex-1 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0 1 1 0 01-2 0zM7 9a1 1 0 100 2 1 1 0 000-2zm6 0a1 1 0 100 2 1 1 0 000-2zm-3 3a1 1 0 100 2 1 1 0 000-2z"></path></svg>
             <span class="text-[10px] font-bold">賽事</span>
         </div>
-        <div id="tab-bracket" onclick="window.switchTab('bracket')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation">
+        <div id="tab-bracket" onclick="window.switchTab('bracket')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H4v-2h3a2 2 0 002-2V1m0 18v-6a2 2 0 012-2h3v-2h-3a2 2 0 01-2-2V1m6 10h4"></path></svg>
             <span class="text-[10px] font-bold">晉級表</span>
         </div>
-        <div id="tab-leaderboard" onclick="window.switchTab('leaderboard')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation">
+        <div id="tab-leaderboard" onclick="window.switchTab('leaderboard')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
             <span class="text-[10px] font-bold">排行榜</span>
         </div>
-        <div id="tab-bets" onclick="window.switchTab('bets')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation">
+        <div id="tab-bets" onclick="window.switchTab('bets')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
             <span class="text-[10px] font-bold">最新注單</span>
+        </div>
+        <div id="tab-admin" onclick="window.switchTab('admin')" class="hidden flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span class="text-[10px] font-bold">管理</span>
         </div>
     </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, updateDoc, doc, setDoc, where, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, updateDoc, doc, setDoc, where, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDuBW9UnNW63zrXJz_8dnpujyHPi8bPTTg", authDomain: "worldcup-bet-2026-8a617.firebaseapp.com", projectId: "worldcup-bet-2026-8a617", storageBucket: "worldcup-bet-2026-8a617.firebasestorage.app", messagingSenderId: "833504479945", appId: "1:833504479945:web:a062125e752a6824589b18" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // ==========================================
-        // 1. 全域變數初始化
-        // ==========================================
         let globalMatches = [];
         window.selectedDate = null; 
         window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
-        window.authenticatedUser = null; 
+        window.authenticatedUser = "Dennis"; 
         window.previousUser = "Dennis"; 
         window.pendingBet = null; 
 
@@ -220,33 +230,27 @@
             "Michael": "bg-teal-600", "Sha": "bg-rose-600", "Travis": "bg-indigo-600"
         };
 
-        // ==========================================
-        // 2. 防禦性綁定：所有 window. 函數移至最頂層
-        // 確保 DOM 渲染前，所有按鈕事件已註冊完畢
-        // ==========================================
         window.switchTab = (tabName) => {
-            document.getElementById('view-matches').classList.add('hidden');
-            document.getElementById('view-bracket').classList.add('hidden');
-            document.getElementById('view-leaderboard').classList.add('hidden');
-            document.getElementById('view-bets').classList.add('hidden');
+            const tabs = ['matches', 'bracket', 'leaderboard', 'bets', 'admin'];
+            
+            tabs.forEach(t => {
+                const view = document.getElementById('view-' + t);
+                const tab = document.getElementById('tab-' + t);
+                
+                if (view) view.classList.add('hidden');
+                if (tab) {
+                    tab.classList.remove('text-green-500');
+                    tab.classList.add('text-gray-500');
+                }
+            });
 
-            document.getElementById('tab-matches').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation";
-            document.getElementById('tab-bracket').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation";
-            document.getElementById('tab-leaderboard').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation";
-            document.getElementById('tab-bets').className = "flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors w-1/4 touch-manipulation";
-
-            if (tabName === 'matches') {
-                document.getElementById('view-matches').classList.remove('hidden');
-                document.getElementById('tab-matches').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4 touch-manipulation";
-            } else if (tabName === 'bracket') {
-                document.getElementById('view-bracket').classList.remove('hidden');
-                document.getElementById('tab-bracket').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4 touch-manipulation";
-            } else if (tabName === 'leaderboard') {
-                document.getElementById('view-leaderboard').classList.remove('hidden');
-                document.getElementById('tab-leaderboard').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4 touch-manipulation";
-            } else if (tabName === 'bets') {
-                document.getElementById('view-bets').classList.remove('hidden');
-                document.getElementById('tab-bets').className = "flex flex-col items-center text-green-500 cursor-pointer transition-colors w-1/4 touch-manipulation";
+            const activeView = document.getElementById('view-' + tabName);
+            const activeTab = document.getElementById('tab-' + tabName);
+            
+            if (activeView) activeView.classList.remove('hidden');
+            if (activeTab) {
+                activeTab.classList.remove('text-gray-500');
+                activeTab.classList.add('text-green-500');
             }
         };
 
@@ -254,6 +258,42 @@
             window.selectedDate = dateStr; 
             renderDateFilter(); 
             renderMatches(); 
+        };
+
+        window.handleUserChange = async (selectElement) => {
+            const selectedUser = selectElement.value;
+            const enteredPin = prompt(`🔐 切換帳號驗證\n請輸入「${selectedUser}」嘅專屬 4 位 PIN 碼：`);
+            
+            if (!enteredPin) {
+                selectElement.value = window.previousUser;
+                return;
+            }
+
+            try {
+                let isValid = false;
+                const playerDocRef = doc(db, "players", selectedUser);
+                const playerDocSnap = await getDoc(playerDocRef);
+
+                if (playerDocSnap.exists()) {
+                    isValid = playerDocSnap.data().pin === enteredPin;
+                } else {
+                    const fallbackPins = { "Dennis": "1971", "Samuel": "0000", "Charles": "0000", "Michael": "0000", "Sha": "0000", "Travis": "0000" };
+                    isValid = fallbackPins[selectedUser] === enteredPin;
+                }
+
+                if (isValid) {
+                    window.authenticatedUser = selectedUser;
+                    window.previousUser = selectedUser;
+                    window.updateHeaderBalance();
+                } else {
+                    alert("❌ 密碼錯誤！無權切換至此帳號。");
+                    selectElement.value = window.previousUser; 
+                }
+            } catch (error) {
+                console.error(error);
+                alert("🚨 系統錯誤：無法連接至伺服器驗證密碼。");
+                selectElement.value = window.previousUser;
+            }
         };
 
         window.smartPasteOdds = async () => {
@@ -305,10 +345,18 @@
             avatarEl.className = `w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md border border-gray-700 transition-colors duration-300 ${newColor}`;
             avatarEl.innerText = currentUser.charAt(0);
 
-            let adminSec = document.getElementById('admin-section');
-            if (adminSec) {
-                if (currentUser === 'Dennis') { adminSec.classList.remove('hidden'); } 
-                else { adminSec.classList.add('hidden'); }
+            let adminTab = document.getElementById('tab-admin');
+            if (adminTab) {
+                if (currentUser === 'Dennis') { 
+                    adminTab.classList.remove('hidden');
+                    adminTab.classList.add('flex');
+                } else { 
+                    adminTab.classList.add('hidden');
+                    adminTab.classList.remove('flex');
+                    if (!document.getElementById('view-admin').classList.contains('hidden')) {
+                        window.switchTab('matches');
+                    }
+                }
             }
         };
 
@@ -317,23 +365,7 @@
             const currentPlayer = document.getElementById('player-select').value;
             
             if (window.authenticatedUser !== currentPlayer) {
-                const enteredPin = prompt(`🔐 安全驗證\n請輸入「${currentPlayer}」嘅專屬 4 位 PIN 碼：`);
-                if (!enteredPin) return; 
-
-                try {
-                    const playerDocRef = doc(db, "players", currentPlayer);
-                    const playerDocSnap = await getDoc(playerDocRef);
-
-                    if (playerDocSnap.exists() && playerDocSnap.data().pin === enteredPin) {
-                        window.authenticatedUser = currentPlayer;
-                        window.previousUser = currentPlayer;
-                        window.updateHeaderBalance();
-                    } else {
-                        alert("❌ 密碼錯誤！嚴禁代人落注！"); return;
-                    }
-                } catch (error) {
-                    console.error("驗證錯誤: ", error); alert("🚨 系統錯誤：無法連接至伺服器驗證密碼。"); return;
-                }
+                alert("❌ 安全異常：帳號狀態不符，請重新登入！"); return;
             }
 
             window.pendingBet = { matchId, selection, odds, player: currentPlayer };
@@ -443,9 +475,28 @@
             }
         };
 
-        // ==========================================
-        // 3. 系統渲染與內部邏輯
-        // ==========================================
+        window.resetAllBets = async () => {
+            const pwd = prompt("🔐 管理員危險操作：\n請輸入莊家密碼：");
+            if (pwd !== "1971") { alert("❌ 密碼錯誤"); return; }
+
+            const phrase = prompt("⚠️ 警告：此操作將會永久刪除所有注單及清空所有人嘅結餘！\n\n為防錯手，請準確輸入以下確認字句：\n大茶飯歸零");
+            if (phrase !== "大茶飯歸零") { alert("❌ 確認字句不符，操作已取消。"); return; }
+
+            try {
+                alert("🧹 正在清空所有注單，請稍候...");
+                const snapshot = await getDocs(collection(db, "bets"));
+                const deletePromises = [];
+                snapshot.forEach((document) => {
+                    deletePromises.push(deleteDoc(doc(db, "bets", document.id)));
+                });
+                await Promise.all(deletePromises);
+                alert("✅ 斬草除根！所有注單已清空，所有人結餘已瞬間歸零。");
+            } catch (e) {
+                console.error(e);
+                alert("❌ 清除失敗：" + e.message);
+            }
+        };
+
         const getFlag = (teamName) => {
             const flags = { "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦", "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿", "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺", "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭", "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪", "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹", "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴" };
             for(let key in flags) { if(teamName.includes(key)) return flags[key]; }
@@ -491,11 +542,32 @@
                 let isFinished = ['FT', 'AET', 'PEN'].includes(match.status);
                 let canBet = isOddsReady && !isStarted;
 
+                let dynamicCalendarIcon = `
+                    <div class="flex flex-col items-center justify-start w-3.5 h-4 bg-[#1c1c1e] rounded-[3px] border border-gray-600 overflow-hidden mr-1.5 flex-shrink-0">
+                        <div class="bg-red-600 w-full h-1.5"></div>
+                        <div class="flex-1 flex items-center justify-center">
+                            <span class="text-[9px] font-bold text-white leading-none tracking-tighter">${match.dateNum}</span>
+                        </div>
+                    </div>
+                `;
+
                 let statusBadge = '', statusText = '';
-                if (isFinished) { statusBadge = '<span class="bg-gray-700/50 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">LOCKED</span>'; statusText = '<span class="text-gray-400">🚫 賽事已完結</span>'; } 
-                else if (isStarted) { statusBadge = '<span class="bg-gray-700/50 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">LOCKED</span>'; statusText = '<span class="text-red-500 animate-pulse">🚩 賽事進行中 (LOCKED)</span>'; } 
-                else if (isOddsReady) { statusBadge = '<span class="bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">ACTIVE</span>'; statusText = `<span class="text-gray-400">📅 ${match.kickoff} 開賽</span>`; } 
-                else { statusBadge = '<span class="bg-yellow-500/20 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">WAITING</span>'; statusText = `<span class="text-gray-400">📅 ${match.kickoff} 開賽 | 盤口未開</span>`; }
+                if (isFinished) { 
+                    statusBadge = '<span class="bg-gray-700/50 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">LOCKED</span>'; 
+                    statusText = `<div class="flex items-center text-gray-400"><span class="mr-1.5 text-[12px]">🚫</span><span class="pt-[1px]">賽事已完結</span></div>`; 
+                } 
+                else if (isStarted) { 
+                    statusBadge = '<span class="bg-gray-700/50 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">LOCKED</span>'; 
+                    statusText = `<div class="flex items-center text-red-500 animate-pulse"><span class="mr-1.5 text-[12px]">🚩</span><span class="pt-[1px]">賽事進行中 (LOCKED)</span></div>`; 
+                } 
+                else if (isOddsReady) { 
+                    statusBadge = '<span class="bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">ACTIVE</span>'; 
+                    statusText = `<div class="flex items-center text-gray-400">${dynamicCalendarIcon} <span class="pt-[1px]">${match.kickoff} 開賽</span></div>`; 
+                } 
+                else { 
+                    statusBadge = '<span class="bg-yellow-500/20 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">WAITING</span>'; 
+                    statusText = `<div class="flex items-center text-gray-400">${dynamicCalendarIcon} <span class="pt-[1px]">${match.kickoff} 開賽 | 盤口未開</span></div>`; 
+                }
                 
                 let homeHandicapStr = match.odds.handicapStr || "", awayHandicapStr = "";
                 if(homeHandicapStr && homeHandicapStr !== "[0]") {
@@ -503,8 +575,9 @@
                     awayHandicapStr = "[" + parts.map(p => { let n = parseFloat(p) * -1; return n > 0 ? "+" + n : n.toString(); }).join('/') + "]";
                 } else if (homeHandicapStr === "[0]") { awayHandicapStr = "[0]"; }
 
-                let homeHandicapDisplay = homeHandicapStr ? `<span class="text-[10px] text-yellow-500 ml-2 font-mono">${homeHandicapStr}</span>` : '';
-                let awayHandicapDisplay = awayHandicapStr ? `<span class="text-[10px] text-yellow-500 mr-2 font-mono">${awayHandicapStr}</span>` : '';
+                let homeHandicapDisplay = homeHandicapStr ? `<span class="text-[10px] text-yellow-500 font-mono mt-0.5">${homeHandicapStr}</span>` : '';
+                let awayHandicapDisplay = awayHandicapStr ? `<span class="text-[10px] text-yellow-500 font-mono mt-0.5">${awayHandicapStr}</span>` : '';
+                
                 let flagH = getFlag(match.home), flagA = getFlag(match.away);
                 let scoreDisplay = '';
                 if (match.scoreHome !== null && match.scoreAway !== null) {
@@ -514,6 +587,7 @@
                 let btnClass = canBet ? "bg-[#2c2c2e] hover:bg-[#3c3c3e] cursor-pointer" : "bg-[#1a1a1c] text-gray-600 cursor-not-allowed";
                 let oddsColor = canBet ? "text-white" : "text-gray-600";
                 
+                // 🚨 改動位：<div class="w-1/5 text-center text-gray-500 text-lg font-black uppercase tracking-wider">VS</div>
                 container.innerHTML += `
                     <div class="glass-panel rounded-2xl p-4 relative overflow-hidden transition-all">
                         <div class="flex justify-between items-center mb-4">
@@ -525,28 +599,28 @@
                                 <span class="text-2xl">${flagH}</span>
                                 <span class="font-bold text-lg text-white whitespace-nowrap">${match.home}</span>
                             </div>
-                            <div class="w-1/5 text-center text-gray-500 text-xs font-bold uppercase">VS</div>
+                            <div class="w-1/5 text-center text-gray-500 text-lg font-black uppercase tracking-wider">VS</div>
                             <div class="flex items-center justify-end space-x-2 w-2/5">
                                 <span class="font-bold text-lg text-white whitespace-nowrap">${match.away}</span>
                                 <span class="text-2xl">${flagA}</span>
                             </div>
                         </div>
                         <div class="text-xs mb-3 space-y-1">
-                            <p>${statusText}</p>
+                            ${statusText}
                             ${scoreDisplay}
                         </div>
                         <div class="bg-[#111] p-1 rounded-xl flex space-x-1 mb-2">
                             <button onclick="${canBet ? `window.placeBet('${match.id}', '${match.home}', ${match.odds.home})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
-                                <span class="font-bold ${oddsColor}">${match.odds.home > 0 ? match.odds.home.toFixed(2) : '-'}</span>
+                                <span class="font-bold ${oddsColor} text-lg">${match.odds.home > 0 ? match.odds.home.toFixed(2) : '-'}</span>
                                 <div class="flex flex-col items-start leading-none">
-                                    <span class="text-[10px] ${canBet?'text-gray-400':'text-gray-600'}">${flagH} 勝</span>
+                                    <span class="text-[11px] ${canBet?'text-gray-400':'text-gray-600'}">${flagH} 勝</span>
                                     ${homeHandicapDisplay}
                                 </div>
                             </button>
                             <button onclick="${canBet ? `window.placeBet('${match.id}', '${match.away}', ${match.odds.away})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
-                                <span class="font-bold ${oddsColor}">${match.odds.away > 0 ? match.odds.away.toFixed(2) : '-'}</span>
+                                <span class="font-bold ${oddsColor} text-lg">${match.odds.away > 0 ? match.odds.away.toFixed(2) : '-'}</span>
                                 <div class="flex flex-col items-start leading-none">
-                                    <span class="text-[10px] ${canBet?'text-gray-400':'text-gray-600'}">${flagA} 勝</span>
+                                    <span class="text-[11px] ${canBet?'text-gray-400':'text-gray-600'}">${flagA} 勝</span>
                                     ${awayHandicapDisplay}
                                 </div>
                             </button>
@@ -672,9 +746,6 @@
             `;
         }
 
-        // ==========================================
-        // 4. 系統啟動與資料載入
-        // ==========================================
         const initMatches = () => {
             const mockJSON = [
                 { id: "2001", home: "墨西哥", away: "南非", date: new Date(2026, 5, 11, 12, 0, 0).toISOString(), status: "NS" },
@@ -731,37 +802,7 @@
         };
 
         initMatches(); 
-
-        // ==========================================
-        // 5. Firebase 事件監聽器
-        // ==========================================
-        document.getElementById('player-select').addEventListener('change', async (e) => {
-            const selectedUser = e.target.value;
-            const enteredPin = prompt(`🔐 切換帳號驗證\n請輸入「${selectedUser}」嘅專屬 4 位 PIN 碼：`);
-            
-            if (!enteredPin) {
-                e.target.value = window.previousUser;
-                return;
-            }
-
-            try {
-                const playerDocRef = doc(db, "players", selectedUser);
-                const playerDocSnap = await getDoc(playerDocRef);
-
-                if (playerDocSnap.exists() && playerDocSnap.data().pin === enteredPin) {
-                    window.authenticatedUser = selectedUser;
-                    window.previousUser = selectedUser;
-                    window.updateHeaderBalance();
-                } else {
-                    alert("❌ 密碼錯誤！無權切換至此帳號。");
-                    e.target.value = window.previousUser; 
-                }
-            } catch (error) {
-                console.error(error);
-                alert("🚨 系統錯誤：無法連接至伺服器驗證密碼。");
-                e.target.value = window.previousUser;
-            }
-        });
+        window.updateHeaderBalance();
 
         onSnapshot(collection(db, "matches_live"), (snapshot) => { 
             let needsRender = false;
@@ -797,7 +838,12 @@
             
             window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
             
-            if (snapshot.empty) { betsList.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; leaderboardDiv.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; return; }
+            if (snapshot.empty) { 
+                betsList.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; 
+                leaderboardDiv.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; 
+                window.updateHeaderBalance(); 
+                return; 
+            }
             
             snapshot.forEach((doc) => {
                 const bet = doc.data(); let resTxt = "等待開彩", resCol = "text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded";
