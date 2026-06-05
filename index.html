@@ -102,6 +102,7 @@
             </div>
         </div>
 
+        <!-- 獨立 Admin 頁面 -->
         <div id="view-admin" class="hidden">
             <h2 class="text-lg font-bold text-white mb-4 pl-1 uppercase tracking-wider flex items-center">
                 <span class="text-gray-400 mr-2">🔧</span> 莊家管理專區
@@ -129,7 +130,7 @@
                 <div class="border-t border-gray-800 my-4"></div>
 
                 <div>
-                    <label class="block text-xs text-gray-500 mb-1">手動輸入：完場派彩 (90分鐘內比數)</label>
+                    <label class="block text-xs text-gray-500 mb-1">手動操作：完場派彩 / 賽事重置</label>
                     <div class="flex flex-col space-y-3">
                         <select id="admin-match-select" class="w-full bg-[#111] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-red-500"></select>
                         <div class="flex items-center space-x-2">
@@ -138,6 +139,7 @@
                             <input type="number" id="score-away" min="0" class="w-16 bg-[#111] text-white p-3 rounded-lg border border-gray-700 text-center font-bold outline-none focus:border-red-500" placeholder="客">
                             <button onclick="window.settleMatch()" class="flex-1 bg-red-600 text-white font-bold px-4 rounded-lg py-3 touch-manipulation">手動結算派彩</button>
                         </div>
+                        <button onclick="window.resetMatch()" class="w-full bg-gray-700 text-white font-bold px-4 py-3 rounded-lg hover:bg-gray-600 transition-colors touch-manipulation border border-gray-600">🔄 重置此賽事為「未開賽」 (清空比數)</button>
                     </div>
                 </div>
 
@@ -154,6 +156,7 @@
 
     </main>
 
+    <!-- 落注視窗 -->
     <div id="bet-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="bet-modal-content">
             <h3 class="text-white font-black text-xl mb-2 flex items-center tracking-wide"><span class="mr-2 text-2xl">⚽</span> 確認落注</h3>
@@ -183,6 +186,7 @@
         </div>
     </div>
 
+    <!-- 底部導航列 -->
     <nav class="fixed bottom-0 w-full bg-[#1c1c1e] border-t border-gray-800 p-3 flex justify-around items-center z-50 pb-safe">
         <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors flex-1 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0 1 1 0 01-2 0zM7 9a1 1 0 100 2 1 1 0 000-2zm6 0a1 1 0 100 2 1 1 0 000-2zm-3 3a1 1 0 100 2 1 1 0 000-2z"></path></svg>
@@ -214,6 +218,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // ==========================================
+        // 1. 全域變數初始化
+        // ==========================================
         let globalMatches = [];
         window.selectedDate = null; 
         window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
@@ -227,6 +234,10 @@
             "Michael": "bg-teal-600", "Sha": "bg-rose-600", "Travis": "bg-indigo-600"
         };
 
+        // ==========================================
+        // 2. 防禦性綁定：所有 window. 函數移至最頂層
+        // ==========================================
+        
         window.switchTab = (tabName) => {
             const tabs = ['matches', 'bracket', 'leaderboard', 'bets', 'admin'];
             
@@ -340,6 +351,27 @@
             } catch(e) { alert("❌ 失敗"); }
         };
 
+        window.resetMatch = async () => {
+            const pwd = prompt("🔐 莊家密碼："); if (pwd !== "1971") return;
+            const matchId = document.getElementById('admin-match-select').value;
+            const match = globalMatches.find(m => m.id === matchId);
+            if (!match) return;
+            
+            if(!confirm(`⚠️ 確定將 ${match.home} VS ${match.away} 重置為「未開賽 (NS)」並清空比數？\n(注意：如需清空舊注單請使用下方的「一鍵洗底」)`)) return;
+
+            try {
+                await setDoc(doc(db, "matches_live", matchId), {
+                    status: 'NS',
+                    scoreHome: null,
+                    scoreAway: null,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                alert("✅ 賽事已成功重置！");
+            } catch(e) { 
+                alert("❌ 失敗: " + e.message); 
+            }
+        };
+
         window.updateHeaderBalance = () => {
             let currentUser = document.getElementById('player-select').value;
             let bal = window.playerBalances[currentUser] || 0;
@@ -378,8 +410,6 @@
             window.pendingBet = { matchId, selection, odds, player: currentPlayer };
             document.getElementById('bet-modal-player').innerText = currentPlayer;
             document.getElementById('bet-modal-selection').innerText = `${selection} (賠率 ${odds})`;
-            
-            // 🚨 配合新 UI，使用 innerText
             document.getElementById('bet-amount-input').innerText = "10"; 
             
             const modal = document.getElementById('bet-modal');
@@ -390,12 +420,10 @@
 
         window.adjustBet = (amount) => {
             const input = document.getElementById('bet-amount-input');
-            // 🚨 配合新 UI，使用 innerText 讀取
             let current = parseInt(input.innerText) || 10; 
             current += amount;
             if (current < 5) current = 5;
             if (current > 100) current = 100;
-            // 🚨 配合新 UI，使用 innerText 寫入
             input.innerText = current; 
         };
 
@@ -409,10 +437,14 @@
 
         window.confirmBet = async () => {
             if (!window.pendingBet) return;
-            // 🚨 配合新 UI，使用 innerText
             const amount = parseInt(document.getElementById('bet-amount-input').innerText);
             
             if (amount >= 5 && amount <= 100) {
+                // 🚨 新增：落注前嘅寸爆警告 Confirm 對話框
+                if (!confirm(`⚠️ 買定離手！\n\n落咗注就絕對冇得改，想縮沙？當莊家流㗎？\n\n確定畀 $${amount} 買 ${window.pendingBet.selection}？`)) {
+                    return; // 撳「取消」就咩都唔做，留喺 Modal 畀佢繼續改
+                }
+
                 try {
                     await addDoc(collection(db, "bets"), { 
                         player: window.pendingBet.player, matchId: window.pendingBet.matchId, 
