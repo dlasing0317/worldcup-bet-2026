@@ -102,7 +102,6 @@
             </div>
         </div>
 
-        <!-- 獨立 Admin 頁面 -->
         <div id="view-admin" class="hidden">
             <h2 class="text-lg font-bold text-white mb-4 pl-1 uppercase tracking-wider flex items-center">
                 <span class="text-gray-400 mr-2">🔧</span> 莊家管理專區
@@ -182,6 +181,22 @@
             <div class="flex space-x-3">
                 <button onclick="window.closeBetModal()" class="flex-1 py-3.5 rounded-xl bg-[#1c1c1e] text-gray-400 font-bold text-sm hover:bg-gray-800 border border-gray-700 transition-colors touch-manipulation">取消</button>
                 <button onclick="window.confirmBet()" class="flex-1 py-3.5 rounded-xl bg-green-600 text-white font-bold text-sm hover:bg-green-500 shadow-lg shadow-green-900/30 transition-colors touch-manipulation">確定落注</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自訂霸氣買定離手 Confirm 彈窗 -->
+    <div id="custom-confirm-modal" class="hidden fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 backdrop-blur-md opacity-0 transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-8 shadow-2xl border border-yellow-600/50 transform scale-95 transition-transform duration-300 flex flex-col items-center text-center" id="custom-confirm-content">
+            <span class="text-5xl mb-4">⚠️</span>
+            <h3 class="text-yellow-500 font-black text-2xl leading-tight mb-6">
+                買定離手！<br>落咗注就絕對冇得改㗎!
+            </h3>
+            <!-- 🚨 完美修正：移除深色黑框，改為純文字完美融入 -->
+            <p id="custom-confirm-detail" class="text-gray-200 text-base mb-8 font-medium w-full"></p>
+            <div class="flex space-x-4 w-full justify-center">
+                <button onclick="window.closeCustomConfirm()" class="flex-1 py-3.5 rounded-xl bg-[#1c1c1e] text-gray-400 font-bold text-sm hover:bg-gray-800 border border-gray-700 transition-colors touch-manipulation">取消</button>
+                <button onclick="window.executeBet()" class="flex-1 py-3.5 rounded-xl bg-yellow-600 text-black font-black text-sm hover:bg-yellow-500 shadow-lg shadow-yellow-900/50 transition-colors touch-manipulation">確定 OK</button>
             </div>
         </div>
     </div>
@@ -435,26 +450,43 @@
             setTimeout(() => { modal.classList.add('hidden'); window.pendingBet = null; }, 300);
         };
 
-        window.confirmBet = async () => {
+        window.confirmBet = () => {
             if (!window.pendingBet) return;
             const amount = parseInt(document.getElementById('bet-amount-input').innerText);
             
             if (amount >= 5 && amount <= 100) {
-                // 🚨 新增：落注前嘅寸爆警告 Confirm 對話框
-                if (!confirm(`⚠️ 買定離手！\n\n落咗注就絕對冇得改，想縮沙？當莊家流㗎？\n\n確定畀 $${amount} 買 ${window.pendingBet.selection}？`)) {
-                    return; // 撳「取消」就咩都唔做，留喺 Modal 畀佢繼續改
-                }
+                document.getElementById('custom-confirm-detail').innerHTML = `確定畀 <span class="text-white font-black">$${amount}</span> 買 <span class="text-white font-black">${window.pendingBet.selection}</span>？`;
+                
+                const modal = document.getElementById('custom-confirm-modal');
+                const modalContent = document.getElementById('custom-confirm-content');
+                modal.classList.remove('hidden');
+                setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); }, 10);
+            }
+        };
 
-                try {
-                    await addDoc(collection(db, "bets"), { 
-                        player: window.pendingBet.player, matchId: window.pendingBet.matchId, 
-                        selection: window.pendingBet.selection, odds: window.pendingBet.odds, 
-                        amount: amount, settled: false, profit: 0, timestamp: serverTimestamp() 
-                    }); 
-                    window.closeBetModal();
-                } catch (e) {
-                    alert("❌ 落注失敗，請重試！"); console.error(e);
-                }
+        window.closeCustomConfirm = () => {
+            const modal = document.getElementById('custom-confirm-modal');
+            const modalContent = document.getElementById('custom-confirm-content');
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        };
+
+        window.executeBet = async () => {
+            if (!window.pendingBet) return;
+            const amount = parseInt(document.getElementById('bet-amount-input').innerText);
+            
+            try {
+                await addDoc(collection(db, "bets"), { 
+                    player: window.pendingBet.player, matchId: window.pendingBet.matchId, 
+                    selection: window.pendingBet.selection, odds: window.pendingBet.odds, 
+                    amount: amount, settled: false, profit: 0, timestamp: serverTimestamp() 
+                }); 
+                
+                window.closeCustomConfirm(); 
+                window.closeBetModal();      
+            } catch (e) {
+                alert("❌ 落注失敗，請重試！"); console.error(e);
             }
         };
 
