@@ -565,8 +565,9 @@
                         let bookmaker = item.bookmakers[0];
                         
                         if (bookmaker && bookmaker.bets) {
-                            let handicapBet = bookmaker.bets.find(b => b.id === 3 || b.name === "Asian Handicap");
-                            let matchWinnerBet = bookmaker.bets.find(b => b.id === 1 || b.name === "Match Winner");
+                            // 🚨 修正：精準搵 Asian Handicap (用 name 搵最穩陣)
+                            let handicapBet = bookmaker.bets.find(b => b.name === "Asian Handicap");
+                            let matchWinnerBet = bookmaker.bets.find(b => b.name === "Match Winner");
                             
                             let homeOdd = 0, awayOdd = 0, hcapStr = "[0]";
 
@@ -578,15 +579,35 @@
                                 if (aBet) awayOdd = parseFloat(aBet.odd);
                             }
 
-                            if (handicapBet) {
+                            // 🚨 修正：智能找出主線 (Main Line) 亞洲盤口
+                            if (handicapBet && handicapBet.values && handicapBet.values.length > 0) {
                                 fallbackCount--; 
-                                let hBet = handicapBet.values.find(v => v.value.includes("Home"));
-                                let aBet = handicapBet.values.find(v => v.value.includes("Away"));
-                                if (hBet && aBet) {
-                                    homeOdd = parseFloat(hBet.odd);
-                                    awayOdd = parseFloat(aBet.odd);
-                                    let hcapMatch = hBet.value.match(/Home\s+([+-]?[0-9.]+)/);
-                                    hcapStr = hcapMatch ? `[${hcapMatch[1]}]` : "[0]";
+                                
+                                // 將所有 Home 同 Away 拆開
+                                let homeOptions = handicapBet.values.filter(v => v.value.includes("Home"));
+                                let awayOptions = handicapBet.values.filter(v => v.value.includes("Away"));
+                                
+                                let bestPair = null;
+                                let minDiff = 999;
+
+                                // 尋找主客賠率最接近 1.90 (即相差最小) 嘅一對作為 Main Line
+                                homeOptions.forEach(h => {
+                                    let hcapValue = h.value.replace("Home ", "");
+                                    // 搵返對應讓球數嘅 Away
+                                    let a = awayOptions.find(a => a.value.replace("Away ", "") === hcapValue);
+                                    if (a) {
+                                        let diff = Math.abs(parseFloat(h.odd) - parseFloat(a.odd));
+                                        if (diff < minDiff) {
+                                            minDiff = diff;
+                                            bestPair = { home: h, away: a, hcap: hcapValue };
+                                        }
+                                    }
+                                });
+
+                                if (bestPair) {
+                                    homeOdd = parseFloat(bestPair.home.odd);
+                                    awayOdd = parseFloat(bestPair.away.odd);
+                                    hcapStr = `[${bestPair.hcap}]`;
                                 }
                             }
                             
@@ -603,16 +624,15 @@
         };
 
         window.betOnTeam = (teamName) => {
-            let match = globalMatches.find(m => (m.home.includes(teamName) || m.away.includes(teamName)) && !['FT', 'AET', 'PEN'].includes(m.status));
-            if (!match) match = globalMatches.find(m => m.home.includes(teamName) || m.away.includes(teamName));
+            let match = globalMatches.find(m => (m.home === teamName || m.away === teamName) && !['FT', 'AET', 'PEN'].includes(m.status));
+            if (!match) match = globalMatches.find(m => m.home === teamName || m.away === teamName);
             
             if(match) {
-                let odds = match.home.includes(teamName) ? match.odds.home : match.odds.away;
-                let actualTeamName = match.home.includes(teamName) ? match.home : match.away;
+                let odds = match.home === teamName ? match.odds.home : match.odds.away;
                 if (odds > 0) {
-                    window.placeBet(match.id, actualTeamName, odds);
+                    window.placeBet(match.id, teamName, odds);
                 } else {
-                    alert("⚠️ " + actualTeamName + " 下一場賽事莊家尚未開盤，暫時無法落注。");
+                    alert("⚠️ " + teamName + " 下一場賽事（" + match.home + " VS " + match.away + "）莊家尚未開盤，暫時無法落注。");
                 }
             } else {
                 alert("⚠️ 系統暫時找不到 " + teamName + " 的賽程資料。");
@@ -672,6 +692,8 @@
         function renderMatches() {
             const container = document.getElementById('match-container'), adminSelect = document.getElementById('admin-match-select');
             container.innerHTML = ''; adminSelect.innerHTML = ''; 
+            
+            // 🚨 修正：吉 Database 提示
             if (globalMatches.length === 0) {
                 container.innerHTML = '<p class="text-center text-gray-500 py-10">資料庫目前無賽事，請管理員進行同步。</p>';
                 return;
@@ -802,11 +824,11 @@
 
             Object.keys(groupTeams).forEach(g => {
                 let teamsHtml = groupTeams[g].map(team => {
-                    let m = globalMatches.find(x => (x.home.includes(team) || x.away.includes(team)) && !['FT', 'AET', 'PEN'].includes(x.status));
-                    if(!m) m = globalMatches.find(x => x.home.includes(team) || x.away.includes(team));
+                    let m = globalMatches.find(x => (x.home === team || x.away === team) && !['FT', 'AET', 'PEN'].includes(x.status));
+                    if(!m) m = globalMatches.find(x => x.home === team || x.away === team);
                     let oddsDisplay = '-';
                     if (m) {
-                        let o = m.home.includes(team) ? m.odds.home : m.odds.away;
+                        let o = m.home === team ? m.odds.home : m.odds.away;
                         if(o > 0) oddsDisplay = o.toFixed(2);
                     }
 
@@ -896,6 +918,7 @@
         }
 
         const initMatches = () => {
+            // 🚨 修正：移除 loadMockData 呼叫
             onSnapshot(collection(db, "matches_2026"), (snapshot) => {
                 let apiMatches = [];
                 if (!snapshot.empty) {
