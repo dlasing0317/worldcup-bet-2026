@@ -351,11 +351,8 @@
             } else alert("❌ 格式錯誤");
         };
 
-        // 🚨 自動派彩核心邏輯：抽離出來方便被調用
-        const autoSettleMatch = async (matchId, scoreHome, scoreAway, hcapStr) => {
-            const match = globalMatches.find(m => m.id === matchId); 
-            if (!match) return;
-
+        // 🚨 終極修復：自動派彩不再依賴本地記憶體，直接傳入 homeTeamName
+        const autoSettleMatch = async (matchId, scoreHome, scoreAway, hcapStr, homeTeamName) => {
             let hcapVal = 0;
             let hcapClean = hcapStr.replace('[', '').replace(']', '').replace('+', '');
             if(hcapClean.includes('/')) { 
@@ -368,12 +365,11 @@
             let netHomeScore = scoreHome - scoreAway + hcapVal;
 
             try {
-                // 搵出所有未結算嘅注單
                 const snapshot = await getDocs(query(collection(db, "bets"), where("matchId", "==", matchId), where("settled", "==", false)));
                 snapshot.forEach(async (document) => { 
                     const bet = document.data(); 
                     let profit = 0; 
-                    let betNetScore = bet.selection === match.home ? netHomeScore : -netHomeScore;
+                    let betNetScore = bet.selection === homeTeamName ? netHomeScore : -netHomeScore;
                     
                     if (betNetScore >= 0.5) profit = bet.amount * (bet.odds - 1); 
                     else if (betNetScore === 0.25) profit = (bet.amount / 2) * (bet.odds - 1); 
@@ -390,7 +386,6 @@
             }
         };
 
-        // 舊有手動派彩掣依然保留，作為 Backup
         window.settleMatch = async () => {
             const pwd = prompt("🔐 密碼："); if (pwd !== "1971") return;
             const matchId = document.getElementById('admin-match-select').value;
@@ -402,7 +397,7 @@
             if (!match) return;
             if(!confirm(`⚠️ 確定賽果 ${scoreHome}:${scoreAway} (90分鐘內)？`)) return;
 
-            await autoSettleMatch(matchId, scoreHome, scoreAway, match.odds.handicapStr || "[0]");
+            await autoSettleMatch(matchId, scoreHome, scoreAway, match.odds.handicapStr || "[0]", match.home);
             await setDoc(doc(db, "matches_2026", matchId), { status: 'FT', scoreHome: scoreHome, scoreAway: scoreAway, updatedAt: serverTimestamp() }, { merge: true });
             
             alert("✅ 手動派彩完成！"); 
@@ -562,12 +557,11 @@
                 if (dataMatches.errors && Object.keys(dataMatches.errors).length > 0) throw new Error("API 存取被拒: " + Object.values(dataMatches.errors)[0]);
                 
                 let matchesCount = 0;
-                let autoSettledCount = 0; // 記錄自動派彩數量
+                let autoSettledCount = 0;
 
                 if (dataMatches.response && dataMatches.response.length > 0) {
                     matchesCount = dataMatches.response.length;
                     
-                    // 🚨 升級：同步賽程時，順便檢查是否完場，並自動派彩
                     const promises = dataMatches.response.map(async (item) => {
                         let mId = item.fixture.id.toString();
                         let hEng = item.teams.home.name;
@@ -578,25 +572,21 @@
                         let mScoreH = item.goals.home;
                         let mScoreA = item.goals.away;
 
-                        // 寫入最新賽果
                         await setDoc(doc(db, "matches_2026", mId), { 
                             id: mId, home: hTC, away: aTC, date: item.fixture.date,
                             status: mStatus, scoreHome: mScoreH, scoreAway: mScoreA, 
                             updatedAt: serverTimestamp() 
                         }, { merge: true });
 
-                        // 🚨 全自動派彩觸發器
-                        // 如果狀態係 FT (完場)，而且比數唔係 null
+                        // 🚨 修正：確保派彩時已經直接傳入主隊名 (hTC)
                         if (['FT', 'AET', 'PEN'].includes(mStatus) && mScoreH !== null && mScoreA !== null) {
-                            // 獲取該場賽事嘅盤口資料 (用來計數)
                             const oddsDoc = await getDoc(doc(db, "odds_2026", mId));
                             let hcapStr = "[0]";
                             if (oddsDoc.exists()) {
                                 hcapStr = oddsDoc.data().handicapStr || "[0]";
                             }
                             
-                            // 呼叫自動結算引擎
-                            await autoSettleMatch(mId, mScoreH, mScoreA, hcapStr);
+                            await autoSettleMatch(mId, mScoreH, mScoreA, hcapStr, hTC);
                             autoSettledCount++;
                         }
                     });
@@ -711,7 +701,7 @@
         // 3. 系統渲染與內部邏輯
         // ==========================================
         const getFlag = (teamName) => {
-            const flags = { "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦", "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿", "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺", "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭", "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪", "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹", "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴" };
+            const flags = { "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦", "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿", "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺", "丹 কাউ":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭", "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪", "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹", "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴" };
             for(let key in flags) { if(teamName.includes(key)) return flags[key]; }
             return "⚽"; 
         };
