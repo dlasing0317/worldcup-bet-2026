@@ -31,6 +31,20 @@
             border-top: 2px solid #374151; width: 24px; z-index: 0; pointer-events: none;
         }
         .bracket-card { height: 64px; position: relative; z-index: 10; background: #1c1c1e; box-sizing: border-box; }
+        
+        #debug-output-container {
+            max-height: 400px;
+            overflow-y: auto;
+            background: #111;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 10px;
+            color: #0f0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            display: none;
+        }
     </style>
 </head>
 <body class="text-gray-100 min-h-screen pb-28">
@@ -108,6 +122,17 @@
             </h2>
             
             <div class="glass-panel rounded-xl p-5 space-y-6">
+                <div class="bg-yellow-900/10 border border-yellow-800/50 p-4 rounded-xl shadow-inner">
+                    <label class="block text-sm text-yellow-500 font-bold mb-2">🔍 測試員專用：API 賠率數據透視鏡</label>
+                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">直接截取 API-Sports 傳返嚟嘅最原始 (Raw JSON) 數據，核對賠率結構有冇變更。</p>
+                    <button onclick="window.debugAPI()" class="w-full bg-yellow-600 text-black font-black py-3 rounded-lg hover:bg-yellow-500 shadow-lg shadow-yellow-900/50 transition-all touch-manipulation">
+                        顯示原始 API 賠率數據
+                    </button>
+                    <div id="debug-output-container" class="mt-4"></div>
+                </div>
+
+                <div class="border-t border-gray-800 my-4"></div>
+
                 <div class="bg-blue-900/10 border border-blue-800/50 p-4 rounded-xl shadow-inner">
                     <label class="block text-sm text-blue-400 font-bold mb-2">🤖 全自動 API 同步 (賽程/比數/賠率)</label>
                     <p class="text-xs text-gray-400 mb-4 leading-relaxed">一鍵連接 API 獲取全球最新賽況及盤口，並快取至 Firebase 供所有人讀取，完美避開 API 收費限制。</p>
@@ -458,7 +483,40 @@
             } catch (e) { alert("❌ 落注失敗，請重試！"); console.error(e); }
         };
 
-        // 🚨 修正：轉回 bookmaker=1 (10Bet) 且 bet=3 (亞洲讓球盤)
+        // 🚨 終極 Debug 專用功能：擷取第一場賽事的所有 API 賠率數據並顯示
+        window.debugAPI = async () => {
+            const apiKey = prompt("🔍 請輸入 API-Sports Key 進行 Debug：", "c97d7ade3c22173f1ec6623c7ef91c23");
+            if (!apiKey) return;
+
+            const debugBox = document.getElementById('debug-output-container');
+            debugBox.style.display = 'block';
+            debugBox.innerText = "⏳ 正在請求 API 原始數據，請稍候...\nURL: https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&bet=3\n";
+
+            try {
+                const resOdds = await fetch("https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&bet=3", { 
+                    method: "GET", 
+                    headers: { "x-apisports-key": apiKey } 
+                });
+                const dataOdds = await resOdds.json();
+
+                if (dataOdds.errors && Object.keys(dataOdds.errors).length > 0) {
+                    debugBox.innerText += "\n❌ API Error:\n" + JSON.stringify(dataOdds.errors, null, 2);
+                    return;
+                }
+
+                if (dataOdds.response && dataOdds.response.length > 0) {
+                    // 只抽第一場有賠率的賽事來 Debug，免得畫面太長
+                    const sampleMatch = dataOdds.response[0];
+                    debugBox.innerText += `\n✅ 成功獲取數據！(顯示第一筆賽事 ID: ${sampleMatch.fixture.id})\n\n`;
+                    debugBox.innerText += JSON.stringify(sampleMatch.bookmakers, null, 2);
+                } else {
+                    debugBox.innerText += "\n⚠️ API 連接成功，但返回的 response 陣列為空 (沒有 2026 亞洲盤數據)。";
+                }
+            } catch (e) {
+                debugBox.innerText += "\n❌ 網絡或執行錯誤:\n" + e.message;
+            }
+        };
+
         window.autoSyncAPI = async () => {
             const pwd = prompt("🔐 管理員密碼："); 
             if (pwd !== "1971") { alert("❌ 密碼錯誤"); return; }
@@ -495,7 +553,6 @@
 
                 alert(`📡 成功獲取 ${matchesCount} 場賽事！\n正在向 10Bet (bookmaker=1) 獲取亞洲讓球盤 (bet=3) 賠率...`);
                 
-                // 🚨 修正：嚴格使用 bookmaker=1 和 bet=3
                 const resOdds = await fetch("https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&bet=3", { method: "GET", headers: { "x-apisports-key": apiKey } });
                 const dataOdds = await resOdds.json();
 
@@ -507,7 +564,6 @@
                     dataOdds.response.forEach(async (item) => {
                         let mId = item.fixture.id.toString();
                         
-                        // 確保層級結構存在，避免 undefined error
                         if (item.bookmakers && item.bookmakers.length > 0 && item.bookmakers[0].bets && item.bookmakers[0].bets.length > 0) {
                             let bets = item.bookmakers[0].bets[0].values;
                             
