@@ -229,9 +229,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // ==========================================
-        // 1. 全域變數初始化
-        // ==========================================
         let globalMatches = [];
         window.selectedDate = null; 
         window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
@@ -261,10 +258,6 @@
             "Iraq":"伊拉克", "Algeria":"阿爾及利亞", "Jordan":"約旦", "Austria":"奧地利", 
             "Congo":"剛果", "DR Congo":"剛果", "Panama":"巴拿馬", "Uzbekistan":"烏茲別克", "Colombia":"哥倫比亞" 
         };
-
-        // ==========================================
-        // 2. 防禦性綁定：所有 window. 函數移至最頂層
-        // ==========================================
         
         window.switchTab = (tabName) => {
             const tabs = ['matches', 'bracket', 'leaderboard', 'bets', 'admin'];
@@ -327,7 +320,7 @@
             if(matchHcap && matchHome && matchAway) {
                 const hStr = `[${matchHcap[1]}]`;
                 if(confirm(`🎯 破解成功！盤口: ${hStr}\n確定同步？`)) {
-                    await setDoc(doc(db, "odds", matchId), { handicapStr: hStr, home: parseFloat(matchHome[1]), away: parseFloat(matchAway[1]), updatedAt: serverTimestamp() }); 
+                    await setDoc(doc(db, "odds_2026", matchId), { handicapStr: hStr, home: parseFloat(matchHome[1]), away: parseFloat(matchAway[1]), updatedAt: serverTimestamp() }); 
                     document.getElementById('admin-odds-text').value = ''; 
                 }
             } else alert("❌ 格式錯誤");
@@ -353,7 +346,7 @@
                     await updateDoc(doc(db, "bets", document.id), { settled: true, profit: profit, settleDetail: detailMsg }); 
                 });
 
-                await setDoc(doc(db, "matches_core", matchId), { status: 'FT', scoreHome: scoreHome, scoreAway: scoreAway, updatedAt: serverTimestamp() }, { merge: true });
+                await setDoc(doc(db, "matches_2026", matchId), { status: 'FT', scoreHome: scoreHome, scoreAway: scoreAway, updatedAt: serverTimestamp() }, { merge: true });
                 alert("✅ 派彩完成，場次已鎖定！"); 
                 document.getElementById('score-home').value = ''; 
                 document.getElementById('score-away').value = '';
@@ -369,7 +362,7 @@
             if(!confirm(`⚠️ 確定將 ${match.home} VS ${match.away} 重置為「未開賽 (NS)」並清空比數？`)) return;
 
             try {
-                await setDoc(doc(db, "matches_core", matchId), { status: 'NS', scoreHome: null, scoreAway: null, updatedAt: serverTimestamp() }, { merge: true });
+                await setDoc(doc(db, "matches_2026", matchId), { status: 'NS', scoreHome: null, scoreAway: null, updatedAt: serverTimestamp() }, { merge: true });
                 alert("✅ 賽事已成功重置！");
             } catch(e) { alert("❌ 失敗: " + e.message); }
         };
@@ -465,7 +458,7 @@
             } catch (e) { alert("❌ 落注失敗，請重試！"); console.error(e); }
         };
 
-        // 🚨 終極 QA 防禦升級：轉用 Bet365 + 智能賠率 Fallback
+        // 🚨 修正：轉回 bookmaker=1 (10Bet) 且 bet=3 (亞洲讓球盤)
         window.autoSyncAPI = async () => {
             const pwd = prompt("🔐 管理員密碼："); 
             if (pwd !== "1971") { alert("❌ 密碼錯誤"); return; }
@@ -490,7 +483,7 @@
                         let hTC = teamMap[hEng] || hEng;
                         let aTC = teamMap[aEng] || aEng;
 
-                        await setDoc(doc(db, "matches_core", mId), { 
+                        await setDoc(doc(db, "matches_2026", mId), { 
                             id: mId, home: hTC, away: aTC, date: item.fixture.date,
                             status: item.fixture.status.short, scoreHome: item.goals.home, scoreAway: item.goals.away, 
                             updatedAt: serverTimestamp() 
@@ -500,10 +493,10 @@
                     alert("⚠️ API 連接成功，但官方仲未有 2026 賽季數據！"); return;
                 }
 
-                alert(`📡 成功獲取 ${matchesCount} 場賽事！\n正在向龍頭莊家 (Bet365) 獲取最新賠率...`);
+                alert(`📡 成功獲取 ${matchesCount} 場賽事！\n正在向 10Bet (bookmaker=1) 獲取亞洲讓球盤 (bet=3) 賠率...`);
                 
-                // 🚨 轉用 bookmaker=8 (Bet365)，取消 bet=3 限制
-                const resOdds = await fetch("https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=8", { method: "GET", headers: { "x-apisports-key": apiKey } });
+                // 🚨 修正：嚴格使用 bookmaker=1 和 bet=3
+                const resOdds = await fetch("https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&bet=3", { method: "GET", headers: { "x-apisports-key": apiKey } });
                 const dataOdds = await resOdds.json();
 
                 if (dataOdds.errors && Object.keys(dataOdds.errors).length > 0) throw new Error("API 存取被拒 (Odds): " + Object.values(dataOdds.errors)[0]);
@@ -513,55 +506,41 @@
                     oddsCount = dataOdds.response.length;
                     dataOdds.response.forEach(async (item) => {
                         let mId = item.fixture.id.toString();
-                        let bookmaker = item.bookmakers[0];
-                        if (bookmaker) {
-                            let handicapBet = bookmaker.bets.find(b => b.id === 3); // 優先搵 Asian Handicap
-                            let matchWinnerBet = bookmaker.bets.find(b => b.id === 1); // 搵唔到就用 Match Winner 頂住檔先
+                        
+                        // 確保層級結構存在，避免 undefined error
+                        if (item.bookmakers && item.bookmakers.length > 0 && item.bookmakers[0].bets && item.bookmakers[0].bets.length > 0) {
+                            let bets = item.bookmakers[0].bets[0].values;
                             
-                            let homeOdd = 0, awayOdd = 0, hcapStr = "[0]";
-
-                            // 1. 先用 Match Winner 墊底
-                            if (matchWinnerBet) {
-                                let hBet = matchWinnerBet.values.find(v => v.value === "Home");
-                                let aBet = matchWinnerBet.values.find(v => v.value === "Away");
-                                if (hBet) homeOdd = parseFloat(hBet.odd);
-                                if (aBet) awayOdd = parseFloat(aBet.odd);
-                            }
-
-                            // 2. 如果有 Asian Handicap 就完美覆蓋
-                            if (handicapBet) {
-                                let hBet = handicapBet.values.find(v => v.value.includes("Home"));
-                                let aBet = handicapBet.values.find(v => v.value.includes("Away"));
-                                if (hBet && aBet) {
-                                    homeOdd = parseFloat(hBet.odd);
-                                    awayOdd = parseFloat(aBet.odd);
-                                    let hcapMatch = hBet.value.match(/Home\s+([+-]?[0-9.]+)/);
-                                    hcapStr = hcapMatch ? `[${hcapMatch[1]}]` : "[0]";
+                            if (bets && bets.length >= 2) {
+                                let homeBet = bets.find(b => b.value.includes("Home"));
+                                let awayBet = bets.find(b => b.value.includes("Away"));
+                                
+                                if (homeBet && awayBet) {
+                                    let hcapMatch = homeBet.value.match(/Home\s+([+-]?[0-9.]+)/);
+                                    let hcapStr = hcapMatch ? `[${hcapMatch[1]}]` : "[0]";
+                                    await setDoc(doc(db, "odds_2026", mId), { handicapStr: hcapStr, home: parseFloat(homeBet.odd), away: parseFloat(awayBet.odd), updatedAt: serverTimestamp() }, { merge: true });
                                 }
-                            }
-                            
-                            if (homeOdd > 0 && awayOdd > 0) {
-                                await setDoc(doc(db, "odds", mId), { handicapStr: hcapStr, home: homeOdd, away: awayOdd, updatedAt: serverTimestamp() }, { merge: true });
                             }
                         }
                     });
                 }
                 
-                alert(`✅ QA 診斷報告：\n成功同步 ${matchesCount} 場賽程！\n成功擷取 ${oddsCount} 場賠率！\n\n如果賠率顯示 [0]，代表 Bet365 暫時只開咗主客和，未開讓球盤！`);
+                alert(`✅ QA 診斷報告：\n成功同步 ${matchesCount} 場賽程！\n成功擷取 ${oddsCount} 場賠率！\n\n(系統已轉用 10Bet 亞洲讓球盤)`);
                 
             } catch(e) { console.error(e); alert("❌ 同步失敗：" + e.message); }
         };
 
         window.betOnTeam = (teamName) => {
-            let match = globalMatches.find(m => (m.home === teamName || m.away === teamName) && !['FT', 'AET', 'PEN'].includes(m.status));
-            if (!match) match = globalMatches.find(m => m.home === teamName || m.away === teamName);
+            let match = globalMatches.find(m => (m.home.includes(teamName) || m.away.includes(teamName)) && !['FT', 'AET', 'PEN'].includes(m.status));
+            if (!match) match = globalMatches.find(m => m.home.includes(teamName) || m.away.includes(teamName));
             
             if(match) {
-                let odds = match.home === teamName ? match.odds.home : match.odds.away;
+                let odds = match.home.includes(teamName) ? match.odds.home : match.odds.away;
+                let actualTeamName = match.home.includes(teamName) ? match.home : match.away;
                 if (odds > 0) {
-                    window.placeBet(match.id, teamName, odds);
+                    window.placeBet(match.id, actualTeamName, odds);
                 } else {
-                    alert("⚠️ " + teamName + " 下一場賽事（" + match.home + " VS " + match.away + "）莊家尚未開盤，暫時無法落注。");
+                    alert("⚠️ " + actualTeamName + " 下一場賽事莊家尚未開盤，暫時無法落注。");
                 }
             } else {
                 alert("⚠️ 系統暫時找不到 " + teamName + " 的賽程資料。");
@@ -747,11 +726,11 @@
 
             Object.keys(groupTeams).forEach(g => {
                 let teamsHtml = groupTeams[g].map(team => {
-                    let m = globalMatches.find(x => (x.home === team || x.away === team) && !['FT', 'AET', 'PEN'].includes(x.status));
-                    if(!m) m = globalMatches.find(x => x.home === team || x.away === team);
+                    let m = globalMatches.find(x => (x.home.includes(team) || x.away.includes(team)) && !['FT', 'AET', 'PEN'].includes(x.status));
+                    if(!m) m = globalMatches.find(x => x.home.includes(team) || x.away.includes(team));
                     let oddsDisplay = '-';
                     if (m) {
-                        let o = m.home === team ? m.odds.home : m.odds.away;
+                        let o = m.home.includes(team) ? m.odds.home : m.odds.away;
                         if(o > 0) oddsDisplay = o.toFixed(2);
                     }
 
@@ -885,7 +864,10 @@
             globalMatches = mockJSON.map(item => {
                 const dateObj = new Date(item.date);
                 return {
-                    id: item.id, home: item.home, away: item.away, status: item.status, scoreHome: null, scoreAway: null, date: item.date,
+                    id: item.id, 
+                    home: "⚠️測試_" + item.home, 
+                    away: "⚠️測試_" + item.away, 
+                    status: item.status, scoreHome: null, scoreAway: null, date: item.date,
                     dateStr: dateObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' }), month: dateObj.getMonth() + 1,
                     dateNum: dateObj.getDate(), weekday: '星期' + weekdaysCH[dateObj.getDay()],
                     kickoff: dateObj.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' }),
@@ -896,9 +878,9 @@
         };
 
         const initMatches = () => {
-            onSnapshot(collection(db, "matches_core"), (snapshot) => {
+            onSnapshot(collection(db, "matches_2026"), (snapshot) => {
                 if (snapshot.empty) {
-                    loadMockData();
+                    loadMockData(); 
                 } else {
                     let apiMatches = [];
                     snapshot.forEach((docSnap) => {
@@ -931,7 +913,7 @@
         // ==========================================
         // 5. Firebase 事件監聽器 (Odds and Bets)
         // ==========================================
-        onSnapshot(collection(db, "odds"), (snapshot) => { 
+        onSnapshot(collection(db, "odds_2026"), (snapshot) => { 
             let needsRender = false; 
             snapshot.forEach((doc) => { 
                 const newOdds = doc.data(); 
