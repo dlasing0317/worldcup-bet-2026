@@ -245,7 +245,6 @@
             "Michael": "bg-teal-600", "Sha": "bg-rose-600", "Travis": "bg-indigo-600"
         };
 
-        // 🚨 終極升級：中英對照翻譯機 (確保 Bracket 唔會崩潰)
         const teamMap = { 
             "USA":"美國", "United States":"美國", "England":"英格蘭", "Germany":"德國", "France":"法國", 
             "Brazil":"巴西", "Argentina":"阿根廷", "Mexico":"墨西哥", "Poland":"波蘭", "Saudi Arabia":"沙特", 
@@ -334,7 +333,6 @@
             } else alert("❌ 格式錯誤");
         };
 
-        // 🚨 更新：派彩寫入 Matches_core
         window.settleMatch = async () => {
             const pwd = prompt("🔐 密碼："); if (pwd !== "1971") return;
             const matchId = document.getElementById('admin-match-select').value, scoreHome = parseInt(document.getElementById('score-home').value), scoreAway = parseInt(document.getElementById('score-away').value);
@@ -362,7 +360,6 @@
             } catch(e) { alert("❌ 失敗"); }
         };
 
-        // 🚨 更新：重置寫入 Matches_core
         window.resetMatch = async () => {
             const pwd = prompt("🔐 莊家密碼："); if (pwd !== "1971") return;
             const matchId = document.getElementById('admin-match-select').value;
@@ -468,7 +465,7 @@
             } catch (e) { alert("❌ 落注失敗，請重試！"); console.error(e); }
         };
 
-        // 🚨 終極升級：API Sync 改為寫入 matches_core，並內置中英翻譯
+        // 🚨 終極 QA 防禦升級：轉用 Bet365 + 智能賠率 Fallback
         window.autoSyncAPI = async () => {
             const pwd = prompt("🔐 管理員密碼："); 
             if (pwd !== "1971") { alert("❌ 密碼錯誤"); return; }
@@ -483,53 +480,75 @@
                 
                 if (dataMatches.errors && Object.keys(dataMatches.errors).length > 0) throw new Error("API 存取被拒: " + Object.values(dataMatches.errors)[0]);
                 
+                let matchesCount = 0;
                 if (dataMatches.response && dataMatches.response.length > 0) {
+                    matchesCount = dataMatches.response.length;
                     dataMatches.response.forEach(async (item) => {
                         let mId = item.fixture.id.toString();
                         let hEng = item.teams.home.name;
                         let aEng = item.teams.away.name;
-                        // 嘗試翻譯，如果 Dictionary 搵唔到就照用英文原名
                         let hTC = teamMap[hEng] || hEng;
                         let aTC = teamMap[aEng] || aEng;
 
                         await setDoc(doc(db, "matches_core", mId), { 
-                            id: mId,
-                            home: hTC, 
-                            away: aTC,
-                            date: item.fixture.date,
-                            status: item.fixture.status.short, 
-                            scoreHome: item.goals.home, 
-                            scoreAway: item.goals.away, 
+                            id: mId, home: hTC, away: aTC, date: item.fixture.date,
+                            status: item.fixture.status.short, scoreHome: item.goals.home, scoreAway: item.goals.away, 
                             updatedAt: serverTimestamp() 
                         }, { merge: true });
                     });
                 } else {
-                    alert("⚠️ API 連接成功，但官方仲未有 2026 賽季數據！\n\n系統會繼續保留現有測試數據。");
-                    return; // 終止，免得 Fetch Odds 都錯
+                    alert("⚠️ API 連接成功，但官方仲未有 2026 賽季數據！"); return;
                 }
 
-                alert("📡 賽況同步完成！正在獲取最新讓球盤賠率...");
-                const resOdds = await fetch("https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&bet=3", { method: "GET", headers: { "x-apisports-key": apiKey } });
+                alert(`📡 成功獲取 ${matchesCount} 場賽事！\n正在向龍頭莊家 (Bet365) 獲取最新賠率...`);
+                
+                // 🚨 轉用 bookmaker=8 (Bet365)，取消 bet=3 限制
+                const resOdds = await fetch("https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=8", { method: "GET", headers: { "x-apisports-key": apiKey } });
                 const dataOdds = await resOdds.json();
 
                 if (dataOdds.errors && Object.keys(dataOdds.errors).length > 0) throw new Error("API 存取被拒 (Odds): " + Object.values(dataOdds.errors)[0]);
 
+                let oddsCount = 0;
                 if (dataOdds.response && dataOdds.response.length > 0) {
+                    oddsCount = dataOdds.response.length;
                     dataOdds.response.forEach(async (item) => {
                         let mId = item.fixture.id.toString();
-                        let bets = item.bookmakers[0].bets[0].values;
-                        if (bets && bets.length >= 2) {
-                            let homeBet = bets.find(b => b.value.includes("Home"));
-                            let awayBet = bets.find(b => b.value.includes("Away"));
-                            if (homeBet && awayBet) {
-                                let hcapMatch = homeBet.value.match(/Home\s+([+-]?[0-9.]+)/);
-                                let hcapStr = hcapMatch ? `[${hcapMatch[1]}]` : "[0]";
-                                await setDoc(doc(db, "odds", mId), { handicapStr: hcapStr, home: parseFloat(homeBet.odd), away: parseFloat(awayBet.odd), updatedAt: serverTimestamp() }, { merge: true });
+                        let bookmaker = item.bookmakers[0];
+                        if (bookmaker) {
+                            let handicapBet = bookmaker.bets.find(b => b.id === 3); // 優先搵 Asian Handicap
+                            let matchWinnerBet = bookmaker.bets.find(b => b.id === 1); // 搵唔到就用 Match Winner 頂住檔先
+                            
+                            let homeOdd = 0, awayOdd = 0, hcapStr = "[0]";
+
+                            // 1. 先用 Match Winner 墊底
+                            if (matchWinnerBet) {
+                                let hBet = matchWinnerBet.values.find(v => v.value === "Home");
+                                let aBet = matchWinnerBet.values.find(v => v.value === "Away");
+                                if (hBet) homeOdd = parseFloat(hBet.odd);
+                                if (aBet) awayOdd = parseFloat(aBet.odd);
+                            }
+
+                            // 2. 如果有 Asian Handicap 就完美覆蓋
+                            if (handicapBet) {
+                                let hBet = handicapBet.values.find(v => v.value.includes("Home"));
+                                let aBet = handicapBet.values.find(v => v.value.includes("Away"));
+                                if (hBet && aBet) {
+                                    homeOdd = parseFloat(hBet.odd);
+                                    awayOdd = parseFloat(aBet.odd);
+                                    let hcapMatch = hBet.value.match(/Home\s+([+-]?[0-9.]+)/);
+                                    hcapStr = hcapMatch ? `[${hcapMatch[1]}]` : "[0]";
+                                }
+                            }
+                            
+                            if (homeOdd > 0 && awayOdd > 0) {
+                                await setDoc(doc(db, "odds", mId), { handicapStr: hcapStr, home: homeOdd, away: awayOdd, updatedAt: serverTimestamp() }, { merge: true });
                             }
                         }
                     });
                 }
-                alert("✅ 全自動同步完美成功！所有玩家畫面將於幾秒內自動更新！");
+                
+                alert(`✅ QA 診斷報告：\n成功同步 ${matchesCount} 場賽程！\n成功擷取 ${oddsCount} 場賠率！\n\n如果賠率顯示 [0]，代表 Bet365 暫時只開咗主客和，未開讓球盤！`);
+                
             } catch(e) { console.error(e); alert("❌ 同步失敗：" + e.message); }
         };
 
@@ -821,7 +840,6 @@
             `;
         }
 
-        // 🚨 終極升級：純 API 驅動初始化
         const loadMockData = () => {
             const mockJSON = [
                 { id: "2001", home: "墨西哥", away: "南非", date: new Date(2026, 5, 11, 12, 0, 0).toISOString(), status: "NS" },
@@ -878,7 +896,6 @@
         };
 
         const initMatches = () => {
-            // 直接聽住 Firebase matches_core，如果有數據就用，無數據就用 mock
             onSnapshot(collection(db, "matches_core"), (snapshot) => {
                 if (snapshot.empty) {
                     loadMockData();
@@ -902,7 +919,6 @@
                             odds: existingOdds
                         });
                     });
-                    // 按日期排序
                     globalMatches = apiMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
                     renderDateFilter(); renderMatches(); renderBracket();
                 }
