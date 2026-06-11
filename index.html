@@ -155,7 +155,6 @@
 
     </main>
 
-    <!-- 落注視窗 -->
     <div id="bet-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="bet-modal-content">
             <h3 class="text-white font-black text-xl mb-2 flex items-center tracking-wide"><span class="mr-2 text-2xl">⚽</span> 確認落注</h3>
@@ -185,14 +184,12 @@
         </div>
     </div>
 
-    <!-- 自訂霸氣買定離手 Confirm 彈窗 -->
     <div id="custom-confirm-modal" class="hidden fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 backdrop-blur-md opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-8 shadow-2xl border border-yellow-600/50 transform scale-95 transition-transform duration-300 flex flex-col items-center text-center" id="custom-confirm-content">
             <span class="text-5xl mb-4">⚠️</span>
             <h3 class="text-yellow-500 font-black text-2xl leading-tight mb-6">
                 買定離手！<br>落咗注就絕對冇得改㗎!
             </h3>
-            <!-- 🚨 完美修正：移除深色黑框，改為純文字完美融入 -->
             <p id="custom-confirm-detail" class="text-gray-200 text-base mb-8 font-medium w-full"></p>
             <div class="flex space-x-4 w-full justify-center">
                 <button onclick="window.closeCustomConfirm()" class="flex-1 py-3.5 rounded-xl bg-[#1c1c1e] text-gray-400 font-bold text-sm hover:bg-gray-800 border border-gray-700 transition-colors touch-manipulation">取消</button>
@@ -201,7 +198,6 @@
         </div>
     </div>
 
-    <!-- 底部導航列 -->
     <nav class="fixed bottom-0 w-full bg-[#1c1c1e] border-t border-gray-800 p-3 flex justify-around items-center z-50 pb-safe">
         <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors flex-1 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0 1 1 0 01-2 0zM7 9a1 1 0 100 2 1 1 0 000-2zm6 0a1 1 0 100 2 1 1 0 000-2zm-3 3a1 1 0 100 2 1 1 0 000-2z"></path></svg>
@@ -249,27 +245,41 @@
             "Michael": "bg-teal-600", "Sha": "bg-rose-600", "Travis": "bg-indigo-600"
         };
 
+        // 🚨 終極升級：中英對照翻譯機 (確保 Bracket 唔會崩潰)
+        const teamMap = { 
+            "USA":"美國", "United States":"美國", "England":"英格蘭", "Germany":"德國", "France":"法國", 
+            "Brazil":"巴西", "Argentina":"阿根廷", "Mexico":"墨西哥", "Poland":"波蘭", "Saudi Arabia":"沙特", 
+            "Spain":"西班牙", "Japan":"日本", "South Korea":"韓國", "Korea Republic":"韓國", "Portugal":"葡萄牙", 
+            "Netherlands":"荷蘭", "Canada":"加拿大", "Bosnia":"波斯尼亞", "Bosnia and Herzegovina":"波斯尼亞",
+            "South Africa":"南非", "Czech Republic":"捷克", "Czechia":"捷克", "Paraguay":"巴拉圭", 
+            "Croatia":"克羅地亞", "Morocco":"摩洛哥", "Qatar":"卡塔爾", "Senegal":"塞內加爾", 
+            "Cameroon":"喀麥隆", "Ecuador":"厄瓜多爾", "Australia":"澳洲", "Denmark":"丹麥", 
+            "Tunisia":"突尼西亞", "Costa Rica":"哥斯達黎加", "Belgium":"比利時", "Wales":"威爾斯", 
+            "Iran":"伊朗", "Uruguay":"烏拉圭", "Switzerland":"瑞士", "Serbia":"塞爾維亞", 
+            "Ghana":"加納", "Scotland":"蘇格蘭", "Haiti":"海地", "Turkey":"土耳其", "Türkiye":"土耳其", 
+            "Curacao":"庫拉索", "Ivory Coast":"科特迪瓦", "Côte d'Ivoire":"科特迪瓦", "Sweden":"瑞典", 
+            "Cape Verde":"佛得角", "Egypt":"埃及", "New Zealand":"新西蘭", "Norway":"挪威", 
+            "Iraq":"伊拉克", "Algeria":"阿爾及利亞", "Jordan":"約旦", "Austria":"奧地利", 
+            "Congo":"剛果", "DR Congo":"剛果", "Panama":"巴拿馬", "Uzbekistan":"烏茲別克", "Colombia":"哥倫比亞" 
+        };
+
         // ==========================================
         // 2. 防禦性綁定：所有 window. 函數移至最頂層
         // ==========================================
         
         window.switchTab = (tabName) => {
             const tabs = ['matches', 'bracket', 'leaderboard', 'bets', 'admin'];
-            
             tabs.forEach(t => {
                 const view = document.getElementById('view-' + t);
                 const tab = document.getElementById('tab-' + t);
-                
                 if (view) view.classList.add('hidden');
                 if (tab) {
                     tab.classList.remove('text-green-500');
                     tab.classList.add('text-gray-500');
                 }
             });
-
             const activeView = document.getElementById('view-' + tabName);
             const activeTab = document.getElementById('tab-' + tabName);
-            
             if (activeView) activeView.classList.remove('hidden');
             if (activeTab) {
                 activeTab.classList.remove('text-gray-500');
@@ -286,24 +296,17 @@
         window.handleUserChange = async (selectElement) => {
             const selectedUser = selectElement.value;
             const enteredPin = prompt(`🔐 切換帳號驗證\n請輸入「${selectedUser}」嘅專屬 4 位 PIN 碼：`);
-            
-            if (!enteredPin) {
-                selectElement.value = window.previousUser;
-                return;
-            }
-
+            if (!enteredPin) { selectElement.value = window.previousUser; return; }
             try {
                 let isValid = false;
                 const playerDocRef = doc(db, "players", selectedUser);
                 const playerDocSnap = await getDoc(playerDocRef);
-
                 if (playerDocSnap.exists()) {
                     isValid = playerDocSnap.data().pin === enteredPin;
                 } else {
                     const fallbackPins = { "Dennis": "1971", "Samuel": "0000", "Charles": "0000", "Michael": "0000", "Sha": "0000", "Travis": "0000" };
                     isValid = fallbackPins[selectedUser] === enteredPin;
                 }
-
                 if (isValid) {
                     window.authenticatedUser = selectedUser;
                     window.previousUser = selectedUser;
@@ -313,9 +316,7 @@
                     selectElement.value = window.previousUser; 
                 }
             } catch (error) {
-                console.error(error);
-                alert("🚨 系統錯誤：無法連接至伺服器驗證密碼。");
-                selectElement.value = window.previousUser;
+                console.error(error); alert("🚨 系統錯誤：無法連接至伺服器驗證密碼。"); selectElement.value = window.previousUser;
             }
         };
 
@@ -333,6 +334,7 @@
             } else alert("❌ 格式錯誤");
         };
 
+        // 🚨 更新：派彩寫入 Matches_core
         window.settleMatch = async () => {
             const pwd = prompt("🔐 密碼："); if (pwd !== "1971") return;
             const matchId = document.getElementById('admin-match-select').value, scoreHome = parseInt(document.getElementById('score-home').value), scoreAway = parseInt(document.getElementById('score-away').value);
@@ -353,38 +355,26 @@
                     await updateDoc(doc(db, "bets", document.id), { settled: true, profit: profit, settleDetail: detailMsg }); 
                 });
 
-                await setDoc(doc(db, "matches_live", matchId), {
-                    status: 'FT',
-                    scoreHome: scoreHome,
-                    scoreAway: scoreAway,
-                    updatedAt: serverTimestamp()
-                }, { merge: true });
-
+                await setDoc(doc(db, "matches_core", matchId), { status: 'FT', scoreHome: scoreHome, scoreAway: scoreAway, updatedAt: serverTimestamp() }, { merge: true });
                 alert("✅ 派彩完成，場次已鎖定！"); 
                 document.getElementById('score-home').value = ''; 
                 document.getElementById('score-away').value = '';
             } catch(e) { alert("❌ 失敗"); }
         };
 
+        // 🚨 更新：重置寫入 Matches_core
         window.resetMatch = async () => {
             const pwd = prompt("🔐 莊家密碼："); if (pwd !== "1971") return;
             const matchId = document.getElementById('admin-match-select').value;
             const match = globalMatches.find(m => m.id === matchId);
             if (!match) return;
             
-            if(!confirm(`⚠️ 確定將 ${match.home} VS ${match.away} 重置為「未開賽 (NS)」並清空比數？\n(注意：如需清空舊注單請使用下方的「一鍵洗底」)`)) return;
+            if(!confirm(`⚠️ 確定將 ${match.home} VS ${match.away} 重置為「未開賽 (NS)」並清空比數？`)) return;
 
             try {
-                await setDoc(doc(db, "matches_live", matchId), {
-                    status: 'NS',
-                    scoreHome: null,
-                    scoreAway: null,
-                    updatedAt: serverTimestamp()
-                }, { merge: true });
+                await setDoc(doc(db, "matches_core", matchId), { status: 'NS', scoreHome: null, scoreAway: null, updatedAt: serverTimestamp() }, { merge: true });
                 alert("✅ 賽事已成功重置！");
-            } catch(e) { 
-                alert("❌ 失敗: " + e.message); 
-            }
+            } catch(e) { alert("❌ 失敗: " + e.message); }
         };
 
         window.updateHeaderBalance = () => {
@@ -402,14 +392,10 @@
             let adminTab = document.getElementById('tab-admin');
             if (adminTab) {
                 if (currentUser === 'Dennis') { 
-                    adminTab.classList.remove('hidden');
-                    adminTab.classList.add('flex');
+                    adminTab.classList.remove('hidden'); adminTab.classList.add('flex');
                 } else { 
-                    adminTab.classList.add('hidden');
-                    adminTab.classList.remove('flex');
-                    if (!document.getElementById('view-admin').classList.contains('hidden')) {
-                        window.switchTab('matches');
-                    }
+                    adminTab.classList.add('hidden'); adminTab.classList.remove('flex');
+                    if (!document.getElementById('view-admin').classList.contains('hidden')) { window.switchTab('matches'); }
                 }
             }
         };
@@ -418,9 +404,7 @@
             if(odds === 0) { alert("⚠️ 莊家尚未開盤，暫時無法落注。"); return; }
             const currentPlayer = document.getElementById('player-select').value;
             
-            if (window.authenticatedUser !== currentPlayer) {
-                alert("❌ 安全異常：帳號狀態不符，請重新登入！"); return;
-            }
+            if (window.authenticatedUser !== currentPlayer) { alert("❌ 安全異常：帳號狀態不符，請重新登入！"); return; }
 
             window.pendingBet = { matchId, selection, odds, player: currentPlayer };
             document.getElementById('bet-modal-player').innerText = currentPlayer;
@@ -453,10 +437,8 @@
         window.confirmBet = () => {
             if (!window.pendingBet) return;
             const amount = parseInt(document.getElementById('bet-amount-input').innerText);
-            
             if (amount >= 5 && amount <= 100) {
                 document.getElementById('custom-confirm-detail').innerHTML = `確定畀 <span class="text-white font-black">$${amount}</span> 買 <span class="text-white font-black">${window.pendingBet.selection}</span>？`;
-                
                 const modal = document.getElementById('custom-confirm-modal');
                 const modalContent = document.getElementById('custom-confirm-content');
                 modal.classList.remove('hidden');
@@ -475,21 +457,18 @@
         window.executeBet = async () => {
             if (!window.pendingBet) return;
             const amount = parseInt(document.getElementById('bet-amount-input').innerText);
-            
             try {
                 await addDoc(collection(db, "bets"), { 
                     player: window.pendingBet.player, matchId: window.pendingBet.matchId, 
                     selection: window.pendingBet.selection, odds: window.pendingBet.odds, 
                     amount: amount, settled: false, profit: 0, timestamp: serverTimestamp() 
                 }); 
-                
                 window.closeCustomConfirm(); 
                 window.closeBetModal();      
-            } catch (e) {
-                alert("❌ 落注失敗，請重試！"); console.error(e);
-            }
+            } catch (e) { alert("❌ 落注失敗，請重試！"); console.error(e); }
         };
 
+        // 🚨 終極升級：API Sync 改為寫入 matches_core，並內置中英翻譯
         window.autoSyncAPI = async () => {
             const pwd = prompt("🔐 管理員密碼："); 
             if (pwd !== "1971") { alert("❌ 密碼錯誤"); return; }
@@ -502,14 +481,33 @@
                 const resMatches = await fetch("https://v3.football.api-sports.io/fixtures?league=1&season=2026", { method: "GET", headers: { "x-apisports-key": apiKey } });
                 const dataMatches = await resMatches.json();
                 
-                if (dataMatches.errors && Object.keys(dataMatches.errors).length > 0) throw new Error("API 存取被拒 (Matches): " + Object.values(dataMatches.errors)[0]);
+                if (dataMatches.errors && Object.keys(dataMatches.errors).length > 0) throw new Error("API 存取被拒: " + Object.values(dataMatches.errors)[0]);
                 
                 if (dataMatches.response && dataMatches.response.length > 0) {
                     dataMatches.response.forEach(async (item) => {
                         let mId = item.fixture.id.toString();
-                        await setDoc(doc(db, "matches_live", mId), { status: item.fixture.status.short, scoreHome: item.goals.home, scoreAway: item.goals.away, updatedAt: serverTimestamp() }, { merge: true });
+                        let hEng = item.teams.home.name;
+                        let aEng = item.teams.away.name;
+                        // 嘗試翻譯，如果 Dictionary 搵唔到就照用英文原名
+                        let hTC = teamMap[hEng] || hEng;
+                        let aTC = teamMap[aEng] || aEng;
+
+                        await setDoc(doc(db, "matches_core", mId), { 
+                            id: mId,
+                            home: hTC, 
+                            away: aTC,
+                            date: item.fixture.date,
+                            status: item.fixture.status.short, 
+                            scoreHome: item.goals.home, 
+                            scoreAway: item.goals.away, 
+                            updatedAt: serverTimestamp() 
+                        }, { merge: true });
                     });
+                } else {
+                    alert("⚠️ API 連接成功，但官方仲未有 2026 賽季數據！\n\n系統會繼續保留現有測試數據。");
+                    return; // 終止，免得 Fetch Odds 都錯
                 }
+
                 alert("📡 賽況同步完成！正在獲取最新讓球盤賠率...");
                 const resOdds = await fetch("https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&bet=3", { method: "GET", headers: { "x-apisports-key": apiKey } });
                 const dataOdds = await resOdds.json();
@@ -532,7 +530,7 @@
                     });
                 }
                 alert("✅ 全自動同步完美成功！所有玩家畫面將於幾秒內自動更新！");
-            } catch(e) { console.error(e); alert("❌ 同步失敗 (如果 API 未有 2026 數據會報錯)：" + e.message); }
+            } catch(e) { console.error(e); alert("❌ 同步失敗：" + e.message); }
         };
 
         window.betOnTeam = (teamName) => {
@@ -554,7 +552,6 @@
         window.resetAllBets = async () => {
             const pwd = prompt("🔐 管理員危險操作：\n請輸入莊家密碼：");
             if (pwd !== "1971") { alert("❌ 密碼錯誤"); return; }
-
             const phrase = prompt("⚠️ 警告：此操作將會永久刪除所有注單及清空所有人嘅結餘！\n\n為防錯手，請準確輸入以下確認字句：\n大茶飯歸零");
             if (phrase !== "大茶飯歸零") { alert("❌ 確認字句不符，操作已取消。"); return; }
 
@@ -562,15 +559,10 @@
                 alert("🧹 正在清空所有注單，請稍候...");
                 const snapshot = await getDocs(collection(db, "bets"));
                 const deletePromises = [];
-                snapshot.forEach((document) => {
-                    deletePromises.push(deleteDoc(doc(db, "bets", document.id)));
-                });
+                snapshot.forEach((document) => { deletePromises.push(deleteDoc(doc(db, "bets", document.id))); });
                 await Promise.all(deletePromises);
                 alert("✅ 斬草除根！所有注單已清空，所有人結餘已瞬間歸零。");
-            } catch (e) {
-                console.error(e);
-                alert("❌ 清除失敗：" + e.message);
-            }
+            } catch (e) { console.error(e); alert("❌ 清除失敗：" + e.message); }
         };
 
         // ==========================================
@@ -829,7 +821,8 @@
             `;
         }
 
-        const initMatches = () => {
+        // 🚨 終極升級：純 API 驅動初始化
+        const loadMockData = () => {
             const mockJSON = [
                 { id: "2001", home: "墨西哥", away: "南非", date: new Date(2026, 5, 11, 12, 0, 0).toISOString(), status: "NS" },
                 { id: "2002", home: "韓國", away: "捷克", date: new Date(2026, 5, 11, 19, 0, 0).toISOString(), status: "NS" },
@@ -874,7 +867,7 @@
             globalMatches = mockJSON.map(item => {
                 const dateObj = new Date(item.date);
                 return {
-                    id: item.id, home: item.home, away: item.away, status: item.status, scoreHome: null, scoreAway: null,
+                    id: item.id, home: item.home, away: item.away, status: item.status, scoreHome: null, scoreAway: null, date: item.date,
                     dateStr: dateObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' }), month: dateObj.getMonth() + 1,
                     dateNum: dateObj.getDate(), weekday: '星期' + weekdaysCH[dateObj.getDay()],
                     kickoff: dateObj.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' }),
@@ -884,27 +877,44 @@
             renderDateFilter(); renderMatches(); renderBracket();
         };
 
+        const initMatches = () => {
+            // 直接聽住 Firebase matches_core，如果有數據就用，無數據就用 mock
+            onSnapshot(collection(db, "matches_core"), (snapshot) => {
+                if (snapshot.empty) {
+                    loadMockData();
+                } else {
+                    let apiMatches = [];
+                    snapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        const dateObj = new Date(data.date);
+                        
+                        let existingOdds = { handicapStr: "", home: 0.00, away: 0.00 };
+                        let existingMatch = globalMatches.find(m => m.id === data.id);
+                        if (existingMatch) { existingOdds = existingMatch.odds; }
+                        
+                        apiMatches.push({
+                            id: data.id, home: data.home, away: data.away, date: data.date, status: data.status, 
+                            scoreHome: data.scoreHome !== undefined ? data.scoreHome : null, 
+                            scoreAway: data.scoreAway !== undefined ? data.scoreAway : null,
+                            dateStr: dateObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' }), month: dateObj.getMonth() + 1,
+                            dateNum: dateObj.getDate(), weekday: '星期' + weekdaysCH[dateObj.getDay()],
+                            kickoff: dateObj.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' }),
+                            odds: existingOdds
+                        });
+                    });
+                    // 按日期排序
+                    globalMatches = apiMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    renderDateFilter(); renderMatches(); renderBracket();
+                }
+            });
+        };
+
         initMatches(); 
         window.updateHeaderBalance();
 
         // ==========================================
-        // 5. Firebase 事件監聽器
+        // 5. Firebase 事件監聽器 (Odds and Bets)
         // ==========================================
-        onSnapshot(collection(db, "matches_live"), (snapshot) => { 
-            let needsRender = false;
-            snapshot.forEach((doc) => { 
-                const liveData = doc.data(); 
-                const matchIndex = globalMatches.findIndex(m => m.id === doc.id); 
-                if(matchIndex !== -1) { 
-                    globalMatches[matchIndex].status = liveData.status || globalMatches[matchIndex].status;
-                    if(liveData.scoreHome !== undefined) globalMatches[matchIndex].scoreHome = liveData.scoreHome;
-                    if(liveData.scoreAway !== undefined) globalMatches[matchIndex].scoreAway = liveData.scoreAway;
-                    needsRender = true; 
-                } 
-            }); 
-            if(needsRender) { renderMatches(); renderBracket(); }
-        });
-
         onSnapshot(collection(db, "odds"), (snapshot) => { 
             let needsRender = false; 
             snapshot.forEach((doc) => { 
