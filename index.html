@@ -275,7 +275,7 @@
             "South Africa":"南非", "Czech Republic":"捷克", "Czechia":"捷克", "Paraguay":"巴拉圭", 
             "Croatia":"克羅地亞", "Morocco":"摩洛哥", "Qatar":"卡塔爾", "Senegal":"塞內加爾", 
             "Cameroon":"喀麥隆", "Ecuador":"厄瓜多爾", "Australia":"澳洲", "Denmark":"丹麥", 
-            "Tunisia":"突尼西亞", "Costa Rica":"哥斯達 মোহ":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", 
+            "Tunisia":"突尼西亞", "Costa Rica":"哥斯達黎加", "Belgium":"比利時", "Wales":"威爾斯", 
             "Iran":"伊朗", "Uruguay":"烏拉圭", "Switzerland":"瑞士", "Serbia":"塞爾維亞", 
             "Ghana":"加納", "Scotland":"蘇格蘭", "Haiti":"海地", "Turkey":"土耳其", "Türkiye":"土耳其", 
             "Curacao":"庫拉索", "Ivory Coast":"科特迪瓦", "Côte d'Ivoire":"科特迪瓦", "Sweden":"瑞典", 
@@ -351,7 +351,6 @@
             } else alert("❌ 格式錯誤");
         };
 
-        // 🚨 終極修復：無 Index 查詢，完美避開 Firebase 報錯
         const autoSettleMatch = async (matchId, scoreHome, scoreAway, hcapStr, homeTeamName) => {
             let hcapVal = 0;
             let hcapClean = hcapStr.replace('[', '').replace(']', '').replace('+', '');
@@ -365,12 +364,10 @@
             let netHomeScore = scoreHome - scoreAway + hcapVal;
 
             try {
-                // ⚠️ 只查詢 matchId，唔查詢 settled，避免 Firebase 要求建立 Composite Index 而報錯！
                 const snapshot = await getDocs(query(collection(db, "bets"), where("matchId", "==", matchId)));
                 
                 snapshot.forEach(async (document) => { 
                     const bet = document.data(); 
-                    // ⚠️ 改由 JavaScript 本地篩選未結算嘅注單
                     if (bet.settled === true) return; 
 
                     let profit = 0; 
@@ -388,7 +385,7 @@
                 console.log(`✅ 已自動派彩賽事 ID: ${matchId}`);
             } catch(e) { 
                 console.error("❌ 自動派彩失敗: " + e.message); 
-                alert("🚨 派彩系統出錯：" + e.message); // 話俾莊家聽有冇 Error
+                alert("🚨 派彩系統出錯：" + e.message);
             }
         };
 
@@ -671,15 +668,17 @@
         };
 
         window.betOnTeam = (teamName) => {
-            let match = globalMatches.find(m => (m.home === teamName || m.away === teamName) && !['FT', 'AET', 'PEN'].includes(m.status));
-            if (!match) match = globalMatches.find(m => m.home === teamName || m.away === teamName);
+            if (!teamName) return; // 🛡️ 防禦
+            let match = globalMatches.find(m => m.home && m.away && (m.home.includes(teamName) || m.away.includes(teamName)) && !['FT', 'AET', 'PEN'].includes(m.status));
+            if (!match) match = globalMatches.find(m => m.home && m.away && (m.home.includes(teamName) || m.away.includes(teamName)));
             
             if(match) {
-                let odds = match.home === teamName ? match.odds.home : match.odds.away;
+                let odds = match.home.includes(teamName) ? match.odds.home : match.odds.away;
+                let actualTeamName = match.home.includes(teamName) ? match.home : match.away;
                 if (odds > 0) {
-                    window.placeBet(match.id, teamName, odds);
+                    window.placeBet(match.id, actualTeamName, odds);
                 } else {
-                    alert("⚠️ " + teamName + " 下一場賽事（" + match.home + " VS " + match.away + "）莊家尚未開盤，暫時無法落注。");
+                    alert("⚠️ " + actualTeamName + " 下一場賽事莊家尚未開盤，暫時無法落注。");
                 }
             } else {
                 alert("⚠️ 系統暫時找不到 " + teamName + " 的賽程資料。");
@@ -706,6 +705,7 @@
         // 3. 系統渲染與內部邏輯
         // ==========================================
         const getFlag = (teamName) => {
+            if (!teamName) return "⚽"; // 🛡️ 防禦
             const flags = { "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦", "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿", "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺", "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭", "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪", "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹", "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴" };
             for(let key in flags) { if(teamName.includes(key)) return flags[key]; }
             return "⚽"; 
@@ -714,6 +714,7 @@
         function renderDateFilter() {
             let uniqueDatesMap = new Map();
             globalMatches.forEach(m => { 
+                if(!m.dateStr) return; // 🛡️ 防禦
                 if(!uniqueDatesMap.has(m.dateStr)) { uniqueDatesMap.set(m.dateStr, { dateStr: m.dateStr, dateNum: m.dateNum, month: m.month, weekday: m.weekday }); }
             });
             const uniqueDates = Array.from(uniqueDatesMap.values());
@@ -751,10 +752,11 @@
             const now = new Date();
 
             matchesToShow.forEach(match => {
+                if (!match.home || !match.away) return; // 🛡️ 防禦
                 adminSelect.innerHTML += `<option value="${match.id}">${match.home} VS ${match.away}</option>`;
                 
                 let matchDateObj = new Date(match.date);
-                let isOddsReady = match.odds.home > 0;
+                let isOddsReady = match.odds && match.odds.home > 0;
                 let isStarted = (match.status !== 'NS' && match.status !== 'TBD') || (now >= matchDateObj);
                 let isFinished = ['FT', 'AET', 'PEN'].includes(match.status);
                 let canBet = isOddsReady && !isStarted && !isFinished;
@@ -786,7 +788,7 @@
                     statusText = `<div class="flex items-center text-gray-400">${dynamicCalendarIcon} <span class="pt-[1px]">${match.kickoff} 開賽 | 盤口未開</span></div>`; 
                 }
                 
-                let homeHandicapStr = match.odds.handicapStr || "", awayHandicapStr = "";
+                let homeHandicapStr = (match.odds && match.odds.handicapStr) ? match.odds.handicapStr : "", awayHandicapStr = "";
                 if(homeHandicapStr && homeHandicapStr !== "[0]") {
                     let parts = homeHandicapStr.replace('[','').replace(']','').split('/');
                     awayHandicapStr = "[" + parts.map(p => { let n = parseFloat(p) * -1; return n > 0 ? "+" + n : n.toString(); }).join('/') + "]";
@@ -870,11 +872,11 @@
 
             Object.keys(groupTeams).forEach(g => {
                 let teamsHtml = groupTeams[g].map(team => {
-                    let m = globalMatches.find(x => (x.home === team || x.away === team) && !['FT', 'AET', 'PEN'].includes(x.status));
-                    if(!m) m = globalMatches.find(x => x.home === team || x.away === team);
+                    let m = globalMatches.find(x => x.home && x.away && (x.home.includes(team) || x.away.includes(team)) && !['FT', 'AET', 'PEN'].includes(x.status));
+                    if(!m) m = globalMatches.find(x => x.home && x.away && (x.home.includes(team) || x.away.includes(team)));
                     let oddsDisplay = '-';
-                    if (m) {
-                        let o = m.home === team ? m.odds.home : m.odds.away;
+                    if (m && m.odds) {
+                        let o = m.home.includes(team) ? m.odds.home : m.odds.away;
                         if(o > 0) oddsDisplay = o.toFixed(2);
                     }
 
@@ -936,17 +938,17 @@
         }
 
         function generateBracketCard(match, isFinal = false) {
-            if(!match) return `<div class="bracket-card rounded-lg p-2 border border-gray-700 flex items-center justify-center text-xs text-gray-600">TBD</div>`;
+            if(!match || !match.home || !match.away) return `<div class="bracket-card rounded-lg p-2 border border-gray-700 flex items-center justify-center text-xs text-gray-600">TBD</div>`;
 
             let borderClass = isFinal ? 'border-yellow-600 shadow-lg shadow-yellow-900/30 bg-yellow-900/10' : 'border-gray-700 hover:bg-gray-800';
             let textClass = isFinal ? 'text-yellow-500' : 'text-white';
             let scoreClass = isFinal ? 'text-yellow-700' : 'text-yellow-500';
 
-            let homeScore = match.scoreHome !== null ? match.scoreHome : (match.odds.home ? match.odds.home.toFixed(2) : '-');
-            let awayScore = match.scoreAway !== null ? match.scoreAway : (match.odds.away ? match.odds.away.toFixed(2) : '-');
+            let homeScore = match.scoreHome !== null ? match.scoreHome : (match.odds && match.odds.home ? match.odds.home.toFixed(2) : '-');
+            let awayScore = match.scoreAway !== null ? match.scoreAway : (match.odds && match.odds.away ? match.odds.away.toFixed(2) : '-');
 
-            let homeClick = match.odds.home > 0 ? `onclick="window.placeBet('${match.id}', '${match.home}', ${match.odds.home})"` : `onclick="alert('⚠️ ${match.home} 莊家尚未開盤。')";`;
-            let awayClick = match.odds.away > 0 ? `onclick="window.placeBet('${match.id}', '${match.away}', ${match.odds.away})"` : `onclick="alert('⚠️ ${match.away} 莊家尚未開盤。')";`;
+            let homeClick = (match.odds && match.odds.home > 0) ? `onclick="window.placeBet('${match.id}', '${match.home}', ${match.odds.home})"` : `onclick="alert('⚠️ ${match.home} 莊家尚未開盤。')";`;
+            let awayClick = (match.odds && match.odds.away > 0) ? `onclick="window.placeBet('${match.id}', '${match.away}', ${match.odds.away})"` : `onclick="alert('⚠️ ${match.away} 莊家尚未開盤。')";`;
 
             return `
             <div class="bracket-card rounded-lg border ${borderClass} flex flex-col justify-center px-2 cursor-pointer transition-colors touch-manipulation">
@@ -969,11 +971,15 @@
                 if (!snapshot.empty) {
                     snapshot.forEach((docSnap) => {
                         const data = docSnap.data();
+                        
+                        // 🚨 終極防禦：過濾任何沒有日期或隊名的壞資料
+                        if (!data || !data.date || !data.home || !data.away) return; 
+
                         const dateObj = new Date(data.date);
                         
                         let existingOdds = { handicapStr: "", home: 0.00, away: 0.00 };
                         let existingMatch = globalMatches.find(m => m.id === data.id);
-                        if (existingMatch) { existingOdds = existingMatch.odds; }
+                        if (existingMatch && existingMatch.odds) { existingOdds = existingMatch.odds; }
                         
                         apiMatches.push({
                             id: data.id, home: data.home, away: data.away, date: data.date, status: data.status, 
