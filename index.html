@@ -89,9 +89,9 @@
 
         <div id="view-bracket" class="hidden">
             <h2 class="text-lg font-bold text-white mb-2 pl-1 uppercase tracking-wider flex items-center">
-                <span class="text-blue-500 mr-2">🗺️</span> 晉級形勢圖
+                <span class="text-blue-500 mr-2">🗺️</span> 晉級形勢與積分榜
             </h2>
-            <p class="text-xs text-gray-500 mb-4 pl-1">💡 點擊下方隊伍即可以該隊目前賠率落注</p>
+            <p class="text-xs text-gray-500 mb-4 pl-1">💡 實時更新各組積分及淘汰賽賽程</p>
             
             <div id="bracket-content" class="overflow-x-auto pb-10 scrollbar-hide relative bg-[#0d0d0d] rounded-xl border border-gray-800 shadow-inner">
                 <p class="text-center text-gray-500 py-10">繪製地圖中...</p>
@@ -278,7 +278,7 @@
             "USA":"美國", "United States":"美國", "England":"英格蘭", "Germany":"德國", "France":"法國", 
             "Brazil":"巴西", "Argentina":"阿根廷", "Mexico":"墨西哥", "Poland":"波蘭", "Saudi Arabia":"沙特", 
             "Spain":"西班牙", "Japan":"日本", "South Korea":"韓國", "Korea Republic":"韓國", "Portugal":"葡萄牙", 
-            "Netherlands":"荷蘭", "Canada":"加拿大", "Bosnia":"波斯尼亞", "Bosnia and Herzegovina":"波斯尼亞",
+            "Netherlands":"荷蘭", "Canada":"加拿大", "Bosnia":"波斯尼亞", "Bosnia and Herzegovina":"波斯尼亞", "Bosnia-Herzegovina":"波斯尼亞",
             "South Africa":"南非", "Czech Republic":"捷克", "Czechia":"捷克", "Paraguay":"巴拉圭", 
             "Croatia":"克羅地亞", "Morocco":"摩洛哥", "Qatar":"卡塔爾", "Senegal":"塞內加爾", 
             "Cameroon":"喀麥隆", "Ecuador":"厄瓜多爾", "Australia":"澳洲", "Denmark":"丹麥", 
@@ -288,7 +288,7 @@
             "Curacao":"庫拉索", "Ivory Coast":"科特迪瓦", "Côte d'Ivoire":"科特迪瓦", "Sweden":"瑞典", 
             "Cape Verde":"佛得角", "Egypt":"埃及", "New Zealand":"新西蘭", "Norway":"挪威", 
             "Iraq":"伊拉克", "Algeria":"阿爾及利亞", "Jordan":"約旦", "Austria":"奧地利", 
-            "Congo":"剛果", "DR Congo":"剛果", "Panama":"巴拿馬", "Uzbekistan":"烏茲別克", "Colombia":"哥倫比亞" 
+            "Congo":"剛果", "DR Congo":"剛果", "Panama":"巴拿馬", "Uzbekistan":"烏茲別克", "Colombia":"哥倫比亞", "Congo DR": "剛果"
         };
         
         window.switchTab = (tabName) => {
@@ -917,10 +917,11 @@
 
         function renderBracket() {
             const bracketDiv = document.getElementById('bracket-content');
-            let html = '<div class="flex space-x-12 min-w-max p-4 h-[1200px]">';
+            // 🚨 放大 Bracket 容器高度，確保 16 個 Box 完美排列
+            let html = '<div class="flex flex-col lg:flex-row gap-6 min-w-max p-4 h-[1500px]">';
 
-            html += '<div class="flex flex-col justify-around w-48 pr-6 border-r border-gray-800">';
-            html += '<div class="text-xs font-bold text-gray-500 text-center mb-2">分組賽 (GS)</div>';
+            html += '<div class="flex flex-col w-72 pr-6 border-r border-gray-800">';
+            html += '<div class="text-sm font-black text-gray-300 text-center mb-4 uppercase tracking-widest">分組賽積分榜</div>';
             
             const groupTeams = {
                 'A': ['墨西哥', '南非', '韓國', '捷克'], 
@@ -938,59 +939,108 @@
             };
 
             Object.keys(groupTeams).forEach(g => {
-                let teamsHtml = groupTeams[g].map(team => {
-                    let m = globalMatches.find(x => x.home && x.away && (x.home.includes(team) || x.away.includes(team)) && !['FT', 'AET', 'PEN'].includes(x.status));
-                    if(!m) m = globalMatches.find(x => x.home && x.away && (x.home.includes(team) || x.away.includes(team)));
-                    let oddsDisplay = '-';
-                    if (m && m.odds) {
-                        let o = m.home.includes(team) ? m.odds.home : m.odds.away;
-                        if(o > 0) oddsDisplay = o.toFixed(2);
-                    }
+                let teamStats = groupTeams[g].map(team => {
+                    // 🚨 升級：加入 得 (GF) 同 失 (GA)
+                    let stats = { team: team, p:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0 };
+                    globalMatches.forEach(m => {
+                        if (!m.home || !m.away) return;
+                        if (['FT', 'AET', 'PEN'].includes(m.status)) {
+                            let isHome = m.home.includes(team);
+                            let isAway = m.away.includes(team);
+                            if (isHome || isAway) {
+                                stats.p++;
+                                let scored = isHome ? m.scoreHome : m.scoreAway;
+                                let conceded = isHome ? m.scoreAway : m.scoreHome;
+                                stats.gf += scored;
+                                stats.ga += conceded;
+                                stats.gd += (scored - conceded);
+                                if (scored > conceded) { stats.w++; stats.pts += 3; }
+                                else if (scored === conceded) { stats.d++; stats.pts += 1; }
+                                else { stats.l++; }
+                            }
+                        }
+                    });
+                    return stats;
+                });
 
-                    return `
-                    <div onclick="window.betOnTeam('${team}')" class="flex justify-between items-center py-1.5 hover:bg-gray-700/50 rounded px-1 cursor-pointer transition-colors touch-manipulation">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-[12px]">${getFlag(team)}</span>
-                            <span class="font-bold text-xs text-white">${team}</span>
-                        </div>
-                        <span class="font-normal text-xs text-yellow-500">${oddsDisplay}</span>
-                    </div>`;
-                }).join('<div class="border-b border-gray-700 w-full my-0.5"></div>');
-                
-                html += `<div class="rounded-lg border border-gray-700 bg-[#1c1c1e] flex flex-col justify-center px-2 py-1.5 mb-6 shadow-sm relative">
-                            <div class="text-gray-400 text-[10px] font-bold mb-1 border-b border-gray-700 pb-1 text-center">Group ${g}</div>
-                            ${teamsHtml}
+                // 🚨 排序：積分 -> 球差 -> 得球
+                teamStats.sort((a,b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+
+                let trs = teamStats.map(s => `
+                    <tr class="border-b border-gray-700/50 last:border-0 hover:bg-gray-800/30 transition-colors">
+                        <td class="py-2 flex items-center space-x-2">
+                            <span class="text-[12px]">${getFlag(s.team)}</span>
+                            <span class="font-bold text-xs text-white">${s.team}</span>
+                        </td>
+                        <td class="py-2 text-center text-gray-400 text-xs">${s.p}</td>
+                        <td class="py-2 text-center text-green-500 text-xs">${s.w}</td>
+                        <td class="py-2 text-center text-gray-400 text-xs">${s.d}</td>
+                        <td class="py-2 text-center text-red-500 text-xs">${s.l}</td>
+                        <td class="py-2 text-center text-gray-300 text-xs">${s.gf}</td>
+                        <td class="py-2 text-center text-gray-300 text-xs">${s.ga}</td>
+                        <td class="py-2 text-center text-blue-400 text-xs">${s.gd > 0 ? '+'+s.gd : s.gd}</td>
+                        <td class="py-2 text-right font-bold text-yellow-500 text-xs">${s.pts}</td>
+                    </tr>
+                `).join('');
+
+                html += `<div class="rounded-lg border border-gray-700 bg-[#1c1c1e] px-3 py-2 mb-6 shadow-sm w-full">
+                            <div class="text-gray-400 text-[10px] font-bold mb-2 border-b border-gray-700 pb-1 text-center uppercase tracking-widest">Group ${g}</div>
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="text-gray-600 text-[10px] border-b border-gray-800">
+                                        <th class="pb-1 font-normal w-3/12">隊伍</th>
+                                        <th class="pb-1 text-center font-normal">賽</th>
+                                        <th class="pb-1 text-center font-normal">勝</th>
+                                        <th class="pb-1 text-center font-normal">和</th>
+                                        <th class="pb-1 text-center font-normal">負</th>
+                                        <th class="pb-1 text-center font-normal">得</th>
+                                        <th class="pb-1 text-center font-normal">失</th>
+                                        <th class="pb-1 text-center font-normal">差</th>
+                                        <th class="pb-1 text-right font-normal">分</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${trs}</tbody>
+                            </table>
                          </div>`;
             });
             html += '</div>';
 
+            // 🚨 終極修復：絕對唔會再將分組賽塞入去淘汰賽！
+            let sortedMatches = [...globalMatches].sort((a,b) => new Date(a.date) - new Date(b.date));
+            let kMatches = Array(32).fill(null);
+            
+            if (sortedMatches.length > 72) {
+                let knockouts = sortedMatches.slice(72);
+                for(let i=0; i<knockouts.length && i<32; i++) {
+                    kMatches[i] = knockouts[i];
+                }
+            }
+            
             const rounds = [
-                { name: "32 強 (R32)", matchIds: Array.from({length:16}, (_,i)=> `20${73+i}`) },
-                { name: "16 強 (R16)", matchIds: Array.from({length:8}, (_,i)=> `20${89+i}`) },
-                { name: "8 強 (QF)", matchIds: ["2097","2098","2099","2100"] },
-                { name: "4 強 (SF)", matchIds: ["2101","2102"] },
-                { name: "決賽 (Final)", matchIds: ["2104"] }
+                { name: "32 強 (R32)", matches: kMatches.slice(0, 16) },
+                { name: "16 強 (R16)", matches: kMatches.slice(16, 24) },
+                { name: "8 強 (QF)", matches: kMatches.slice(24, 28) },
+                { name: "4 強 (SF)", matches: kMatches.slice(28, 30) },
+                { name: "決賽 (Final)", matches: [kMatches[31]] } 
             ];
 
+            html += '<div class="flex space-x-12 pt-4 lg:pt-0">';
             rounds.forEach((round, colIndex) => {
                 let isFinal = colIndex === rounds.length - 1;
                 html += `<div class="flex flex-col justify-around w-48 pl-6 relative">`;
                 html += `<div class="text-xs font-bold ${isFinal ? 'text-yellow-500' : 'text-gray-500'} text-center absolute -top-4 w-full">${round.name}</div>`;
 
                 if (!isFinal) {
-                    for (let i = 0; i < round.matchIds.length; i += 2) {
-                        let m1 = globalMatches.find(m => m.id === round.matchIds[i]);
-                        let m2 = globalMatches.find(m => m.id === round.matchIds[i+1]);
+                    for (let i = 0; i < round.matches.length; i += 2) {
                         html += `<div class="bracket-pair">`;
-                        html += generateBracketCard(m1);
-                        html += generateBracketCard(m2);
+                        html += generateBracketCard(round.matches[i]);
+                        html += generateBracketCard(round.matches[i+1]);
                         html += `</div>`;
                     }
                 } else {
-                    let mFinal = globalMatches.find(m => m.id === round.matchIds[0]);
-                    html += generateBracketCard(mFinal, true);
-
-                    let m3rd = globalMatches.find(m => m.id === "2103");
+                    html += generateBracketCard(round.matches[0], true);
+                    
+                    let m3rd = kMatches[30];
                     html += `<div class="mt-8">
                                 <div class="text-xs font-bold text-gray-500 text-center mb-1 border-t border-gray-800 pt-2">季軍戰</div>
                                 ${generateBracketCard(m3rd, false)}
@@ -999,15 +1049,32 @@
 
                 html += `</div>`;
             });
+            html += '</div>';
 
             html += '</div>';
             bracketDiv.innerHTML = html;
         }
 
+        // 🚨 終極修復：TBD 顯示兩個空對戰槽，確保 1 個 Box = 1 場比賽 = 2 隊
         function generateBracketCard(match, isFinal = false) {
-            if(!match || !match.home || !match.away) return `<div class="bracket-card rounded-lg p-2 border border-gray-700 flex items-center justify-center text-xs text-gray-600">TBD</div>`;
-
             let borderClass = isFinal ? 'border-yellow-600 shadow-lg shadow-yellow-900/30 bg-yellow-900/10' : 'border-gray-700 hover:bg-gray-800';
+            
+            if(!match || !match.home || !match.away) {
+                return `
+                <div class="bracket-card rounded-lg border ${borderClass} flex flex-col justify-center px-2 cursor-not-allowed bg-black/20">
+                    <div class="flex justify-between items-center py-1 rounded px-1">
+                        <span class="font-bold text-xs text-gray-600">TBD</span>
+                        <span class="font-normal text-xs text-gray-700">-</span>
+                    </div>
+                    <div class="border-b ${isFinal ? 'border-yellow-700/50' : 'border-gray-800'} w-full my-0.5"></div>
+                    <div class="flex justify-between items-center py-1 rounded px-1">
+                        <span class="font-bold text-xs text-gray-600">TBD</span>
+                        <span class="font-normal text-xs text-gray-700">-</span>
+                    </div>
+                </div>
+                `;
+            }
+
             let textClass = isFinal ? 'text-yellow-500' : 'text-white';
             let scoreClass = isFinal ? 'text-yellow-700' : 'text-yellow-500';
 
@@ -1126,14 +1193,12 @@
             leaderboardDiv.innerHTML = '';
             window.updateHeaderBalance(); 
 
-            // 🚨 更新：使用 Dense Ranking (密集排名) 演算法
             let sortedPlayers = Object.keys(window.playerBalances).sort((a, b) => window.playerBalances[b] - window.playerBalances[a]);
             let uniqueBalances = [...new Set(Object.values(window.playerBalances))].sort((a, b) => b - a);
 
             sortedPlayers.forEach((p) => {
                 let bal = window.playerBalances[p], cClass = bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400');
                 
-                // 找出分數喺 uniqueBalances 入面排第幾 (0-indexed)
                 let denseRank = uniqueBalances.indexOf(bal);
                 let rankMedal = denseRank === 0 ? '🥇' : (denseRank === 1 ? '🥈' : (denseRank === 2 ? '🥉' : '<span class="w-[18px] inline-block"></span>'));
                 
