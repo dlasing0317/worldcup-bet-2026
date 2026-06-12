@@ -278,19 +278,36 @@
             "USA":"美國", "United States":"美國", "England":"英格蘭", "Germany":"德國", "France":"法國", 
             "Brazil":"巴西", "Argentina":"阿根廷", "Mexico":"墨西哥", "Poland":"波蘭", "Saudi Arabia":"沙特", 
             "Spain":"西班牙", "Japan":"日本", "South Korea":"韓國", "Korea Republic":"韓國", "Portugal":"葡萄牙", 
-            "Netherlands":"荷蘭", "Canada":"加拿大", "Bosnia":"波斯尼亞", "Bosnia and Herzegovina":"波斯尼亞", "Bosnia-Herzegovina":"波斯尼亞",
+            "Netherlands":"荷蘭", "Canada":"加拿大", "Bosnia":"波斯尼亞", "Bosnia and Herzegovina":"波斯尼亞", "Bosnia-Herzegovina":"波斯尼亞", "Bosnia & Herzegovina":"波斯尼亞",
             "South Africa":"南非", "Czech Republic":"捷克", "Czechia":"捷克", "Paraguay":"巴拉圭", 
             "Croatia":"克羅地亞", "Morocco":"摩洛哥", "Qatar":"卡塔爾", "Senegal":"塞內加爾", 
             "Cameroon":"喀麥隆", "Ecuador":"厄瓜多爾", "Australia":"澳洲", "Denmark":"丹麥", 
             "Tunisia":"突尼西亞", "Costa Rica":"哥斯達黎加", "Belgium":"比利時", "Wales":"威爾斯", 
-            "Iran":"伊朗", "Uruguay":"烏拉圭", "Switzerland":"瑞士", "Serbia":"塞爾維亞", 
+            "Iran":"伊朗", "IR Iran":"伊朗", "Islamic Republic of Iran":"伊朗", "Uruguay":"烏拉圭", "Switzerland":"瑞士", "Serbia":"塞爾維亞", 
             "Ghana":"加納", "Scotland":"蘇格蘭", "Haiti":"海地", "Turkey":"土耳其", "Türkiye":"土耳其", 
-            "Curacao":"庫拉索", "Ivory Coast":"科特迪瓦", "Côte d'Ivoire":"科特迪瓦", "Sweden":"瑞典", 
-            "Cape Verde":"佛得角", "Egypt":"埃及", "New Zealand":"新西蘭", "Norway":"挪威", 
+            "Curacao":"庫拉索", "Curaçao":"庫拉索", "Ivory Coast":"科特迪瓦", "Côte d'Ivoire":"科特迪瓦", "Cote d'Ivoire":"科特迪瓦", "Cote d Ivoire":"科特迪瓦", "Sweden":"瑞典", 
+            "Cape Verde":"佛得角", "Cape Verde Islands":"佛得角", "Cabo Verde":"佛得角", "Egypt":"埃及", "New Zealand":"新西蘭", "Norway":"挪威", 
             "Iraq":"伊拉克", "Algeria":"阿爾及利亞", "Jordan":"約旦", "Austria":"奧地利", 
-            "Congo":"剛果", "DR Congo":"剛果", "Panama":"巴拿馬", "Uzbekistan":"烏茲別克", "Colombia":"哥倫比亞", "Congo DR": "剛果"
+            "Congo":"剛果", "DR Congo":"剛果", "Panama":"巴拿馬", "Uzbekistan":"烏茲別克", "Colombia":"哥倫比亞", "Congo DR": "剛果", "Democratic Republic of the Congo": "剛果",
+            "Italy":"意大利", "Chile":"智利", "Peru":"秘魯", "Venezuela":"委內瑞拉", "Bolivia":"玻利維亞",
+            "Mali":"馬里", "Burkina Faso":"布基納法索", "Guinea":"幾內亞", "Nigeria":"尼日利亞", "Angola":"安哥拉",
+            "United Arab Emirates":"阿聯酋", "UAE":"阿聯酋", "Oman":"阿曼", "Bahrain":"巴林", "Syria":"敘利亞", "China":"中國", "China PR":"中國",
+            "Jamaica":"牙買加", "El Salvador":"薩爾瓦多", "Honduras":"洪都拉斯", "Guatemala":"危地馬拉", "Trinidad and Tobago":"千里達", "Trinidad & Tobago":"千里達"
         };
         
+        // 🚨 終極 FS1 賽程名單
+        const fs1Pairs = [
+            ['澳洲', '土耳其'], ['科特迪瓦', '厄瓜多爾'], ['瑞典', '突尼西亞'],
+            ['沙特', '烏拉圭'], ['伊朗', '新西蘭'], ['奧地利', '約旦'],
+            ['加納', '巴拿馬'], ['烏茲別克', '哥倫比亞'], ['加拿大', '卡塔爾'],
+            ['土耳其', '巴拉圭'], ['厄瓜多爾', '庫拉索'], ['突尼西亞', '日本'],
+            ['約旦', '阿爾及利亞'], ['哥倫比亞', '剛果'], ['波斯尼亞', '卡塔爾'],
+            ['摩洛哥', '海地'], ['韓國', '南非'], ['庫拉索', '科特迪瓦'],
+            ['日本', '瑞典'], ['巴拉圭', '澳洲'], ['塞內加爾', '伊拉克'],
+            ['佛得角', '沙特'], ['埃及', '伊朗'], ['克羅地亞', '加納'],
+            ['剛果', '烏茲別克'], ['阿爾及利亞', '奧地利']
+        ];
+
         window.switchTab = (tabName) => {
             const tabs = ['matches', 'bracket', 'leaderboard', 'bets', 'admin'];
             tabs.forEach(t => {
@@ -739,10 +756,22 @@
         // ==========================================
         // 3. 系統渲染與內部邏輯
         // ==========================================
+        
         const getFlag = (teamName) => {
             if (!teamName) return "⚽"; 
-            const flags = { "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦", "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿", "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺", "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭", "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪", "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹", "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴" };
-            for(let key in flags) { if(teamName.includes(key)) return flags[key]; }
+            let tName = teamMap[teamName] || teamName; 
+            const flags = { 
+                "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦",
+                "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿",
+                "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺",
+                "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭",
+                "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪",
+                "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹",
+                "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴", "意大利":"🇮🇹", "智利":"🇨🇱", "秘魯":"🇵🇪", "委內瑞拉":"🇻🇪", "玻利維亞":"🇧🇴",
+                "馬里":"🇲🇱", "布基納法索":"🇧🇫", "幾內亞":"🇬🇳", "尼日利亞":"🇳🇬", "安哥拉":"🇦🇴", "阿聯酋":"🇦🇪", "阿曼":"🇴🇲", "巴林":"🇧🇭", "敘利亞":"🇸🇾", "中國":"🇨🇳",
+                "牙買加":"🇯🇲", "薩爾瓦多":"🇸🇻", "洪都拉斯":"🇭🇳", "危地馬拉":"🇬🇹", "千里達":"🇹🇹"
+            };
+            for(let key in flags) { if(tName.includes(key)) return flags[key]; }
             return "⚽"; 
         };
 
@@ -787,9 +816,12 @@
             const now = new Date();
 
             matchesToShow.forEach(match => {
-                if (!match.home || !match.away || match.home === 'null' || match.home === 'TBD') return; 
+                if (!match.home || !match.away || match.home.trim() === '' || match.away.trim() === '' || match.home === 'null' || match.home === 'TBD') return; 
                 
-                adminSelect.innerHTML += `<option value="${match.id}">${match.home} VS ${match.away}</option>`;
+                let displayHome = teamMap[match.home] || match.home;
+                let displayAway = teamMap[match.away] || match.away;
+                
+                adminSelect.innerHTML += `<option value="${match.id}">${displayHome} VS ${displayAway}</option>`;
                 
                 let matchDateObj = new Date(match.date);
                 let isOddsReady = match.odds && match.odds.home > 0;
@@ -821,19 +853,22 @@
                     ['哥倫比亞', '剛果'], ['南非', '韓國'], ['土耳其', '美國'], 
                     ['新西蘭', '比利時']
                 ].some(pair => 
-                    (match.home.includes(pair[0]) && match.away.includes(pair[1])) || 
-                    (match.home.includes(pair[1]) && match.away.includes(pair[0]))
+                    (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
+                    (displayHome.includes(pair[1]) && displayAway.includes(pair[0]))
                 ) || ["2101", "2102", "2103", "2104"].includes(match.id);
 
-                let viuTvSvg = `
-                    <svg class="w-3.5 h-3.5 mr-1 drop-shadow-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="24" height="24" rx="6" fill="#3B82F6"/>
-                        <circle cx="12" cy="12" r="7" stroke="white" stroke-width="2.5"/>
-                        <path d="M10 8L15 12L10 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                `;
-                
+                // 🚨 檢查是否 FS1 賽事
+                let isFS1 = fs1Pairs.some(pair => 
+                    (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
+                    (displayHome.includes(pair[1]) && displayAway.includes(pair[0]))
+                ) || ["2079", "2084"].includes(match.id);
+
+                let viuTvSvg = `<svg class="w-3.5 h-3.5 mr-1 drop-shadow-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#3B82F6"/><circle cx="12" cy="12" r="7" stroke="white" stroke-width="2.5"/><path d="M10 8L15 12L10 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
                 let viuTvBadge = isViuTV ? `<span class="bg-blue-900/40 text-blue-400 border border-blue-700/50 text-[9px] font-bold px-1.5 py-0.5 rounded ml-2 uppercase tracking-wider flex items-center">${viuTvSvg}免費直播</span>` : '';
+
+                // 🚨 生成 FS1 標籤
+                let fs1Svg = `<svg class="w-6 h-3 mr-0.5 inline-block" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="24" rx="4" fill="#002D72"/><text x="30" y="17" fill="white" font-size="14" font-family="sans-serif" font-weight="900" text-anchor="middle">FS1</text></svg>`;
+                let fs1Badge = isFS1 ? `<span class="bg-blue-900/40 text-blue-200 border border-blue-800/50 text-[9px] font-bold px-1.5 py-0.5 rounded ml-1 uppercase tracking-wider flex items-center">${fs1Svg}直播</span>` : '';
 
                 let statusBadge = '', statusText = '';
                 if (isFinished) { 
@@ -862,7 +897,7 @@
                 let homeHandicapDisplay = homeHandicapStr ? `<span class="text-[10px] text-yellow-500 font-mono mt-0.5">${homeHandicapStr}</span>` : '';
                 let awayHandicapDisplay = awayHandicapStr ? `<span class="text-[10px] text-yellow-500 font-mono mt-0.5">${awayHandicapStr}</span>` : '';
                 
-                let flagH = getFlag(match.home), flagA = getFlag(match.away);
+                let flagH = getFlag(displayHome), flagA = getFlag(displayAway);
 
                 let middleElement = `<div class="w-1/5 text-center text-gray-500 text-lg font-black uppercase tracking-wider">VS</div>`;
                 if (match.scoreHome !== null && match.scoreAway !== null) {
@@ -873,23 +908,27 @@
                 let btnClass = canBet ? "bg-[#2c2c2e] hover:bg-[#3c3c3e] cursor-pointer" : "bg-[#1a1a1c] text-gray-600 cursor-not-allowed";
                 let oddsColor = canBet ? "text-white" : "text-gray-600";
                 
+                let safeHome = displayHome.replace(/'/g, "\\'");
+                let safeAway = displayAway.replace(/'/g, "\\'");
+                
                 container.innerHTML += `
                     <div class="glass-panel rounded-2xl p-4 relative overflow-hidden transition-all">
                         <div class="flex justify-between items-center mb-4">
-                            <div class="flex items-center">
+                            <div class="flex items-center flex-wrap gap-y-1">
                                 ${matchLabelHtml}
                                 ${viuTvBadge}
+                                ${fs1Badge}
                             </div>
                             ${statusBadge}
                         </div>
                         <div class="flex justify-between items-center mb-3">
                             <div class="flex items-center space-x-2 w-2/5">
                                 <span class="text-2xl">${flagH}</span>
-                                <span class="font-bold text-lg text-white whitespace-nowrap">${match.home}</span>
+                                <span class="font-bold text-lg text-white whitespace-nowrap">${displayHome}</span>
                             </div>
                             ${middleElement}
                             <div class="flex items-center justify-end space-x-2 w-2/5">
-                                <span class="font-bold text-lg text-white whitespace-nowrap">${match.away}</span>
+                                <span class="font-bold text-lg text-white whitespace-nowrap">${displayAway}</span>
                                 <span class="text-2xl">${flagA}</span>
                             </div>
                         </div>
@@ -897,14 +936,14 @@
                             ${statusText}
                         </div>
                         <div class="bg-[#111] p-1 rounded-xl flex space-x-1 mb-2">
-                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${match.home}', ${match.odds.home})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
+                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
                                 <span class="font-bold ${oddsColor} text-lg">${match.odds.home > 0 ? match.odds.home.toFixed(2) : '-'}</span>
                                 <div class="flex flex-col items-start leading-none">
                                     <span class="text-[11px] ${canBet?'text-gray-400':'text-gray-600'}">${flagH} 勝</span>
                                     ${homeHandicapDisplay}
                                 </div>
                             </button>
-                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${match.away}', ${match.odds.away})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
+                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
                                 <span class="font-bold ${oddsColor} text-lg">${match.odds.away > 0 ? match.odds.away.toFixed(2) : '-'}</span>
                                 <div class="flex flex-col items-start leading-none">
                                     <span class="text-[11px] ${canBet?'text-gray-400':'text-gray-600'}">${flagA} 勝</span>
@@ -943,9 +982,13 @@
                     let stats = { team: team, p:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0 };
                     globalMatches.forEach(m => {
                         if (!m.home || !m.away) return;
+                        
+                        let hName = teamMap[m.home] || m.home;
+                        let aName = teamMap[m.away] || m.away;
+
                         if (['FT', 'AET', 'PEN'].includes(m.status)) {
-                            let isHome = m.home.includes(team);
-                            let isAway = m.away.includes(team);
+                            let isHome = hName.includes(team);
+                            let isAway = aName.includes(team);
                             if (isHome || isAway) {
                                 stats.p++;
                                 let scored = isHome ? m.scoreHome : m.scoreAway;
@@ -1069,7 +1112,14 @@
             ];
             
             let isViuTV = false;
-            if (match) {
+            let isFS1 = false;
+            let displayHome = 'TBD';
+            let displayAway = 'TBD';
+
+            if (match && match.home && match.away && match.home !== 'null' && match.away !== 'null') {
+                displayHome = teamMap[match.home] || match.home;
+                displayAway = teamMap[match.away] || match.away;
+
                 isViuTV = [
                     ['墨西哥', '南非'], ['加拿大', '波斯尼亞'], ['美國', '巴拉圭'], 
                     ['法國', '塞內加爾'], ['烏茲別克', '哥倫比亞'], ['墨西哥', '韓國'], 
@@ -1078,33 +1128,41 @@
                     ['哥倫比亞', '剛果'], ['南非', '韓國'], ['土耳其', '美國'], 
                     ['新西蘭', '比利時']
                 ].some(pair => 
-                    (match.home && match.away && ((match.home.includes(pair[0]) && match.away.includes(pair[1])) || 
-                    (match.home.includes(pair[1]) && match.away.includes(pair[0]))))
+                    ((displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
+                    (displayHome.includes(pair[1]) && displayAway.includes(pair[0])))
                 ) || [14, 17, 20, 24, 27, 28, 29, 30, 31].includes(matchIndex);
+
+                isFS1 = fs1Pairs.some(pair => 
+                    ((displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
+                    (displayHome.includes(pair[1]) && displayAway.includes(pair[0])))
+                ) || [6, 11].includes(matchIndex);
             } else {
                 isViuTV = [14, 17, 20, 24, 27, 28, 29, 30, 31].includes(matchIndex);
+                isFS1 = [6, 11].includes(matchIndex);
             }
 
             let viuTvSvg = `<svg class="w-2.5 h-2.5 mr-0.5 inline-block" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#3B82F6"/><circle cx="12" cy="12" r="7" stroke="white" stroke-width="2.5"/><path d="M10 8L15 12L10 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
             let viuTvBadge = isViuTV ? `<span class="bg-blue-900/60 text-blue-400 border border-blue-700/50 text-[7px] font-bold px-1 py-0.5 rounded ml-1.5 uppercase tracking-wider flex items-center">${viuTvSvg}免費直播</span>` : '';
 
+            // 🚨 渲染 FS1 Bracket 標籤
+            let fs1SvgBracket = `<svg class="w-5 h-2.5 mr-0.5 inline-block" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="24" rx="4" fill="#002D72"/><text x="30" y="17" fill="white" font-size="14" font-family="sans-serif" font-weight="900" text-anchor="middle">FS1</text></svg>`;
+            let fs1BadgeBracket = isFS1 ? `<span class="bg-blue-900/60 text-blue-200 border border-blue-800/50 text-[7px] font-bold px-1 py-0.5 rounded ml-1.5 uppercase tracking-wider flex items-center">${fs1SvgBracket}</span>` : '';
+
             let isTBD = !match || !match.home || !match.away || match.home === 'TBD' || match.home === 'null' || typeof match.home === 'undefined';
             let dateStrDisplay = (!isTBD && match.dateStr) ? `${match.dateStr} ${match.kickoff}` : fallbackDates[matchIndex] || '等待開盤';
-            let dateBadge = `<div class="absolute -top-2.5 left-1/2 transform -translate-x-1/2 flex items-center bg-[#0d0d0d] px-1.5 py-0.5 text-[9px] text-gray-500 font-mono tracking-tighter whitespace-nowrap rounded z-20 border border-gray-800 shadow-sm">${dateStrDisplay}${viuTvBadge}</div>`;
+            let dateBadge = `<div class="absolute -top-2.5 left-1/2 transform -translate-x-1/2 flex items-center bg-[#0d0d0d] px-1.5 py-0.5 text-[9px] text-gray-500 font-mono tracking-tighter whitespace-nowrap rounded z-20 border border-gray-800 shadow-sm">${dateStrDisplay}${viuTvBadge}${fs1BadgeBracket}</div>`;
 
             if(isTBD) {
-                let homeStr = match && match.home && match.home !== 'null' ? match.home : 'TBD';
-                let awayStr = match && match.away && match.away !== 'null' ? match.away : 'TBD';
                 return `
                 <div class="bracket-card rounded-lg border ${borderClass} flex flex-col justify-center px-2 cursor-not-allowed bg-black/20 relative">
                     ${dateBadge}
                     <div class="flex justify-between items-center py-0.5 rounded px-1 mt-1">
-                        <span class="font-bold text-[11px] text-gray-600">${homeStr}</span>
+                        <span class="font-bold text-[11px] text-gray-600">TBD</span>
                         <span class="font-normal text-[11px] text-gray-700">-</span>
                     </div>
                     <div class="border-b ${isFinal ? 'border-yellow-700/50' : 'border-gray-800'} w-full my-0.5"></div>
                     <div class="flex justify-between items-center py-0.5 rounded px-1 mb-1">
-                        <span class="font-bold text-[11px] text-gray-600">${awayStr}</span>
+                        <span class="font-bold text-[11px] text-gray-600">TBD</span>
                         <span class="font-normal text-[11px] text-gray-700">-</span>
                     </div>
                 </div>
@@ -1117,19 +1175,22 @@
             let homeScore = match.scoreHome !== null ? match.scoreHome : (match.odds && match.odds.home ? match.odds.home.toFixed(2) : '-');
             let awayScore = match.scoreAway !== null ? match.scoreAway : (match.odds && match.odds.away ? match.odds.away.toFixed(2) : '-');
 
-            let homeClick = (match.odds && match.odds.home > 0) ? `onclick="window.placeBet('${match.id}', '${match.home}', ${match.odds.home})"` : `onclick="alert('⚠️ ${match.home} 莊家尚未開盤。')";`;
-            let awayClick = (match.odds && match.odds.away > 0) ? `onclick="window.placeBet('${match.id}', '${match.away}', ${match.odds.away})"` : `onclick="alert('⚠️ ${match.away} 莊家尚未開盤。')";`;
+            let safeHome = displayHome.replace(/'/g, "\\'");
+            let safeAway = displayAway.replace(/'/g, "\\'");
+
+            let homeClick = (match.odds && match.odds.home > 0) ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ ${safeHome} 莊家尚未開盤。')";`;
+            let awayClick = (match.odds && match.odds.away > 0) ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ ${safeAway} 莊家尚未開盤。')";`;
 
             return `
             <div class="bracket-card rounded-lg border ${borderClass} flex flex-col justify-center px-2 cursor-pointer transition-colors touch-manipulation relative">
                 ${dateBadge}
                 <div ${homeClick} class="flex justify-between items-center py-0.5 hover:bg-gray-700/50 rounded px-1 touch-manipulation mt-1">
-                    <span class="font-bold text-[11px] ${textClass}">${match.home}</span>
+                    <span class="font-bold text-[11px] ${textClass}">${displayHome}</span>
                     <span class="font-normal text-[11px] ${scoreClass}">${homeScore}</span>
                 </div>
                 <div class="border-b ${isFinal ? 'border-yellow-700/50' : 'border-gray-700'} w-full my-0.5"></div>
                 <div ${awayClick} class="flex justify-between items-center py-0.5 hover:bg-gray-700/50 rounded px-1 touch-manipulation mb-1">
-                    <span class="font-bold text-[11px] ${textClass}">${match.away}</span>
+                    <span class="font-bold text-[11px] ${textClass}">${displayAway}</span>
                     <span class="font-normal text-[11px] ${scoreClass}">${awayScore}</span>
                 </div>
             </div>
