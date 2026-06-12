@@ -257,9 +257,17 @@
         let globalMatches = [];
         window.selectedDate = null; 
         window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
-        window.authenticatedUser = "Dennis"; 
-        window.previousUser = "Dennis"; 
+        
+        // 🚨 終極修復：從 localStorage 讀取上次登入身份，預設為 Dennis
+        window.authenticatedUser = localStorage.getItem('daChaFan_user') || "Dennis"; 
+        window.previousUser = window.authenticatedUser; 
         window.pendingBet = null; 
+
+        // 確保網頁一載入，右上角下拉選單就會顯示正確嘅人名
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectEl = document.getElementById('player-select');
+            if(selectEl) selectEl.value = window.authenticatedUser;
+        });
 
         const weekdaysCH = ['日', '一', '二', '三', '四', '五', '六'];
         const avatarColors = {
@@ -327,6 +335,8 @@
                 if (isValid) {
                     window.authenticatedUser = selectedUser;
                     window.previousUser = selectedUser;
+                    // 🚨 新增：登入成功後，將身份寫入手機 localStorage
+                    localStorage.setItem('daChaFan_user', selectedUser);
                     window.updateHeaderBalance();
                 } else {
                     alert("❌ 密碼錯誤！無權切換至此帳號。");
@@ -789,7 +799,6 @@
                     (match.home.includes(pair[1]) && match.away.includes(pair[0]))
                 ) || ["2101", "2102", "2103", "2104"].includes(match.id);
 
-                // 🚨 終極修復：使用純 SVG 代碼繪製 ViuTV Logo，永不死圖
                 let viuTvSvg = `
                     <svg class="w-3.5 h-3.5 mr-1 drop-shadow-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect width="24" height="24" rx="6" fill="#3B82F6"/>
