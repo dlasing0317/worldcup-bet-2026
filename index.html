@@ -668,7 +668,7 @@
         };
 
         window.betOnTeam = (teamName) => {
-            if (!teamName) return; // 🛡️ 防禦
+            if (!teamName) return; 
             let match = globalMatches.find(m => m.home && m.away && (m.home.includes(teamName) || m.away.includes(teamName)) && !['FT', 'AET', 'PEN'].includes(m.status));
             if (!match) match = globalMatches.find(m => m.home && m.away && (m.home.includes(teamName) || m.away.includes(teamName)));
             
@@ -705,7 +705,7 @@
         // 3. 系統渲染與內部邏輯
         // ==========================================
         const getFlag = (teamName) => {
-            if (!teamName) return "⚽"; // 🛡️ 防禦
+            if (!teamName) return "⚽"; 
             const flags = { "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦", "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿", "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺", "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭", "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪", "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹", "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴" };
             for(let key in flags) { if(teamName.includes(key)) return flags[key]; }
             return "⚽"; 
@@ -714,7 +714,7 @@
         function renderDateFilter() {
             let uniqueDatesMap = new Map();
             globalMatches.forEach(m => { 
-                if(!m.dateStr) return; // 🛡️ 防禦
+                if(!m.dateStr) return; 
                 if(!uniqueDatesMap.has(m.dateStr)) { uniqueDatesMap.set(m.dateStr, { dateStr: m.dateStr, dateNum: m.dateNum, month: m.month, weekday: m.weekday }); }
             });
             const uniqueDates = Array.from(uniqueDatesMap.values());
@@ -752,7 +752,7 @@
             const now = new Date();
 
             matchesToShow.forEach(match => {
-                if (!match.home || !match.away) return; // 🛡️ 防禦
+                if (!match.home || !match.away) return; 
                 adminSelect.innerHTML += `<option value="${match.id}">${match.home} VS ${match.away}</option>`;
                 
                 let matchDateObj = new Date(match.date);
@@ -769,6 +769,14 @@
                         </div>
                     </div>
                 `;
+
+                // 🚨 修正：頂部標籤動態化
+                let matchLabelHtml = `<span class="text-gray-400 text-xs font-semibold tracking-wide uppercase">UPCOMING</span>`;
+                if (isFinished) {
+                    matchLabelHtml = `<span class="text-gray-500 text-xs font-semibold tracking-wide uppercase">FINISHED</span>`;
+                } else if (isStarted) {
+                    matchLabelHtml = `<span class="text-red-500 text-xs font-bold tracking-wide uppercase animate-pulse">LIVE / IN-PLAY</span>`;
+                }
 
                 let statusBadge = '', statusText = '';
                 if (isFinished) { 
@@ -811,7 +819,7 @@
                 container.innerHTML += `
                     <div class="glass-panel rounded-2xl p-4 relative overflow-hidden transition-all">
                         <div class="flex justify-between items-center mb-4">
-                            <span class="text-gray-400 text-xs font-semibold tracking-wide uppercase">Upcoming</span>
+                            ${matchLabelHtml}
                             ${statusBadge}
                         </div>
                         <div class="flex justify-between items-center mb-3">
@@ -971,8 +979,6 @@
                 if (!snapshot.empty) {
                     snapshot.forEach((docSnap) => {
                         const data = docSnap.data();
-                        
-                        // 🚨 終極防禦：過濾任何沒有日期或隊名的壞資料
                         if (!data || !data.date || !data.home || !data.away) return; 
 
                         const dateObj = new Date(data.date);
