@@ -826,12 +826,13 @@
                 ) || ["2101", "2102", "2103", "2104"].includes(match.id);
 
                 let viuTvSvg = `
-                    <svg class="w-2.5 h-2.5 mr-0.5 inline-block" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-3.5 h-3.5 mr-1 drop-shadow-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect width="24" height="24" rx="6" fill="#3B82F6"/>
                         <circle cx="12" cy="12" r="7" stroke="white" stroke-width="2.5"/>
                         <path d="M10 8L15 12L10 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 `;
+                
                 let viuTvBadge = isViuTV ? `<span class="bg-blue-900/40 text-blue-400 border border-blue-700/50 text-[9px] font-bold px-1.5 py-0.5 rounded ml-2 uppercase tracking-wider flex items-center">${viuTvSvg}免費直播</span>` : '';
 
                 let statusBadge = '', statusText = '';
@@ -917,7 +918,7 @@
 
         function renderBracket() {
             const bracketDiv = document.getElementById('bracket-content');
-            let html = '<div class="flex flex-row gap-6 min-w-max p-4 h-[1500px]">';
+            let html = '<div class="flex flex-row gap-6 min-w-max p-4">';
 
             html += '<div class="flex flex-col w-72 pr-6 border-r border-gray-800">';
             html += '<div class="text-sm font-black text-gray-300 text-center mb-4 uppercase tracking-widest">分組賽積分榜</div>';
@@ -1054,7 +1055,6 @@
         function generateBracketCard(match, isFinal = false, matchIndex = 0) {
             let borderClass = isFinal ? 'border-yellow-600 shadow-lg shadow-yellow-900/30 bg-yellow-900/10' : 'border-gray-700 hover:bg-gray-800';
             
-            // 🚨 終極升級：加入 32 場淘汰賽官方日期時間 (Fallback)
             const fallbackDates = [
                 "6月29日 03:00", "6月29日 07:00", "6月29日 10:00", 
                 "6月30日 03:00", "6月30日 07:00", "6月30日 10:00", 
