@@ -345,14 +345,12 @@
             }
         };
 
-        // 🚨 終極懶人極速輸入法
         window.smartPasteOdds = async () => {
             const pwd = prompt("🔐 請輸入莊家密碼："); if (pwd !== "1971") { alert("❌ 密碼錯誤"); return; }
             const matchId = document.getElementById('admin-match-select').value;
             const text = document.getElementById('admin-odds-text').value.trim();
             if(!text) return;
             
-            // 嘗試將輸入嘅字串用空格或者逗號分開
             const parts = text.split(/[\s,]+/);
             
             if (parts.length >= 3) {
@@ -360,7 +358,6 @@
                 let homeOdd = parseFloat(parts[1]);
                 let awayOdd = parseFloat(parts[2]);
                 
-                // 自動幫個讓球數字加返 []
                 let finalHcapStr = hcapStrRaw.startsWith('[') ? hcapStrRaw : `[${hcapStrRaw}]`;
 
                 if (!isNaN(homeOdd) && !isNaN(awayOdd)) {
@@ -377,7 +374,6 @@
                 }
             }
             
-            // 如果拆唔出三個數字，就嘗試行返舊版 Regex (兼容舊打法)
             const matchHcap = text.match(/\[(.*?)\]/), matchHome = text.match(/主[^0-9]*([0-9.]+)/), matchAway = text.match(/客[^0-9]*([0-9.]+)/);
             if(matchHcap && matchHome && matchAway) {
                 const hStr = `[${matchHcap[1]}]`;
@@ -1130,10 +1126,17 @@
             leaderboardDiv.innerHTML = '';
             window.updateHeaderBalance(); 
 
-            Object.keys(window.playerBalances).sort((a, b) => window.playerBalances[b] - window.playerBalances[a]).forEach((p, i) => {
+            // 🚨 更新：使用 Dense Ranking (密集排名) 演算法
+            let sortedPlayers = Object.keys(window.playerBalances).sort((a, b) => window.playerBalances[b] - window.playerBalances[a]);
+            let uniqueBalances = [...new Set(Object.values(window.playerBalances))].sort((a, b) => b - a);
+
+            sortedPlayers.forEach((p) => {
                 let bal = window.playerBalances[p], cClass = bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400');
                 
-                let rankMedal = i===0?'🥇':(i===1?'🥈':(i===2?'🥉':'<span class="w-[18px] inline-block"></span>'));
+                // 找出分數喺 uniqueBalances 入面排第幾 (0-indexed)
+                let denseRank = uniqueBalances.indexOf(bal);
+                let rankMedal = denseRank === 0 ? '🥇' : (denseRank === 1 ? '🥈' : (denseRank === 2 ? '🥉' : '<span class="w-[18px] inline-block"></span>'));
+                
                 let boardAvatarColor = avatarColors[p] || 'bg-gray-600';
                 
                 leaderboardDiv.innerHTML += `
