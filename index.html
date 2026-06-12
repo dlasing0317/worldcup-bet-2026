@@ -144,9 +144,10 @@
                 <div class="border-t border-gray-800 my-4"></div>
 
                 <div>
-                    <label class="block text-xs text-gray-500 mb-1">手動輸入：同步讓球盤</label>
+                    <label class="block text-xs text-gray-500 mb-1">手動輸入：極速同步讓球盤</label>
+                    <p class="text-[10px] text-gray-500 mb-2">只需用空格分開：<span class="text-gray-300">讓球數 主賠 客賠</span></p>
                     <div class="flex space-x-2">
-                        <input type="text" id="admin-odds-text" class="flex-1 bg-[#111] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-green-500 text-sm" placeholder="盤口 [-0.5/-1] 主 1.87 客 1.89">
+                        <input type="text" id="admin-odds-text" class="flex-1 bg-[#111] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-green-500 text-sm" placeholder="例如：-0.5/-1 1.87 1.89">
                         <button onclick="window.smartPasteOdds()" class="bg-blue-600 text-white font-bold px-4 rounded-lg touch-manipulation">同步</button>
                     </div>
                 </div>
@@ -258,12 +259,10 @@
         window.selectedDate = null; 
         window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
         
-        // 🚨 終極修復：從 localStorage 讀取上次登入身份，預設為 Dennis
         window.authenticatedUser = localStorage.getItem('daChaFan_user') || "Dennis"; 
         window.previousUser = window.authenticatedUser; 
         window.pendingBet = null; 
 
-        // 確保網頁一載入，右上角下拉選單就會顯示正確嘅人名
         document.addEventListener('DOMContentLoaded', () => {
             const selectEl = document.getElementById('player-select');
             if(selectEl) selectEl.value = window.authenticatedUser;
@@ -335,7 +334,6 @@
                 if (isValid) {
                     window.authenticatedUser = selectedUser;
                     window.previousUser = selectedUser;
-                    // 🚨 新增：登入成功後，將身份寫入手機 localStorage
                     localStorage.setItem('daChaFan_user', selectedUser);
                     window.updateHeaderBalance();
                 } else {
@@ -347,18 +345,49 @@
             }
         };
 
+        // 🚨 終極懶人極速輸入法
         window.smartPasteOdds = async () => {
             const pwd = prompt("🔐 請輸入莊家密碼："); if (pwd !== "1971") { alert("❌ 密碼錯誤"); return; }
-            const matchId = document.getElementById('admin-match-select').value, text = document.getElementById('admin-odds-text').value;
+            const matchId = document.getElementById('admin-match-select').value;
+            const text = document.getElementById('admin-odds-text').value.trim();
             if(!text) return;
+            
+            // 嘗試將輸入嘅字串用空格或者逗號分開
+            const parts = text.split(/[\s,]+/);
+            
+            if (parts.length >= 3) {
+                let hcapStrRaw = parts[0];
+                let homeOdd = parseFloat(parts[1]);
+                let awayOdd = parseFloat(parts[2]);
+                
+                // 自動幫個讓球數字加返 []
+                let finalHcapStr = hcapStrRaw.startsWith('[') ? hcapStrRaw : `[${hcapStrRaw}]`;
+
+                if (!isNaN(homeOdd) && !isNaN(awayOdd)) {
+                    if(confirm(`🎯 極速破解成功！\n\n盤口: ${finalHcapStr}\n主隊賠率: ${homeOdd}\n客隊賠率: ${awayOdd}\n\n確定同步寫入資料庫？`)) {
+                        await setDoc(doc(db, "odds_2026", matchId), { 
+                            handicapStr: finalHcapStr, 
+                            home: homeOdd, 
+                            away: awayOdd, 
+                            updatedAt: serverTimestamp() 
+                        }, { merge: true }); 
+                        document.getElementById('admin-odds-text').value = ''; 
+                    }
+                    return;
+                }
+            }
+            
+            // 如果拆唔出三個數字，就嘗試行返舊版 Regex (兼容舊打法)
             const matchHcap = text.match(/\[(.*?)\]/), matchHome = text.match(/主[^0-9]*([0-9.]+)/), matchAway = text.match(/客[^0-9]*([0-9.]+)/);
             if(matchHcap && matchHome && matchAway) {
                 const hStr = `[${matchHcap[1]}]`;
-                if(confirm(`🎯 破解成功！盤口: ${hStr}\n確定同步？`)) {
-                    await setDoc(doc(db, "odds_2026", matchId), { handicapStr: hStr, home: parseFloat(matchHome[1]), away: parseFloat(matchAway[1]), updatedAt: serverTimestamp() }); 
+                if(confirm(`🎯 傳統破解成功！盤口: ${hStr}\n確定同步？`)) {
+                    await setDoc(doc(db, "odds_2026", matchId), { handicapStr: hStr, home: parseFloat(matchHome[1]), away: parseFloat(matchAway[1]), updatedAt: serverTimestamp() }, { merge: true }); 
                     document.getElementById('admin-odds-text').value = ''; 
                 }
-            } else alert("❌ 格式錯誤");
+            } else {
+                alert("❌ 格式錯誤！\n請直接輸入三個數字（用空格分開）。\n例如：-0.5/-1 1.87 1.89");
+            }
         };
 
         const autoSettleMatch = async (matchId, scoreHome, scoreAway, hcapStr, homeTeamName) => {
