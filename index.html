@@ -181,6 +181,7 @@
 
     </main>
 
+    <!-- 落注視窗 -->
     <div id="bet-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="bet-modal-content">
             <h3 class="text-white font-black text-xl mb-2 flex items-center tracking-wide"><span class="mr-2 text-2xl">⚽</span> 確認落注</h3>
@@ -210,6 +211,7 @@
         </div>
     </div>
 
+    <!-- 自訂霸氣買定離手 Confirm 彈窗 -->
     <div id="custom-confirm-modal" class="hidden fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 backdrop-blur-md opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-8 shadow-2xl border border-yellow-600/50 transform scale-95 transition-transform duration-300 flex flex-col items-center text-center" id="custom-confirm-content">
             <span class="text-5xl mb-4">⚠️</span>
@@ -224,6 +226,7 @@
         </div>
     </div>
 
+    <!-- 底部導航列 -->
     <nav class="fixed bottom-0 w-full bg-[#1c1c1e] border-t border-gray-800 p-3 flex justify-around items-center z-50 pb-safe">
         <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors flex-1 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0 1 1 0 01-2 0zM7 9a1 1 0 100 2 1 1 0 000-2zm6 0a1 1 0 100 2 1 1 0 000-2zm-3 3a1 1 0 100 2 1 1 0 000-2z"></path></svg>
@@ -262,7 +265,7 @@
         window.authenticatedUser = localStorage.getItem('daChaFan_user') || "Dennis"; 
         window.previousUser = window.authenticatedUser; 
         window.pendingBet = null; 
-        window.isSubmittingBet = false; // 🚨 防連點 Lock
+        window.isSubmittingBet = false; 
 
         document.addEventListener('DOMContentLoaded', () => {
             const selectEl = document.getElementById('player-select');
@@ -474,7 +477,6 @@
             } catch(e) { alert("❌ 失敗: " + e.message); }
         };
 
-        // 🚨 更新 Header 邏輯：根據登入者決定是否顯示 Admin 按鈕
         window.updateHeaderBalance = () => {
             let currentUser = document.getElementById('player-select').value;
             let bal = window.playerBalances[currentUser] || 0;
@@ -554,10 +556,9 @@
             setTimeout(() => { modal.classList.add('hidden'); }, 300);
         };
 
-        // 🚨 終極修復：加入 Mutex Lock 防止 iPhone 狂撳造成嘅 Double-entry
         window.executeBet = async () => {
             if (!window.pendingBet || window.isSubmittingBet) return;
-            window.isSubmittingBet = true; // 上鎖
+            window.isSubmittingBet = true; 
             
             const btn = document.getElementById('btn-execute-bet');
             if (btn) btn.innerText = "處理中...";
@@ -574,12 +575,11 @@
             } catch (e) { 
                 alert("❌ 落注失敗，請重試！"); console.error(e); 
             } finally {
-                window.isSubmittingBet = false; // 解鎖
+                window.isSubmittingBet = false; 
                 if (btn) btn.innerText = "確定 OK";
             }
         };
 
-        // 🚨 莊家專用：秒殺垃圾注單
         window.deleteBet = async (betId) => {
             if (window.authenticatedUser !== 'Dennis') return;
             if(confirm("⚠️ 老細，確定要 Delete 呢張注單？ (刪除後無法復原)")) {
@@ -802,6 +802,7 @@
             return "⚽"; 
         };
 
+        // 🚨 智能時間對位與 Auto-Scroll 升級
         function renderDateFilter() {
             let uniqueDatesMap = new Map();
             globalMatches.forEach(m => { 
@@ -809,7 +810,25 @@
                 if(!uniqueDatesMap.has(m.dateStr)) { uniqueDatesMap.set(m.dateStr, { dateStr: m.dateStr, dateNum: m.dateNum, month: m.month, weekday: m.weekday }); }
             });
             const uniqueDates = Array.from(uniqueDatesMap.values());
-            if (!window.selectedDate && uniqueDates.length > 0) window.selectedDate = uniqueDates[0].dateStr;
+            
+            // 🚨 系統一打開：智能抓取今日日期 / 下一場 / 決賽日
+            if (!window.selectedDate && uniqueDates.length > 0) {
+                let now = new Date();
+                let todayStr = now.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' });
+                
+                if (uniqueDates.some(d => d.dateStr === todayStr)) {
+                    window.selectedDate = todayStr;
+                } else {
+                    let todayMidnight = new Date();
+                    todayMidnight.setHours(0,0,0,0);
+                    let upcomingMatch = globalMatches.find(m => new Date(m.date) >= todayMidnight);
+                    if (upcomingMatch) {
+                        window.selectedDate = upcomingMatch.dateStr;
+                    } else {
+                        window.selectedDate = uniqueDates[uniqueDates.length - 1].dateStr;
+                    }
+                }
+            }
             
             const selectorContainer = document.getElementById('date-selector'); selectorContainer.innerHTML = '';
             const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -826,6 +845,14 @@
                     </button>
                 `;
             });
+
+            // 🚨 自動置中動畫 (延遲以確保 DOM 已更新)
+            setTimeout(() => {
+                const activeBtn = selectorContainer.querySelector('.bg-green-600');
+                if (activeBtn) {
+                    activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            }, 100);
         }
 
         function renderMatches() {
@@ -1288,7 +1315,7 @@
             
             snapshot.forEach((docSnap) => {
                 const bet = docSnap.data();
-                bet.docId = docSnap.id; // 🚨 記錄低 Database ID 方便刪除
+                bet.docId = docSnap.id; 
                 allBetsArray.push(bet);
                 
                 if (bet.settled && window.playerBalances[bet.player] !== undefined) {
@@ -1340,7 +1367,6 @@
                     let betAvatarColor = avatarColors[bet.player] || 'bg-gray-600';
                     let displaySelection = teamMap[bet.selection] || bet.selection;
                     
-                    // 🚨 莊家專用：垃圾桶 Delete 制
                     let deleteBtn = `<button onclick="window.deleteBet('${bet.docId}')" style="display: ${window.authenticatedUser === 'Dennis' ? 'flex' : 'none'};" class="admin-only-btn ml-3 text-red-500 hover:text-red-400 transition-colors bg-red-900/20 rounded p-1.5 flex-shrink-0 touch-manipulation items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>`;
                     
                     return `
