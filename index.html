@@ -111,7 +111,7 @@
             <h2 class="text-lg font-bold text-white mb-4 pl-1 uppercase tracking-wider flex items-center">
                 <span class="text-blue-500 mr-2">📜</span> 最新注單
             </h2>
-            <div id="bets-list" class="space-y-3">
+            <div id="bets-list" class="space-y-6">
                 <p class="text-gray-600 text-sm text-center">載入中...</p>
             </div>
         </div>
@@ -219,7 +219,7 @@
             <p id="custom-confirm-detail" class="text-gray-200 text-base mb-8 font-medium w-full"></p>
             <div class="flex space-x-4 w-full justify-center">
                 <button onclick="window.closeCustomConfirm()" class="flex-1 py-3.5 rounded-xl bg-[#1c1c1e] text-gray-400 font-bold text-sm hover:bg-gray-800 border border-gray-700 transition-colors touch-manipulation">取消</button>
-                <button onclick="window.executeBet()" class="flex-1 py-3.5 rounded-xl bg-yellow-600 text-black font-black text-sm hover:bg-yellow-500 shadow-lg shadow-yellow-900/50 transition-colors touch-manipulation">確定 OK</button>
+                <button id="btn-execute-bet" onclick="window.executeBet()" class="flex-1 py-3.5 rounded-xl bg-yellow-600 text-black font-black text-sm hover:bg-yellow-500 shadow-lg shadow-yellow-900/50 transition-colors touch-manipulation">確定 OK</button>
             </div>
         </div>
     </div>
@@ -262,6 +262,7 @@
         window.authenticatedUser = localStorage.getItem('daChaFan_user') || "Dennis"; 
         window.previousUser = window.authenticatedUser; 
         window.pendingBet = null; 
+        window.isSubmittingBet = false; // 🚨 防連點 Lock
 
         document.addEventListener('DOMContentLoaded', () => {
             const selectEl = document.getElementById('player-select');
@@ -295,7 +296,6 @@
             "Jamaica":"牙買加", "El Salvador":"薩爾瓦多", "Honduras":"洪都拉斯", "Guatemala":"危地馬拉", "Trinidad and Tobago":"千里達", "Trinidad & Tobago":"千里達"
         };
         
-        // 🚨 終極 FS1 賽程名單
         const fs1Pairs = [
             ['澳洲', '土耳其'], ['科特迪瓦', '厄瓜多爾'], ['瑞典', '突尼西亞'],
             ['沙特', '烏拉圭'], ['伊朗', '新西蘭'], ['奧地利', '約旦'],
@@ -474,6 +474,7 @@
             } catch(e) { alert("❌ 失敗: " + e.message); }
         };
 
+        // 🚨 更新 Header 邏輯：根據登入者決定是否顯示 Admin 按鈕
         window.updateHeaderBalance = () => {
             let currentUser = document.getElementById('player-select').value;
             let bal = window.playerBalances[currentUser] || 0;
@@ -487,13 +488,15 @@
             avatarEl.innerText = currentUser.charAt(0);
 
             let adminTab = document.getElementById('tab-admin');
-            if (adminTab) {
-                if (currentUser === 'Dennis') { 
-                    adminTab.classList.remove('hidden'); adminTab.classList.add('flex');
-                } else { 
-                    adminTab.classList.add('hidden'); adminTab.classList.remove('flex');
-                    if (!document.getElementById('view-admin').classList.contains('hidden')) { window.switchTab('matches'); }
-                }
+            let adminBtns = document.querySelectorAll('.admin-only-btn');
+            
+            if (currentUser === 'Dennis') { 
+                if (adminTab) { adminTab.classList.remove('hidden'); adminTab.classList.add('flex'); }
+                adminBtns.forEach(btn => btn.style.display = 'flex');
+            } else { 
+                if (adminTab) { adminTab.classList.add('hidden'); adminTab.classList.remove('flex'); }
+                adminBtns.forEach(btn => btn.style.display = 'none');
+                if (!document.getElementById('view-admin').classList.contains('hidden')) { window.switchTab('matches'); }
             }
         };
 
@@ -551,8 +554,14 @@
             setTimeout(() => { modal.classList.add('hidden'); }, 300);
         };
 
+        // 🚨 終極修復：加入 Mutex Lock 防止 iPhone 狂撳造成嘅 Double-entry
         window.executeBet = async () => {
-            if (!window.pendingBet) return;
+            if (!window.pendingBet || window.isSubmittingBet) return;
+            window.isSubmittingBet = true; // 上鎖
+            
+            const btn = document.getElementById('btn-execute-bet');
+            if (btn) btn.innerText = "處理中...";
+
             const amount = parseInt(document.getElementById('bet-amount-input').innerText);
             try {
                 await addDoc(collection(db, "bets"), { 
@@ -562,7 +571,25 @@
                 }); 
                 window.closeCustomConfirm(); 
                 window.closeBetModal();      
-            } catch (e) { alert("❌ 落注失敗，請重試！"); console.error(e); }
+            } catch (e) { 
+                alert("❌ 落注失敗，請重試！"); console.error(e); 
+            } finally {
+                window.isSubmittingBet = false; // 解鎖
+                if (btn) btn.innerText = "確定 OK";
+            }
+        };
+
+        // 🚨 莊家專用：秒殺垃圾注單
+        window.deleteBet = async (betId) => {
+            if (window.authenticatedUser !== 'Dennis') return;
+            if(confirm("⚠️ 老細，確定要 Delete 呢張注單？ (刪除後無法復原)")) {
+                try {
+                    await deleteDoc(doc(db, "bets", betId));
+                } catch(e) { 
+                    console.error(e); 
+                    alert("❌ 刪除失敗"); 
+                }
+            }
         };
 
         window.debugAPI = async () => {
@@ -857,7 +884,6 @@
                     (displayHome.includes(pair[1]) && displayAway.includes(pair[0]))
                 ) || ["2101", "2102", "2103", "2104"].includes(match.id);
 
-                // 🚨 檢查是否 FS1 賽事
                 let isFS1 = fs1Pairs.some(pair => 
                     (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
                     (displayHome.includes(pair[1]) && displayAway.includes(pair[0]))
@@ -866,7 +892,6 @@
                 let viuTvSvg = `<svg class="w-3.5 h-3.5 mr-1 drop-shadow-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#3B82F6"/><circle cx="12" cy="12" r="7" stroke="white" stroke-width="2.5"/><path d="M10 8L15 12L10 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
                 let viuTvBadge = isViuTV ? `<span class="bg-blue-900/40 text-blue-400 border border-blue-700/50 text-[9px] font-bold px-1.5 py-0.5 rounded ml-2 uppercase tracking-wider flex items-center">${viuTvSvg}免費直播</span>` : '';
 
-                // 🚨 生成 FS1 標籤
                 let fs1Svg = `<svg class="w-6 h-3 mr-0.5 inline-block" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="24" rx="4" fill="#002D72"/><text x="30" y="17" fill="white" font-size="14" font-family="sans-serif" font-weight="900" text-anchor="middle">FS1</text></svg>`;
                 let fs1Badge = isFS1 ? `<span class="bg-blue-900/40 text-blue-200 border border-blue-800/50 text-[9px] font-bold px-1.5 py-0.5 rounded ml-1 uppercase tracking-wider flex items-center">${fs1Svg}直播</span>` : '';
 
@@ -1144,7 +1169,6 @@
             let viuTvSvg = `<svg class="w-2.5 h-2.5 mr-0.5 inline-block" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#3B82F6"/><circle cx="12" cy="12" r="7" stroke="white" stroke-width="2.5"/><path d="M10 8L15 12L10 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
             let viuTvBadge = isViuTV ? `<span class="bg-blue-900/60 text-blue-400 border border-blue-700/50 text-[7px] font-bold px-1 py-0.5 rounded ml-1.5 uppercase tracking-wider flex items-center">${viuTvSvg}免費直播</span>` : '';
 
-            // 🚨 渲染 FS1 Bracket 標籤
             let fs1SvgBracket = `<svg class="w-5 h-2.5 mr-0.5 inline-block" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="24" rx="4" fill="#002D72"/><text x="30" y="17" fill="white" font-size="14" font-family="sans-serif" font-weight="900" text-anchor="middle">FS1</text></svg>`;
             let fs1BadgeBracket = isFS1 ? `<span class="bg-blue-900/60 text-blue-200 border border-blue-800/50 text-[7px] font-bold px-1 py-0.5 rounded ml-1.5 uppercase tracking-wider flex items-center">${fs1SvgBracket}</span>` : '';
 
@@ -1259,33 +1283,92 @@
                 return; 
             }
             
-            snapshot.forEach((doc) => {
-                const bet = doc.data(); let resTxt = "等待開彩", resCol = "text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded";
-                if (bet.settled) {
-                    if (bet.profit > 0 && bet.profit < (bet.amount * (bet.odds - 1))) { resTxt = `贏半 +$${bet.profit.toFixed(1)}`; resCol = "text-green-400 bg-green-500/10 px-2 py-1 rounded"; }
-                    else if (bet.profit > 0) { resTxt = `贏全 +$${bet.profit.toFixed(1)}`; resCol = "text-green-500 font-bold bg-green-500/10 px-2 py-1 rounded"; }
-                    else if (bet.profit === 0) { resTxt = `走水 $0`; resCol = "text-gray-400 bg-gray-600/20 px-2 py-1 rounded"; }
-                    else if (bet.profit < 0 && bet.profit > -bet.amount) { resTxt = `輸半 -$${Math.abs(bet.profit).toFixed(1)}`; resCol = "text-red-400 bg-red-500/10 px-2 py-1 rounded"; }
-                    else { resTxt = `輸全 -$${Math.abs(bet.profit).toFixed(1)}`; resCol = "text-red-500 font-bold bg-red-500/10 px-2 py-1 rounded"; }
+            let matchGroupMap = new Map();
+            let allBetsArray = [];
+            
+            snapshot.forEach((docSnap) => {
+                const bet = docSnap.data();
+                bet.docId = docSnap.id; // 🚨 記錄低 Database ID 方便刪除
+                allBetsArray.push(bet);
+                
+                if (bet.settled && window.playerBalances[bet.player] !== undefined) {
+                    window.playerBalances[bet.player] += bet.profit;
                 }
                 
-                let betAvatarColor = avatarColors[bet.player] || 'bg-gray-600';
+                if (!matchGroupMap.has(bet.matchId)) {
+                    matchGroupMap.set(bet.matchId, []);
+                }
+                matchGroupMap.get(bet.matchId).push(bet);
+            });
+            
+            matchGroupMap.forEach((bets, matchId) => {
+                let match = globalMatches.find(m => m.id === matchId);
+                let matchHeaderHtml = '';
                 
-                betsList.innerHTML += `
-                    <div class="glass-panel p-4 rounded-xl flex justify-between items-center mb-3">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm border border-gray-700 ${betAvatarColor}">${bet.player.charAt(0)}</div>
-                            <div>
-                                <p class="font-bold text-gray-200 text-sm mb-0.5">${bet.player}</p>
-                                <p class="text-xs text-gray-400">買: ${bet.selection} <span class="font-mono text-gray-300">($${bet.amount})</span></p>
+                if (match) {
+                    let hName = teamMap[match.home] || match.home;
+                    let aName = teamMap[match.away] || match.away;
+                    let scoreTxt = (match.scoreHome !== null && match.scoreAway !== null) ? ` (${match.scoreHome}:${match.scoreAway})` : '';
+                    matchHeaderHtml = `
+                        <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-3">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-gray-400 tracking-wide uppercase">
+                                <span>⚽ ${getFlag(hName)} ${hName} VS ${getFlag(aName)} ${aName}${scoreTxt}</span>
+                            </div>
+                            <span class="text-[10px] bg-gray-800 text-gray-500 font-mono px-1.5 py-0.5 rounded">${match.dateStr || ''}</span>
+                        </div>
+                    `;
+                } else {
+                    matchHeaderHtml = `
+                        <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-3">
+                            <div class="text-xs font-bold text-gray-500 tracking-wide uppercase">
+                                <span>⚽ 賽事 ID: ${matchId}</span>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <span class="text-xs ${resCol}">${resTxt}</span>
-                            <span class="block text-[10px] text-gray-500 mt-2 font-mono tracking-tighter">${bet.settleDetail||''}</span>
+                    `;
+                }
+                
+                let betsItemsHtml = bets.map(bet => {
+                    let resTxt = "等待開彩", resCol = "text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded";
+                    if (bet.settled) {
+                        if (bet.profit > 0 && bet.profit < (bet.amount * (bet.odds - 1))) { resTxt = `贏半 +$${bet.profit.toFixed(1)}`; resCol = "text-green-400 bg-green-500/10 px-2 py-1 rounded"; }
+                        else if (bet.profit > 0) { resTxt = `贏全 +$${bet.profit.toFixed(1)}`; resCol = "text-green-500 font-bold bg-green-500/10 px-2 py-1 rounded"; }
+                        else if (bet.profit === 0) { resTxt = `走水 $0`; resCol = "text-gray-400 bg-gray-600/20 px-2 py-1 rounded"; }
+                        else if (bet.profit < 0 && bet.profit > -bet.amount) { resTxt = `輸半 -$${Math.abs(bet.profit).toFixed(1)}`; resCol = "text-red-400 bg-red-500/10 px-2 py-1 rounded"; }
+                        else { resTxt = `輸全 -$${Math.abs(bet.profit).toFixed(1)}`; resCol = "text-red-500 font-bold bg-red-500/10 px-2 py-1 rounded"; }
+                    }
+                    
+                    let betAvatarColor = avatarColors[bet.player] || 'bg-gray-600';
+                    let displaySelection = teamMap[bet.selection] || bet.selection;
+                    
+                    // 🚨 莊家專用：垃圾桶 Delete 制
+                    let deleteBtn = `<button onclick="window.deleteBet('${bet.docId}')" style="display: ${window.authenticatedUser === 'Dennis' ? 'flex' : 'none'};" class="admin-only-btn ml-3 text-red-500 hover:text-red-400 transition-colors bg-red-900/20 rounded p-1.5 flex-shrink-0 touch-manipulation items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>`;
+                    
+                    return `
+                        <div class="flex justify-between items-center py-2 last:pb-0 border-b border-gray-800/40 last:border-0">
+                            <div class="flex items-center space-x-3 overflow-hidden">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm border border-gray-700 flex-shrink-0 ${betAvatarColor}">${bet.player.charAt(0)}</div>
+                                <div class="truncate">
+                                    <p class="font-bold text-gray-200 text-sm mb-0.5">${bet.player}</p>
+                                    <p class="text-xs text-gray-400 truncate">買: <span class="text-yellow-500 font-semibold">${displaySelection}</span> <span class="font-mono text-gray-500">($${bet.amount})</span></p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-end flex-shrink-0 ml-2">
+                                <div class="text-right">
+                                    <span class="text-xs ${resCol} inline-block">${resTxt}</span>
+                                    <span class="block text-[9px] text-gray-500 mt-1 font-mono tracking-tighter">${bet.settleDetail||''}</span>
+                                </div>
+                                ${deleteBtn}
+                            </div>
                         </div>
-                    </div>`;
-                if (bet.settled && window.playerBalances[bet.player] !== undefined) window.playerBalances[bet.player] += bet.profit;
+                    `;
+                }).join('');
+                
+                betsList.innerHTML += `
+                    <div class="glass-panel p-4 rounded-2xl shadow-lg">
+                        ${matchHeaderHtml}
+                        <div class="space-y-1.5">${betsItemsHtml}</div>
+                    </div>
+                `;
             });
             
             leaderboardDiv.innerHTML = '';
