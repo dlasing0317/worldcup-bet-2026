@@ -181,7 +181,6 @@
 
     </main>
 
-    <!-- 落注視窗 -->
     <div id="bet-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="bet-modal-content">
             <h3 class="text-white font-black text-xl mb-2 flex items-center tracking-wide"><span class="mr-2 text-2xl">⚽</span> 確認落注</h3>
@@ -211,7 +210,6 @@
         </div>
     </div>
 
-    <!-- 自訂霸氣買定離手 Confirm 彈窗 -->
     <div id="custom-confirm-modal" class="hidden fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 backdrop-blur-md opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-8 shadow-2xl border border-yellow-600/50 transform scale-95 transition-transform duration-300 flex flex-col items-center text-center" id="custom-confirm-content">
             <span class="text-5xl mb-4">⚠️</span>
@@ -226,7 +224,6 @@
         </div>
     </div>
 
-    <!-- 底部導航列 -->
     <nav class="fixed bottom-0 w-full bg-[#1c1c1e] border-t border-gray-800 p-3 flex justify-around items-center z-50 pb-safe">
         <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors flex-1 touch-manipulation">
             <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0 1 1 0 01-2 0zM7 9a1 1 0 100 2 1 1 0 000-2zm6 0a1 1 0 100 2 1 1 0 000-2zm-3 3a1 1 0 100 2 1 1 0 000-2z"></path></svg>
@@ -598,10 +595,10 @@
 
             const debugBox = document.getElementById('debug-output-container');
             debugBox.style.display = 'block';
-            debugBox.innerText = "⏳ 正在請求 API 原始數據，請稍候...\nURL: https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1\n";
+            debugBox.innerText = "⏳ 正在請求 API 原始數據 (第 1 頁)，請稍候...\nURL: https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&page=1\n";
 
             try {
-                const resOdds = await fetch("https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1", { 
+                const resOdds = await fetch("https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&page=1", { 
                     method: "GET", 
                     headers: { "x-apisports-key": apiKey } 
                 });
@@ -614,7 +611,8 @@
 
                 if (dataOdds.response && dataOdds.response.length > 0) {
                     const sampleMatch = dataOdds.response[0];
-                    debugBox.innerText += `\n✅ 成功獲取數據！(顯示第一筆賽事 ID: ${sampleMatch.fixture.id})\n\n`;
+                    let totalPagesStr = dataOdds.paging ? dataOdds.paging.total : "未知";
+                    debugBox.innerText += `\n✅ 成功獲取數據！\n👉 第一筆賽事 ID: ${sampleMatch.fixture.id}\n👉 總共頁數 (Pages): ${totalPagesStr}\n\n`;
                     debugBox.innerText += JSON.stringify(sampleMatch.bookmakers, null, 2);
                 } else {
                     debugBox.innerText += "\n⚠️ API 連接成功，但返回的 response 陣列為空 (沒有 2026 數據)。";
@@ -624,6 +622,7 @@
             }
         };
 
+        // 🚨 終極修復：全自動翻頁 + 雙軌智能解析
         window.autoSyncAPI = async () => {
             const pwd = prompt("🔐 管理員密碼："); 
             if (pwd !== "1971") { alert("❌ 密碼錯誤"); return; }
@@ -633,6 +632,8 @@
 
             try {
                 alert("📡 正在連接 API 獲取最新賽況... (請勿關閉視窗)");
+                
+                // 1. 同步賽程
                 const resMatches = await fetch("https://v3.football.api-sports.io/fixtures?league=1&season=2026", { method: "GET", headers: { "x-apisports-key": apiKey } });
                 const dataMatches = await resMatches.json();
                 
@@ -666,82 +667,100 @@
                             if (oddsDoc.exists()) {
                                 hcapStr = oddsDoc.data().handicapStr || "[0]";
                             }
-                            
                             await autoSettleMatch(mId, mScoreH, mScoreA, hcapStr, hTC);
                             autoSettledCount++;
                         }
                     });
                     await Promise.all(promises);
-
-                } else {
-                    alert("⚠️ API 連接成功，但官方仲未有 2026 賽季數據！"); return;
                 }
 
-                alert(`📡 成功獲取 ${matchesCount} 場賽事！\n(觸發了 ${autoSettledCount} 場自動派彩)\n\n正在向 10Bet 獲取最新賠率...`);
+                alert(`📡 成功獲取 ${matchesCount} 場賽事！\n(觸發了 ${autoSettledCount} 場自動派彩)\n\n🔄 準備進行【全頁數】盤口深度掃描...`);
                 
-                const resOdds = await fetch("https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1", { method: "GET", headers: { "x-apisports-key": apiKey } });
-                const dataOdds = await resOdds.json();
-
-                if (dataOdds.errors && Object.keys(dataOdds.errors).length > 0) throw new Error("API 存取被拒 (Odds): " + Object.values(dataOdds.errors)[0]);
-
+                // 2. 🚨 分頁同步賠率
                 let oddsCount = 0;
                 let fallbackCount = 0;
-                if (dataOdds.response && dataOdds.response.length > 0) {
-                    oddsCount = dataOdds.response.length;
-                    dataOdds.response.forEach(async (item) => {
-                        let mId = item.fixture.id.toString();
-                        let bookmaker = item.bookmakers[0];
-                        
-                        if (bookmaker && bookmaker.bets) {
-                            let handicapBet = bookmaker.bets.find(b => b.name === "Asian Handicap");
-                            let matchWinnerBet = bookmaker.bets.find(b => b.name === "Match Winner");
+                let currentPage = 1;
+                let totalPages = 1;
+
+                while (currentPage <= totalPages) {
+                    console.log(`Fetching Odds Page ${currentPage} of ${totalPages}...`);
+                    const resOdds = await fetch(`https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&page=${currentPage}`, { method: "GET", headers: { "x-apisports-key": apiKey } });
+                    const dataOdds = await resOdds.json();
+
+                    if (dataOdds.errors && Object.keys(dataOdds.errors).length > 0) throw new Error(`API 存取被拒 (Odds P${currentPage}): ` + Object.values(dataOdds.errors)[0]);
+
+                    if (currentPage === 1 && dataOdds.paging) {
+                        totalPages = dataOdds.paging.total || 1;
+                    }
+
+                    if (dataOdds.response && dataOdds.response.length > 0) {
+                        for (const item of dataOdds.response) {
+                            oddsCount++;
+                            let mId = item.fixture.id.toString();
+                            let bookmaker = item.bookmakers[0];
                             
-                            let homeOdd = 0, awayOdd = 0, hcapStr = "[0]";
-
-                            if (matchWinnerBet) {
-                                fallbackCount++;
-                                let hBet = matchWinnerBet.values.find(v => v.value === "Home");
-                                let aBet = matchWinnerBet.values.find(v => v.value === "Away");
-                                if (hBet) homeOdd = parseFloat(hBet.odd);
-                                if (aBet) awayOdd = parseFloat(aBet.odd);
-                            }
-
-                            if (handicapBet && handicapBet.values && handicapBet.values.length > 0) {
-                                fallbackCount--; 
+                            if (bookmaker && bookmaker.bets) {
+                                let handicapBet = bookmaker.bets.find(b => b.name === "Asian Handicap");
+                                let matchWinnerBet = bookmaker.bets.find(b => b.name === "Match Winner");
                                 
-                                let homeOptions = handicapBet.values.filter(v => v.value.includes("Home"));
-                                let awayOptions = handicapBet.values.filter(v => v.value.includes("Away"));
-                                
-                                let bestPair = null;
-                                let minDiff = 999;
+                                let homeOdd = 0, awayOdd = 0, hcapStr = "[0]";
 
-                                homeOptions.forEach(h => {
-                                    let hcapValue = h.value.replace("Home ", "");
-                                    let a = awayOptions.find(a => a.value.replace("Away ", "") === hcapValue);
-                                    if (a) {
-                                        let diff = Math.abs(parseFloat(h.odd) - parseFloat(a.odd));
-                                        if (diff < minDiff) {
-                                            minDiff = diff;
-                                            bestPair = { home: h, away: a, hcap: hcapValue };
+                                if (matchWinnerBet) {
+                                    fallbackCount++;
+                                    let hBet = matchWinnerBet.values.find(v => v.value === "Home");
+                                    let aBet = matchWinnerBet.values.find(v => v.value === "Away");
+                                    if (hBet) homeOdd = parseFloat(hBet.odd);
+                                    if (aBet) awayOdd = parseFloat(aBet.odd);
+                                }
+
+                                // 🚨 雙軌智能解析
+                                if (handicapBet && handicapBet.values && handicapBet.values.length > 0) {
+                                    let bestPair = null;
+                                    let minDiff = 999;
+
+                                    let homeOptions = handicapBet.values.filter(v => v.value.startsWith("Home"));
+                                    let awayOptions = handicapBet.values.filter(v => v.value.startsWith("Away"));
+
+                                    homeOptions.forEach(h => {
+                                        let hcapNumStr = h.value.replace("Home", "").trim();
+                                        let hcapNum = parseFloat(hcapNumStr) || 0;
+
+                                        let a = awayOptions.find(opt => {
+                                            let aNumStr = opt.value.replace("Away", "").trim();
+                                            let aNum = parseFloat(aNumStr) || 0;
+                                            // 兼容 10Bet (兩邊字串一樣) 或 標準版 (數字正負對調)
+                                            return aNumStr === hcapNumStr || aNum === -hcapNum;
+                                        });
+
+                                        if (a) {
+                                            let diff = Math.abs(parseFloat(h.odd) - parseFloat(a.odd));
+                                            if (diff < minDiff) {
+                                                minDiff = diff;
+                                                let displaySign = hcapNum > 0 ? `+${hcapNum}` : `${hcapNum}`;
+                                                if (hcapNum === 0) displaySign = "0";
+                                                bestPair = { home: h, away: a, hcap: `[${displaySign}]` };
+                                            }
                                         }
-                                    }
-                                });
+                                    });
 
-                                if (bestPair) {
-                                    homeOdd = parseFloat(bestPair.home.odd);
-                                    awayOdd = parseFloat(bestPair.away.odd);
-                                    hcapStr = `[${bestPair.hcap}]`;
+                                    if (bestPair) {
+                                        fallbackCount--; 
+                                        homeOdd = parseFloat(bestPair.home.odd);
+                                        awayOdd = parseFloat(bestPair.away.odd);
+                                        hcapStr = bestPair.hcap;
+                                    }
+                                }
+                                
+                                if (homeOdd > 0 && awayOdd > 0) {
+                                    await setDoc(doc(db, "odds_2026", mId), { handicapStr: hcapStr, home: homeOdd, away: awayOdd, updatedAt: serverTimestamp() }, { merge: true });
                                 }
                             }
-                            
-                            if (homeOdd > 0 && awayOdd > 0) {
-                                await setDoc(doc(db, "odds_2026", mId), { handicapStr: hcapStr, home: homeOdd, away: awayOdd, updatedAt: serverTimestamp() }, { merge: true });
-                            }
                         }
-                    });
+                    }
+                    currentPage++;
                 }
                 
-                alert(`✅ QA 診斷報告：\n成功同步 ${matchesCount} 場賽程！\n成功擷取 ${oddsCount} 場賠率！\n\n(注意：當中有 ${fallbackCount} 場因未開亞洲盤，自動退回主客和賠率)`);
+                alert(`✅ QA 診斷報告：\n成功掃描 ${totalPages} 頁資料！\n成功擷取 ${oddsCount} 場賠率！\n\n(注意：當中有 ${fallbackCount} 場因未開亞洲盤，自動退回主客和賠率)`);
                 
             } catch(e) { console.error(e); alert("❌ 同步失敗：" + e.message); }
         };
@@ -802,7 +821,6 @@
             return "⚽"; 
         };
 
-        // 🚨 智能時間對位與 Auto-Scroll 升級
         function renderDateFilter() {
             let uniqueDatesMap = new Map();
             globalMatches.forEach(m => { 
@@ -811,7 +829,6 @@
             });
             const uniqueDates = Array.from(uniqueDatesMap.values());
             
-            // 🚨 系統一打開：智能抓取今日日期 / 下一場 / 決賽日
             if (!window.selectedDate && uniqueDates.length > 0) {
                 let now = new Date();
                 let todayStr = now.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' });
@@ -846,7 +863,6 @@
                 `;
             });
 
-            // 🚨 自動置中動畫 (延遲以確保 DOM 已更新)
             setTimeout(() => {
                 const activeBtn = selectorContainer.querySelector('.bg-green-600');
                 if (activeBtn) {
