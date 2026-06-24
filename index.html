@@ -75,6 +75,29 @@
         </div>
     </header>
 
+    <nav class="fixed bottom-0 w-full bg-[#1c1c1e] border-t border-gray-800 p-3 flex justify-around items-center z-50 pb-safe">
+        <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors flex-1 touch-manipulation">
+            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0 1 1 0 01-2 0zM7 9a1 1 0 100 2 1 1 0 000-2zm6 0a1 1 0 100 2 1 1 0 000-2zm-3 3a1 1 0 100 2 1 1 0 000-2z"></path></svg>
+            <span class="text-[10px] font-bold">賽事</span>
+        </div>
+        <div id="tab-bracket" onclick="window.switchTab('bracket')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H4v-2h3a2 2 0 002-2V1m0 18v-6a2 2 0 012-2h3v-2h-3a2 2 0 01-2-2V1m6 10h4"></path></svg>
+            <span class="text-[10px] font-bold">晉級表</span>
+        </div>
+        <div id="tab-leaderboard" onclick="window.switchTab('leaderboard')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
+            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
+            <span class="text-[10px] font-bold">排行榜</span>
+        </div>
+        <div id="tab-bets" onclick="window.switchTab('bets')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
+            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+            <span class="text-[10px] font-bold">最新注單</span>
+        </div>
+        <div id="tab-admin" onclick="window.switchTab('admin')" class="hidden flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span class="text-[10px] font-bold">管理</span>
+        </div>
+    </nav>
+
     <main class="p-4 space-y-6">
         
         <div id="view-matches">
@@ -181,6 +204,7 @@
 
     </main>
 
+    <!-- 落注視窗 -->
     <div id="bet-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="bet-modal-content">
             <h3 class="text-white font-black text-xl mb-2 flex items-center tracking-wide"><span class="mr-2 text-2xl">⚽</span> 確認落注</h3>
@@ -210,6 +234,7 @@
         </div>
     </div>
 
+    <!-- 自訂霸氣買定離手 Confirm 彈窗 -->
     <div id="custom-confirm-modal" class="hidden fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 backdrop-blur-md opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-8 shadow-2xl border border-yellow-600/50 transform scale-95 transition-transform duration-300 flex flex-col items-center text-center" id="custom-confirm-content">
             <span class="text-5xl mb-4">⚠️</span>
@@ -224,29 +249,6 @@
         </div>
     </div>
 
-    <nav class="fixed bottom-0 w-full bg-[#1c1c1e] border-t border-gray-800 p-3 flex justify-around items-center z-50 pb-safe">
-        <div id="tab-matches" onclick="window.switchTab('matches')" class="flex flex-col items-center text-green-500 cursor-pointer transition-colors flex-1 touch-manipulation">
-            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11a1 1 0 112 0 1 1 0 01-2 0zM7 9a1 1 0 100 2 1 1 0 000-2zm6 0a1 1 0 100 2 1 1 0 000-2zm-3 3a1 1 0 100 2 1 1 0 000-2z"></path></svg>
-            <span class="text-[10px] font-bold">賽事</span>
-        </div>
-        <div id="tab-bracket" onclick="window.switchTab('bracket')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H4v-2h3a2 2 0 002-2V1m0 18v-6a2 2 0 012-2h3v-2h-3a2 2 0 01-2-2V1m6 10h4"></path></svg>
-            <span class="text-[10px] font-bold">晉級表</span>
-        </div>
-        <div id="tab-leaderboard" onclick="window.switchTab('leaderboard')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
-            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
-            <span class="text-[10px] font-bold">排行榜</span>
-        </div>
-        <div id="tab-bets" onclick="window.switchTab('bets')" class="flex flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
-            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-            <span class="text-[10px] font-bold">最新注單</span>
-        </div>
-        <div id="tab-admin" onclick="window.switchTab('admin')" class="hidden flex-col items-center text-gray-500 hover:text-gray-300 cursor-pointer transition-colors flex-1 touch-manipulation">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-            <span class="text-[10px] font-bold">管理</span>
-        </div>
-    </nav>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, updateDoc, doc, setDoc, where, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -255,10 +257,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let globalMatches = [];
+        // 🚨 終極安全防禦：強制綁定所有核心變數及函數到 window
+        window.globalMatches = [];
         window.selectedDate = null; 
         window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
-        
         window.authenticatedUser = localStorage.getItem('daChaFan_user') || "Dennis"; 
         window.previousUser = window.authenticatedUser; 
         window.pendingBet = null; 
@@ -270,12 +272,12 @@
         });
 
         const weekdaysCH = ['日', '一', '二', '三', '四', '五', '六'];
-        const avatarColors = {
+        window.avatarColors = {
             "Dennis": "bg-blue-600", "Samuel": "bg-purple-600", "Charles": "bg-orange-600",
             "Michael": "bg-teal-600", "Sha": "bg-rose-600", "Travis": "bg-indigo-600"
         };
 
-        const teamMap = { 
+        window.teamMap = { 
             "USA":"美國", "United States":"美國", "England":"英格蘭", "Germany":"德國", "France":"法國", 
             "Brazil":"巴西", "Argentina":"阿根廷", "Mexico":"墨西哥", "Poland":"波蘭", "Saudi Arabia":"沙特", 
             "Spain":"西班牙", "Japan":"日本", "South Korea":"韓國", "Korea Republic":"韓國", "Portugal":"葡萄牙", 
@@ -296,7 +298,7 @@
             "Jamaica":"牙買加", "El Salvador":"薩爾瓦多", "Honduras":"洪都拉斯", "Guatemala":"危地馬拉", "Trinidad and Tobago":"千里達", "Trinidad & Tobago":"千里達"
         };
         
-        const fs1Pairs = [
+        window.fs1Pairs = [
             ['澳洲', '土耳其'], ['科特迪瓦', '厄瓜多爾'], ['瑞典', '突尼西亞'],
             ['沙特', '烏拉圭'], ['伊朗', '新西蘭'], ['奧地利', '約旦'],
             ['加納', '巴拿馬'], ['烏茲別克', '哥倫比亞'], ['加拿大', '卡塔爾'],
@@ -330,8 +332,8 @@
 
         window.filterByDate = (dateStr) => { 
             window.selectedDate = dateStr; 
-            renderDateFilter(); 
-            renderMatches(); 
+            window.renderDateFilter(); 
+            window.renderMatches(); 
         };
 
         window.handleUserChange = async (selectElement) => {
@@ -403,7 +405,7 @@
             }
         };
 
-        const autoSettleMatch = async (matchId, scoreHome, scoreAway, hcapStr, homeTeamName) => {
+        window.autoSettleMatch = async (matchId, scoreHome, scoreAway, hcapStr, homeTeamName) => {
             let hcapVal = 0;
             let hcapClean = hcapStr.replace('[', '').replace(']', '').replace('+', '');
             if(hcapClean.includes('/')) { 
@@ -448,11 +450,11 @@
             const scoreAway = parseInt(document.getElementById('score-away').value);
             
             if(isNaN(scoreHome) || isNaN(scoreAway)) return;
-            const match = globalMatches.find(m => m.id === matchId); 
+            const match = window.globalMatches.find(m => m.id === matchId); 
             if (!match) return;
             if(!confirm(`⚠️ 確定賽果 ${scoreHome}:${scoreAway} (90分鐘內)？`)) return;
 
-            await autoSettleMatch(matchId, scoreHome, scoreAway, match.odds.handicapStr || "[0]", match.home);
+            await window.autoSettleMatch(matchId, scoreHome, scoreAway, match.odds.handicapStr || "[0]", match.home);
             await setDoc(doc(db, "matches_2026", matchId), { status: 'FT', scoreHome: scoreHome, scoreAway: scoreAway, updatedAt: serverTimestamp() }, { merge: true });
             
             alert("✅ 手動派彩完成！"); 
@@ -463,7 +465,7 @@
         window.resetMatch = async () => {
             const pwd = prompt("🔐 莊家密碼："); if (pwd !== "1971") return;
             const matchId = document.getElementById('admin-match-select').value;
-            const match = globalMatches.find(m => m.id === matchId);
+            const match = window.globalMatches.find(m => m.id === matchId);
             if (!match) return;
             
             if(!confirm(`⚠️ 確定將 ${match.home} VS ${match.away} 重置為「未開賽 (NS)」並清空比數？`)) return;
@@ -482,7 +484,7 @@
             headerBal.className = `text-sm font-bold ${bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400')}`;
             
             let avatarEl = document.getElementById('header-avatar');
-            let newColor = avatarColors[currentUser] || 'bg-gray-600';
+            let newColor = window.avatarColors[currentUser] || 'bg-gray-600';
             avatarEl.className = `w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md border border-gray-700 transition-colors duration-300 ${newColor}`;
             avatarEl.innerText = currentUser.charAt(0);
 
@@ -622,7 +624,6 @@
             }
         };
 
-        // 🚨 終極修復：全自動翻頁 + 雙軌智能解析
         window.autoSyncAPI = async () => {
             const pwd = prompt("🔐 管理員密碼："); 
             if (pwd !== "1971") { alert("❌ 密碼錯誤"); return; }
@@ -630,10 +631,29 @@
             const apiKey = prompt("🔑 確認使用 API-Sports 同步？(留空取消)", "c97d7ade3c22173f1ec6623c7ef91c23");
             if (!apiKey) return;
 
+            const kDates = [
+                "2026-06-28T14:00:00-07:00", "2026-06-28T18:00:00-07:00",
+                "2026-06-29T10:00:00-07:00", "2026-06-29T14:00:00-07:00", "2026-06-29T18:00:00-07:00",
+                "2026-06-30T10:00:00-07:00", "2026-06-30T14:00:00-07:00", "2026-06-30T18:00:00-07:00",
+                "2026-07-01T10:00:00-07:00", "2026-07-01T14:00:00-07:00", "2026-07-01T18:00:00-07:00",
+                "2026-07-02T10:00:00-07:00", "2026-07-02T14:00:00-07:00", "2026-07-02T18:00:00-07:00",
+                "2026-07-03T12:00:00-07:00", "2026-07-03T16:00:00-07:00",
+                "2026-07-04T10:00:00-07:00", "2026-07-04T14:00:00-07:00",
+                "2026-07-05T10:00:00-07:00", "2026-07-05T14:00:00-07:00",
+                "2026-07-06T10:00:00-07:00", "2026-07-06T14:00:00-07:00",
+                "2026-07-07T10:00:00-07:00", "2026-07-07T14:00:00-07:00",
+                "2026-07-09T14:00:00-07:00",
+                "2026-07-10T10:00:00-07:00", "2026-07-10T14:00:00-07:00",
+                "2026-07-11T14:00:00-07:00",
+                "2026-07-14T14:00:00-07:00",
+                "2026-07-15T14:00:00-07:00",
+                "2026-07-18T14:00:00-07:00",
+                "2026-07-19T12:00:00-07:00"
+            ];
+
             try {
                 alert("📡 正在連接 API 獲取最新賽況... (請勿關閉視窗)");
                 
-                // 1. 同步賽程
                 const resMatches = await fetch("https://v3.football.api-sports.io/fixtures?league=1&season=2026", { method: "GET", headers: { "x-apisports-key": apiKey } });
                 const dataMatches = await resMatches.json();
                 
@@ -645,18 +665,33 @@
                 if (dataMatches.response && dataMatches.response.length > 0) {
                     matchesCount = dataMatches.response.length;
                     
-                    const promises = dataMatches.response.map(async (item) => {
-                        let mId = item.fixture.id.toString();
-                        let hEng = item.teams.home.name;
-                        let aEng = item.teams.away.name;
-                        let hTC = teamMap[hEng] || hEng;
-                        let aTC = teamMap[aEng] || aEng;
-                        let mStatus = item.fixture.status.short;
-                        let mScoreH = item.goals.home;
-                        let mScoreA = item.goals.away;
+                    let sortedAPI = dataMatches.response.sort((a,b) => (a.fixture?.timestamp || 9999999999) - (b.fixture?.timestamp || 9999999999) || a.fixture?.id - b.fixture?.id);
+                    let kIndex = 0;
+
+                    const promises = sortedAPI.map(async (item, index) => {
+                        let mId = item.fixture?.id?.toString();
+                        if (!mId) return;
+                        
+                        // 🚨 終極護城河防 Crash
+                        let hEng = item.teams?.home?.name || "TBD";
+                        let aEng = item.teams?.away?.name || "TBD";
+                        let hTC = window.teamMap[hEng] || hEng;
+                        let aTC = window.teamMap[aEng] || aEng;
+                        let mStatus = item.fixture?.status?.short || "NS";
+                        let mScoreH = item.goals?.home !== undefined && item.goals?.home !== null ? item.goals.home : null;
+                        let mScoreA = item.goals?.away !== undefined && item.goals?.away !== null ? item.goals.away : null;
+
+                        let mDate = item.fixture?.date;
+                        
+                        if (!mDate || mDate.includes("00:00:00")) {
+                            if (index >= 72 && kIndex < 32) {
+                                mDate = kDates[kIndex];
+                            }
+                        }
+                        if (index >= 72) kIndex++;
 
                         await setDoc(doc(db, "matches_2026", mId), { 
-                            id: mId, home: hTC, away: aTC, date: item.fixture.date,
+                            id: mId, home: hTC, away: aTC, date: mDate,
                             status: mStatus, scoreHome: mScoreH, scoreAway: mScoreA, 
                             updatedAt: serverTimestamp() 
                         }, { merge: true });
@@ -667,7 +702,7 @@
                             if (oddsDoc.exists()) {
                                 hcapStr = oddsDoc.data().handicapStr || "[0]";
                             }
-                            await autoSettleMatch(mId, mScoreH, mScoreA, hcapStr, hTC);
+                            await window.autoSettleMatch(mId, mScoreH, mScoreA, hcapStr, hTC);
                             autoSettledCount++;
                         }
                     });
@@ -676,25 +711,27 @@
 
                 alert(`📡 成功獲取 ${matchesCount} 場賽事！\n(觸發了 ${autoSettledCount} 場自動派彩)\n\n🔄 準備進行【全頁數】盤口深度掃描...`);
                 
-                // 2. 🚨 分頁同步賠率
                 let oddsCount = 0;
                 let fallbackCount = 0;
-                let currentPage = 1;
+
+                const firstOddsRes = await fetch("https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&page=1", { method: "GET", headers: { "x-apisports-key": apiKey } });
+                const firstOddsData = await firstOddsRes.json();
                 let totalPages = 1;
+                if (firstOddsData.paging) {
+                    totalPages = firstOddsData.paging.total || 1;
+                }
 
-                while (currentPage <= totalPages) {
-                    console.log(`Fetching Odds Page ${currentPage} of ${totalPages}...`);
-                    const resOdds = await fetch(`https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&page=${currentPage}`, { method: "GET", headers: { "x-apisports-key": apiKey } });
-                    const dataOdds = await resOdds.json();
-
-                    if (dataOdds.errors && Object.keys(dataOdds.errors).length > 0) throw new Error(`API 存取被拒 (Odds P${currentPage}): ` + Object.values(dataOdds.errors)[0]);
-
-                    if (currentPage === 1 && dataOdds.paging) {
-                        totalPages = dataOdds.paging.total || 1;
+                for (let p = 1; p <= totalPages; p++) {
+                    let pageRes, pageData;
+                    if (p === 1) {
+                        pageData = firstOddsData;
+                    } else {
+                        pageRes = await fetch(`https://v3.football.api-sports.io/odds?league=1&season=2026&bookmaker=1&page=${p}`, { method: "GET", headers: { "x-apisports-key": apiKey } });
+                        pageData = await pageRes.json();
                     }
 
-                    if (dataOdds.response && dataOdds.response.length > 0) {
-                        for (const item of dataOdds.response) {
+                    if (pageData.response && pageData.response.length > 0) {
+                        for (const item of pageData.response) {
                             oddsCount++;
                             let mId = item.fixture.id.toString();
                             let bookmaker = item.bookmakers[0];
@@ -713,7 +750,6 @@
                                     if (aBet) awayOdd = parseFloat(aBet.odd);
                                 }
 
-                                // 🚨 雙軌智能解析
                                 if (handicapBet && handicapBet.values && handicapBet.values.length > 0) {
                                     let bestPair = null;
                                     let minDiff = 999;
@@ -728,8 +764,7 @@
                                         let a = awayOptions.find(opt => {
                                             let aNumStr = opt.value.replace("Away", "").trim();
                                             let aNum = parseFloat(aNumStr) || 0;
-                                            // 兼容 10Bet (兩邊字串一樣) 或 標準版 (數字正負對調)
-                                            return aNumStr === hcapNumStr || aNum === -hcapNum;
+                                            return aNumStr === hcapNumStr || (aNum === -hcapNum);
                                         });
 
                                         if (a) {
@@ -757,18 +792,17 @@
                             }
                         }
                     }
-                    currentPage++;
                 }
                 
-                alert(`✅ QA 診斷報告：\n成功掃描 ${totalPages} 頁資料！\n成功擷取 ${oddsCount} 場賠率！\n\n(注意：當中有 ${fallbackCount} 場因未開亞洲盤，自動退回主客和賠率)`);
+                alert(`✅ 莊家全頁數深度擷取完成！\n成功爬取總共 ${totalPages} 頁資料！\n入庫 ${oddsCount} 場最新賠率！`);
                 
             } catch(e) { console.error(e); alert("❌ 同步失敗：" + e.message); }
         };
 
         window.betOnTeam = (teamName) => {
             if (!teamName) return; 
-            let match = globalMatches.find(m => m.home && m.away && (m.home.includes(teamName) || m.away.includes(teamName)) && !['FT', 'AET', 'PEN'].includes(m.status));
-            if (!match) match = globalMatches.find(m => m.home && m.away && (m.home.includes(teamName) || m.away.includes(teamName)));
+            let match = window.globalMatches.find(m => m.home && m.away && (m.home.includes(teamName) || m.away.includes(teamName)) && !['FT', 'AET', 'PEN'].includes(m.status));
+            if (!match) match = window.globalMatches.find(m => m.home && m.away && (m.home.includes(teamName) || m.away.includes(teamName)));
             
             if(match) {
                 let odds = match.home.includes(teamName) ? match.odds.home : match.odds.away;
@@ -802,10 +836,9 @@
         // ==========================================
         // 3. 系統渲染與內部邏輯
         // ==========================================
-        
-        const getFlag = (teamName) => {
+        window.getFlag = (teamName) => {
             if (!teamName) return "⚽"; 
-            let tName = teamMap[teamName] || teamName; 
+            let tName = window.teamMap[teamName] || teamName; 
             const flags = { 
                 "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦",
                 "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿",
@@ -821,9 +854,9 @@
             return "⚽"; 
         };
 
-        function renderDateFilter() {
+        window.renderDateFilter = () => {
             let uniqueDatesMap = new Map();
-            globalMatches.forEach(m => { 
+            window.globalMatches.forEach(m => { 
                 if(!m.dateStr) return; 
                 if(!uniqueDatesMap.has(m.dateStr)) { uniqueDatesMap.set(m.dateStr, { dateStr: m.dateStr, dateNum: m.dateNum, month: m.month, weekday: m.weekday }); }
             });
@@ -838,7 +871,7 @@
                 } else {
                     let todayMidnight = new Date();
                     todayMidnight.setHours(0,0,0,0);
-                    let upcomingMatch = globalMatches.find(m => new Date(m.date) >= todayMidnight);
+                    let upcomingMatch = window.globalMatches.find(m => new Date(m.date) >= todayMidnight);
                     if (upcomingMatch) {
                         window.selectedDate = upcomingMatch.dateStr;
                     } else {
@@ -869,27 +902,28 @@
                     activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
                 }
             }, 100);
-        }
+        };
 
-        function renderMatches() {
+        window.renderMatches = () => {
             const container = document.getElementById('match-container'), adminSelect = document.getElementById('admin-match-select');
             container.innerHTML = ''; adminSelect.innerHTML = ''; 
             
-            if (globalMatches.length === 0) {
+            if (window.globalMatches.length === 0) {
                 container.innerHTML = '<p class="text-center text-gray-500 py-10">資料庫目前無賽事，請管理員進行同步。</p>';
                 return;
             }
             
-            const matchesToShow = globalMatches.filter(m => m.dateStr === window.selectedDate);
+            const matchesToShow = window.globalMatches.filter(m => m.dateStr === window.selectedDate);
             if(matchesToShow.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 py-10">此日無賽事</p>'; return; }
             
             const now = new Date();
 
             matchesToShow.forEach(match => {
-                if (!match.home || !match.away || match.home.trim() === '' || match.away.trim() === '' || match.home === 'null' || match.home === 'TBD') return; 
+                // 🚨 終極解鎖：不論 TBD 定 Null 都放行渲染！
+                if (!match) return; 
                 
-                let displayHome = teamMap[match.home] || match.home;
-                let displayAway = teamMap[match.away] || match.away;
+                let displayHome = (match.home && match.home !== 'null' && match.home.trim() !== '') ? (window.teamMap[match.home] || match.home) : 'TBD';
+                let displayAway = (match.away && match.away !== 'null' && match.away.trim() !== '') ? (window.teamMap[match.away] || match.away) : 'TBD';
                 
                 adminSelect.innerHTML += `<option value="${match.id}">${displayHome} VS ${displayAway}</option>`;
                 
@@ -927,7 +961,7 @@
                     (displayHome.includes(pair[1]) && displayAway.includes(pair[0]))
                 ) || ["2101", "2102", "2103", "2104"].includes(match.id);
 
-                let isFS1 = fs1Pairs.some(pair => 
+                let isFS1 = window.fs1Pairs.some(pair => 
                     (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
                     (displayHome.includes(pair[1]) && displayAway.includes(pair[0]))
                 ) || ["2079", "2084"].includes(match.id);
@@ -965,7 +999,7 @@
                 let homeHandicapDisplay = homeHandicapStr ? `<span class="text-[10px] text-yellow-500 font-mono mt-0.5">${homeHandicapStr}</span>` : '';
                 let awayHandicapDisplay = awayHandicapStr ? `<span class="text-[10px] text-yellow-500 font-mono mt-0.5">${awayHandicapStr}</span>` : '';
                 
-                let flagH = getFlag(displayHome), flagA = getFlag(displayAway);
+                let flagH = window.getFlag(displayHome), flagA = window.getFlag(displayAway);
 
                 let middleElement = `<div class="w-1/5 text-center text-gray-500 text-lg font-black uppercase tracking-wider">VS</div>`;
                 if (match.scoreHome !== null && match.scoreAway !== null) {
@@ -979,6 +1013,9 @@
                 let safeHome = displayHome.replace(/'/g, "\\'");
                 let safeAway = displayAway.replace(/'/g, "\\'");
                 
+                let homeClick = (match.odds && match.odds.home > 0 && displayHome !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
+                let awayClick = (match.odds && match.odds.away > 0 && displayAway !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
+
                 container.innerHTML += `
                     <div class="glass-panel rounded-2xl p-4 relative overflow-hidden transition-all">
                         <div class="flex justify-between items-center mb-4">
@@ -992,11 +1029,11 @@
                         <div class="flex justify-between items-center mb-3">
                             <div class="flex items-center space-x-2 w-2/5">
                                 <span class="text-2xl">${flagH}</span>
-                                <span class="font-bold text-lg text-white whitespace-nowrap">${displayHome}</span>
+                                <span class="font-bold text-lg ${displayHome === 'TBD' ? 'text-gray-600' : 'text-white'} whitespace-nowrap">${displayHome}</span>
                             </div>
                             ${middleElement}
                             <div class="flex items-center justify-end space-x-2 w-2/5">
-                                <span class="font-bold text-lg text-white whitespace-nowrap">${displayAway}</span>
+                                <span class="font-bold text-lg ${displayAway === 'TBD' ? 'text-gray-600' : 'text-white'} whitespace-nowrap">${displayAway}</span>
                                 <span class="text-2xl">${flagA}</span>
                             </div>
                         </div>
@@ -1004,15 +1041,15 @@
                             ${statusText}
                         </div>
                         <div class="bg-[#111] p-1 rounded-xl flex space-x-1 mb-2">
-                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
-                                <span class="font-bold ${oddsColor} text-lg">${match.odds.home > 0 ? match.odds.home.toFixed(2) : '-'}</span>
+                            <button ${homeClick} class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
+                                <span class="font-bold ${oddsColor} text-lg">${match.odds && match.odds.home > 0 ? match.odds.home.toFixed(2) : '-'}</span>
                                 <div class="flex flex-col items-start leading-none">
                                     <span class="text-[11px] ${canBet?'text-gray-400':'text-gray-600'}">${flagH} 勝</span>
                                     ${homeHandicapDisplay}
                                 </div>
                             </button>
-                            <button onclick="${canBet ? `window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})` : ''}" class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
-                                <span class="font-bold ${oddsColor} text-lg">${match.odds.away > 0 ? match.odds.away.toFixed(2) : '-'}</span>
+                            <button ${awayClick} class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
+                                <span class="font-bold ${oddsColor} text-lg">${match.odds && match.odds.away > 0 ? match.odds.away.toFixed(2) : '-'}</span>
                                 <div class="flex flex-col items-start leading-none">
                                     <span class="text-[11px] ${canBet?'text-gray-400':'text-gray-600'}">${flagA} 勝</span>
                                     ${awayHandicapDisplay}
@@ -1021,9 +1058,9 @@
                         </div>
                     </div>`;
             });
-        }
+        };
 
-        function renderBracket() {
+        window.renderBracket = () => {
             const bracketDiv = document.getElementById('bracket-content');
             let html = '<div class="flex flex-row gap-6 min-w-max p-4">';
 
@@ -1048,11 +1085,11 @@
             Object.keys(groupTeams).forEach(g => {
                 let teamStats = groupTeams[g].map(team => {
                     let stats = { team: team, p:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0 };
-                    globalMatches.forEach(m => {
+                    window.globalMatches.forEach(m => {
                         if (!m.home || !m.away) return;
                         
-                        let hName = teamMap[m.home] || m.home;
-                        let aName = teamMap[m.away] || m.away;
+                        let hName = window.teamMap[m.home] || m.home;
+                        let aName = window.teamMap[m.away] || m.away;
 
                         if (['FT', 'AET', 'PEN'].includes(m.status)) {
                             let isHome = hName.includes(team);
@@ -1078,7 +1115,7 @@
                 let trs = teamStats.map(s => `
                     <tr class="border-b border-gray-700/50 last:border-0 hover:bg-gray-800/30 transition-colors">
                         <td class="py-2 flex items-center space-x-2">
-                            <span class="text-[12px]">${getFlag(s.team)}</span>
+                            <span class="text-[12px]">${window.getFlag(s.team)}</span>
                             <span class="font-bold text-xs text-white">${s.team}</span>
                         </td>
                         <td class="py-2 text-center text-gray-400 text-xs">${s.p}</td>
@@ -1114,7 +1151,7 @@
             });
             html += '</div>';
 
-            let sortedMatches = [...globalMatches].sort((a,b) => new Date(a.date) - new Date(b.date));
+            let sortedMatches = [...window.globalMatches].sort((a,b) => new Date(a.date) - new Date(b.date));
             let kMatches = Array(32).fill(null);
             
             if (sortedMatches.length > 72) {
@@ -1141,17 +1178,17 @@
                 if (!isFinal) {
                     for (let i = 0; i < round.matches.length; i += 2) {
                         html += `<div class="bracket-pair">`;
-                        html += generateBracketCard(round.matches[i], false, round.offset + i);
-                        html += generateBracketCard(round.matches[i+1], false, round.offset + i + 1);
+                        html += window.generateBracketCard(round.matches[i], false, round.offset + i);
+                        html += window.generateBracketCard(round.matches[i+1], false, round.offset + i + 1);
                         html += `</div>`;
                     }
                 } else {
-                    html += generateBracketCard(round.matches[0], true, round.offset);
+                    html += window.generateBracketCard(round.matches[0], true, round.offset);
                     
                     let m3rd = kMatches[30];
                     html += `<div class="mt-8">
                                 <div class="text-xs font-bold text-gray-500 text-center mb-2 border-t border-gray-800 pt-3">季軍戰</div>
-                                ${generateBracketCard(m3rd, false, 30)}
+                                ${window.generateBracketCard(m3rd, false, 30)}
                              </div>`;
                 }
 
@@ -1161,22 +1198,29 @@
 
             html += '</div>';
             bracketDiv.innerHTML = html;
-        }
+        };
 
-        function generateBracketCard(match, isFinal = false, matchIndex = 0) {
+        window.generateBracketCard = (match, isFinal = false, matchIndex = 0) => {
             let borderClass = isFinal ? 'border-yellow-600 shadow-lg shadow-yellow-900/30 bg-yellow-900/10' : 'border-gray-700 hover:bg-gray-800';
             
             const fallbackDates = [
-                "6月29日 03:00", "6月29日 07:00", "6月29日 10:00", 
-                "6月30日 03:00", "6月30日 07:00", "6月30日 10:00", 
-                "7月1日 03:00", "7月1日 07:00", "7月1日 10:00", 
-                "7月2日 03:00", "7月2日 07:00", "7月2日 10:00", 
-                "7月3日 03:00", "7月3日 07:00", "7月4日 02:00", "7月4日 07:00", 
-                "7月4日 22:00", "7月5日 01:00", "7月5日 05:00", "7月6日 00:00", "7月6日 04:00", "7月7日 01:00", "7月7日 05:00", "7月8日 01:00", 
-                "7月10日 04:00", "7月11日 01:00", "7月11日 05:00", "7月12日 05:00", 
-                "7月15日 03:00", "7月16日 03:00", 
-                "7月19日 05:00", 
-                "7月20日 03:00"  
+                "6月28日 14:00", "6月28日 18:00", 
+                "6月29日 10:00", "6月29日 14:00", "6月29日 18:00", 
+                "6月30日 10:00", "6月30日 14:00", "6月30日 18:00", 
+                "7月1日 10:00", "7月1日 14:00", "7月1日 18:00", 
+                "7月2日 10:00", "7月2日 14:00", "7月2日 18:00", 
+                "7月3日 12:00", "7月3日 16:00", 
+                "7月4日 10:00", "7月4日 14:00", 
+                "7月5日 10:00", "7月5日 14:00", 
+                "7月6日 10:00", "7月6日 14:00", 
+                "7月7日 10:00", "7月7日 14:00", 
+                "7月9日 14:00", 
+                "7月10日 10:00", "7月10日 14:00", 
+                "7月11日 14:00", 
+                "7月14日 14:00", 
+                "7月15日 14:00", 
+                "7月18日 14:00", 
+                "7月19日 12:00"
             ];
             
             let isViuTV = false;
@@ -1185,8 +1229,8 @@
             let displayAway = 'TBD';
 
             if (match && match.home && match.away && match.home !== 'null' && match.away !== 'null') {
-                displayHome = teamMap[match.home] || match.home;
-                displayAway = teamMap[match.away] || match.away;
+                displayHome = window.teamMap[match.home] || match.home;
+                displayAway = window.teamMap[match.away] || match.away;
 
                 isViuTV = [
                     ['墨西哥', '南非'], ['加拿大', '波斯尼亞'], ['美國', '巴拉圭'], 
@@ -1200,7 +1244,7 @@
                     (displayHome.includes(pair[1]) && displayAway.includes(pair[0])))
                 ) || [14, 17, 20, 24, 27, 28, 29, 30, 31].includes(matchIndex);
 
-                isFS1 = fs1Pairs.some(pair => 
+                isFS1 = window.fs1Pairs.some(pair => 
                     ((displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
                     (displayHome.includes(pair[1]) && displayAway.includes(pair[0])))
                 ) || [6, 11].includes(matchIndex);
@@ -1215,21 +1259,25 @@
             let fs1SvgBracket = `<svg class="w-5 h-2.5 mr-0.5 inline-block" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="24" rx="4" fill="#002D72"/><text x="30" y="17" fill="white" font-size="14" font-family="sans-serif" font-weight="900" text-anchor="middle">FS1</text></svg>`;
             let fs1BadgeBracket = isFS1 ? `<span class="bg-blue-900/60 text-blue-200 border border-blue-800/50 text-[7px] font-bold px-1 py-0.5 rounded ml-1.5 uppercase tracking-wider flex items-center">${fs1SvgBracket}</span>` : '';
 
-            let isTBD = !match || !match.home || !match.away || match.home === 'TBD' || match.home === 'null' || typeof match.home === 'undefined';
-            let dateStrDisplay = (!isTBD && match.dateStr) ? `${match.dateStr} ${match.kickoff}` : fallbackDates[matchIndex] || '等待開盤';
+            let dateStrDisplay = (match && match.dateStr) ? `${match.dateStr} ${match.kickoff}` : fallbackDates[matchIndex] || '等待開盤';
             let dateBadge = `<div class="absolute -top-2.5 left-1/2 transform -translate-x-1/2 flex items-center bg-[#0d0d0d] px-1.5 py-0.5 text-[9px] text-gray-500 font-mono tracking-tighter whitespace-nowrap rounded z-20 border border-gray-800 shadow-sm">${dateStrDisplay}${viuTvBadge}${fs1BadgeBracket}</div>`;
 
+            let isTBD = !match || !match.home || match.home === 'TBD' || match.home === 'null' || match.home.trim() === '';
+            
             if(isTBD) {
+                let homeStr = (match && match.home && match.home !== 'null' && match.home.trim() !== '') ? match.home : 'TBD';
+                let awayStr = (match && match.away && match.away !== 'null' && match.away.trim() !== '') ? match.away : 'TBD';
+                
                 return `
                 <div class="bracket-card rounded-lg border ${borderClass} flex flex-col justify-center px-2 cursor-not-allowed bg-black/20 relative">
                     ${dateBadge}
                     <div class="flex justify-between items-center py-0.5 rounded px-1 mt-1">
-                        <span class="font-bold text-[11px] text-gray-600">TBD</span>
+                        <span class="font-bold text-[11px] text-gray-600">${homeStr}</span>
                         <span class="font-normal text-[11px] text-gray-700">-</span>
                     </div>
                     <div class="border-b ${isFinal ? 'border-yellow-700/50' : 'border-gray-800'} w-full my-0.5"></div>
                     <div class="flex justify-between items-center py-0.5 rounded px-1 mb-1">
-                        <span class="font-bold text-[11px] text-gray-600">TBD</span>
+                        <span class="font-bold text-[11px] text-gray-600">${awayStr}</span>
                         <span class="font-normal text-[11px] text-gray-700">-</span>
                     </div>
                 </div>
@@ -1245,26 +1293,46 @@
             let safeHome = displayHome.replace(/'/g, "\\'");
             let safeAway = displayAway.replace(/'/g, "\\'");
 
-            let homeClick = (match.odds && match.odds.home > 0) ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ ${safeHome} 莊家尚未開盤。')";`;
-            let awayClick = (match.odds && match.odds.away > 0) ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ ${safeAway} 莊家尚未開盤。')";`;
+            let homeClick = (match.odds && match.odds.home > 0 && displayHome !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
+            let awayClick = (match.odds && match.odds.away > 0 && displayAway !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
 
             return `
             <div class="bracket-card rounded-lg border ${borderClass} flex flex-col justify-center px-2 cursor-pointer transition-colors touch-manipulation relative">
                 ${dateBadge}
                 <div ${homeClick} class="flex justify-between items-center py-0.5 hover:bg-gray-700/50 rounded px-1 touch-manipulation mt-1">
-                    <span class="font-bold text-[11px] ${textClass}">${displayHome}</span>
+                    <span class="font-bold text-[11px] ${displayHome === 'TBD' ? 'text-gray-600' : textClass}">${displayHome}</span>
                     <span class="font-normal text-[11px] ${scoreClass}">${homeScore}</span>
                 </div>
                 <div class="border-b ${isFinal ? 'border-yellow-700/50' : 'border-gray-700'} w-full my-0.5"></div>
                 <div ${awayClick} class="flex justify-between items-center py-0.5 hover:bg-gray-700/50 rounded px-1 touch-manipulation mb-1">
-                    <span class="font-bold text-[11px] ${textClass}">${displayAway}</span>
+                    <span class="font-bold text-[11px] ${displayAway === 'TBD' ? 'text-gray-600' : textClass}">${displayAway}</span>
                     <span class="font-normal text-[11px] ${scoreClass}">${awayScore}</span>
                 </div>
             </div>
             `;
-        }
+        };
 
-        const initMatches = () => {
+        window.initMatches = () => {
+            const kDates = [
+                "2026-06-28T14:00:00-07:00", "2026-06-28T18:00:00-07:00",
+                "2026-06-29T10:00:00-07:00", "2026-06-29T14:00:00-07:00", "2026-06-29T18:00:00-07:00",
+                "2026-06-30T10:00:00-07:00", "2026-06-30T14:00:00-07:00", "2026-06-30T18:00:00-07:00",
+                "2026-07-01T10:00:00-07:00", "2026-07-01T14:00:00-07:00", "2026-07-01T18:00:00-07:00",
+                "2026-07-02T10:00:00-07:00", "2026-07-02T14:00:00-07:00", "2026-07-02T18:00:00-07:00",
+                "2026-07-03T12:00:00-07:00", "2026-07-03T16:00:00-07:00",
+                "2026-07-04T10:00:00-07:00", "2026-07-04T14:00:00-07:00",
+                "2026-07-05T10:00:00-07:00", "2026-07-05T14:00:00-07:00",
+                "2026-07-06T10:00:00-07:00", "2026-07-06T14:00:00-07:00",
+                "2026-07-07T10:00:00-07:00", "2026-07-07T14:00:00-07:00",
+                "2026-07-09T14:00:00-07:00",
+                "2026-07-10T10:00:00-07:00", "2026-07-10T14:00:00-07:00",
+                "2026-07-11T14:00:00-07:00",
+                "2026-07-14T14:00:00-07:00",
+                "2026-07-15T14:00:00-07:00",
+                "2026-07-18T14:00:00-07:00",
+                "2026-07-19T12:00:00-07:00"
+            ];
+
             onSnapshot(collection(db, "matches_2026"), (snapshot) => {
                 let apiMatches = [];
                 if (!snapshot.empty) {
@@ -1275,7 +1343,7 @@
                         const dateObj = new Date(data.date);
                         
                         let existingOdds = { handicapStr: "", home: 0.00, away: 0.00 };
-                        let existingMatch = globalMatches.find(m => m.id === data.id);
+                        let existingMatch = window.globalMatches.find(m => m.id === data.id);
                         if (existingMatch && existingMatch.odds) { existingOdds = existingMatch.odds; }
                         
                         apiMatches.push({
@@ -1289,12 +1357,31 @@
                         });
                     });
                 }
-                globalMatches = apiMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
-                renderDateFilter(); renderMatches(); renderBracket();
+
+                // 🚨 幽靈賽程本地生成引擎：確保所有日期 100% 完整現身！
+                let knockoutsFound = apiMatches.length > 72 ? (apiMatches.length - 72) : 0;
+                if (knockoutsFound < 32) {
+                    for (let i = knockoutsFound; i < 32; i++) {
+                        let dObj = new Date(kDates[i]);
+                        apiMatches.push({
+                            id: "KO_PLACEHOLDER_" + i, home: "TBD", away: "TBD", date: kDates[i], status: "NS", 
+                            scoreHome: null, scoreAway: null,
+                            dateStr: dObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' }), month: dObj.getMonth() + 1,
+                            dateNum: dObj.getDate(), weekday: '星期' + weekdaysCH[dObj.getDay()],
+                            kickoff: dObj.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' }),
+                            odds: { handicapStr: "", home: 0, away: 0 }
+                        });
+                    }
+                }
+
+                window.globalMatches = apiMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+                window.renderDateFilter(); 
+                window.renderMatches(); 
+                window.renderBracket();
             });
         };
 
-        initMatches(); 
+        window.initMatches(); 
         window.updateHeaderBalance();
 
         // ==========================================
@@ -1304,13 +1391,13 @@
             let needsRender = false; 
             snapshot.forEach((doc) => { 
                 const newOdds = doc.data(); 
-                const matchIndex = globalMatches.findIndex(m => m.id === doc.id); 
+                const matchIndex = window.globalMatches.findIndex(m => m.id === doc.id); 
                 if(matchIndex !== -1) { 
-                    globalMatches[matchIndex].odds = { handicapStr: newOdds.handicapStr || "", home: newOdds.home, away: newOdds.away }; 
+                    window.globalMatches[matchIndex].odds = { handicapStr: newOdds.handicapStr || "", home: newOdds.home, away: newOdds.away }; 
                     needsRender = true; 
                 } 
             }); 
-            if(needsRender) { renderMatches(); renderBracket(); }
+            if(needsRender) { window.renderMatches(); window.renderBracket(); }
         }); 
 
         onSnapshot(query(collection(db, "bets"), orderBy("timestamp", "desc")), (snapshot) => {
@@ -1345,17 +1432,17 @@
             });
             
             matchGroupMap.forEach((bets, matchId) => {
-                let match = globalMatches.find(m => m.id === matchId);
+                let match = window.globalMatches.find(m => m.id === matchId);
                 let matchHeaderHtml = '';
                 
                 if (match) {
-                    let hName = teamMap[match.home] || match.home;
-                    let aName = teamMap[match.away] || match.away;
+                    let hName = window.teamMap[match.home] || match.home;
+                    let aName = window.teamMap[match.away] || match.away;
                     let scoreTxt = (match.scoreHome !== null && match.scoreAway !== null) ? ` (${match.scoreHome}:${match.scoreAway})` : '';
                     matchHeaderHtml = `
                         <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-3">
                             <div class="flex items-center space-x-2 text-xs font-bold text-gray-400 tracking-wide uppercase">
-                                <span>⚽ ${getFlag(hName)} ${hName} VS ${getFlag(aName)} ${aName}${scoreTxt}</span>
+                                <span>⚽ ${window.getFlag(hName)} ${hName} VS ${window.getFlag(aName)} ${aName}${scoreTxt}</span>
                             </div>
                             <span class="text-[10px] bg-gray-800 text-gray-500 font-mono px-1.5 py-0.5 rounded">${match.dateStr || ''}</span>
                         </div>
@@ -1380,8 +1467,8 @@
                         else { resTxt = `輸全 -$${Math.abs(bet.profit).toFixed(1)}`; resCol = "text-red-500 font-bold bg-red-500/10 px-2 py-1 rounded"; }
                     }
                     
-                    let betAvatarColor = avatarColors[bet.player] || 'bg-gray-600';
-                    let displaySelection = teamMap[bet.selection] || bet.selection;
+                    let betAvatarColor = window.avatarColors[bet.player] || 'bg-gray-600';
+                    let displaySelection = window.teamMap[bet.selection] || bet.selection;
                     
                     let deleteBtn = `<button onclick="window.deleteBet('${bet.docId}')" style="display: ${window.authenticatedUser === 'Dennis' ? 'flex' : 'none'};" class="admin-only-btn ml-3 text-red-500 hover:text-red-400 transition-colors bg-red-900/20 rounded p-1.5 flex-shrink-0 touch-manipulation items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>`;
                     
@@ -1425,7 +1512,7 @@
                 let denseRank = uniqueBalances.indexOf(bal);
                 let rankMedal = denseRank === 0 ? '🥇' : (denseRank === 1 ? '🥈' : (denseRank === 2 ? '🥉' : '<span class="w-[18px] inline-block"></span>'));
                 
-                let boardAvatarColor = avatarColors[p] || 'bg-gray-600';
+                let boardAvatarColor = window.avatarColors[p] || 'bg-gray-600';
                 
                 leaderboardDiv.innerHTML += `
                     <div class="flex justify-between items-center py-3 border-b border-gray-800 last:border-0">
