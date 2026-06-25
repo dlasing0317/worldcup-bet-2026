@@ -257,7 +257,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 🚨 終極安全防禦：強制綁定所有核心變數及函數到 window
         window.globalMatches = [];
         window.selectedDate = null; 
         window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
@@ -672,7 +671,6 @@
                         let mId = item.fixture?.id?.toString();
                         if (!mId) return;
                         
-                        // 🚨 終極護城河防 Crash
                         let hEng = item.teams?.home?.name || "TBD";
                         let aEng = item.teams?.away?.name || "TBD";
                         let hTC = window.teamMap[hEng] || hEng;
@@ -833,9 +831,6 @@
             } catch (e) { console.error(e); alert("❌ 清除失敗：" + e.message); }
         };
 
-        // ==========================================
-        // 3. 系統渲染與內部邏輯
-        // ==========================================
         window.getFlag = (teamName) => {
             if (!teamName) return "⚽"; 
             let tName = window.teamMap[teamName] || teamName; 
@@ -919,7 +914,6 @@
             const now = new Date();
 
             matchesToShow.forEach(match => {
-                // 🚨 終極解鎖：不論 TBD 定 Null 都放行渲染！
                 if (!match) return; 
                 
                 let displayHome = (match.home && match.home !== 'null' && match.home.trim() !== '') ? (window.teamMap[match.home] || match.home) : 'TBD';
@@ -1013,8 +1007,8 @@
                 let safeHome = displayHome.replace(/'/g, "\\'");
                 let safeAway = displayAway.replace(/'/g, "\\'");
                 
-                let homeClick = (match.odds && match.odds.home > 0 && displayHome !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
-                let awayClick = (match.odds && match.odds.away > 0 && displayAway !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
+                let homeClick = (canBet && displayHome !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
+                let awayClick = (canBet && displayAway !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
 
                 container.innerHTML += `
                     <div class="glass-panel rounded-2xl p-4 relative overflow-hidden transition-all">
@@ -1072,14 +1066,14 @@
                 'B': ['加拿大', '波斯尼亞', '美國', '巴拉圭'],
                 'C': ['卡塔爾', '瑞士', '巴西', '摩洛哥'], 
                 'D': ['海地', '蘇格蘭', '澳洲', '土耳其'],
-                'E': ['德國', '庫拉索', '荷蘭', '日本'], 
-                'F': ['科特迪瓦', '厄瓜多爾', '瑞典', '突尼西亞'],
-                'G': ['西班牙', '佛得角', '比利時', '埃及'], 
-                'H': ['沙特', '烏拉圭', '伊朗', '新西蘭'],
-                'I': ['法國', '塞內加爾', '伊拉克', '挪威'], 
-                'J': ['阿根廷', '阿爾及利亞', '奧地利', '約旦'],
-                'K': ['葡萄牙', '剛果', '英格蘭', '克羅地亞'], 
-                'L': ['加納', '巴拿馬', '烏茲別克', '哥倫比亞']
+                'E': ['德國', '科特迪瓦', '厄瓜多爾', '庫拉索'], 
+                'F': ['荷蘭', '日本', '瑞典', '突尼西亞'],
+                'G': ['埃及', '伊朗', '比利時', '新西蘭'], 
+                'H': ['西班牙', '烏拉圭', '佛得角', '沙特'],
+                'I': ['法國', '挪威', '塞內加爾', '伊拉克'], 
+                'J': ['阿根廷', '奧地利', '阿爾及利亞', '約旦'],
+                'K': ['哥倫比亞', '葡萄牙', '剛果', '烏茲別克'], 
+                'L': ['英格蘭', '加納', '克羅地亞', '巴拿馬']
             };
 
             Object.keys(groupTeams).forEach(g => {
@@ -1358,7 +1352,6 @@
                     });
                 }
 
-                // 🚨 幽靈賽程本地生成引擎：確保所有日期 100% 完整現身！
                 let knockoutsFound = apiMatches.length > 72 ? (apiMatches.length - 72) : 0;
                 if (knockoutsFound < 32) {
                     for (let i = knockoutsFound; i < 32; i++) {
