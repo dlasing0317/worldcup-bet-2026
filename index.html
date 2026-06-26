@@ -257,7 +257,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 🚨 全域綁定確保永不白屏
+        // 🚨 全域綁定確保永不白屏 (100% Crash-Proof Scope)
         window.globalMatches = [];
         window.selectedDate = null; 
         window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
@@ -310,7 +310,7 @@
             ['剛果', '烏茲別克'], ['阿爾及利亞', '奧地利']
         ];
 
-        // 🚨 終極 R32 硬骨架 (PDT 時區) - 100% Match Apple Sports
+        // 🚨 終極 R32 上帝視角：100% 強制匹配 Apple Sports 賽程與美西時間！
         window.kDates = [
             "2026-06-28T12:00:00-07:00", "2026-06-29T10:00:00-07:00", "2026-06-29T13:30:00-07:00", "2026-06-29T18:00:00-07:00",
             "2026-06-30T10:00:00-07:00", "2026-06-30T14:00:00-07:00", "2026-06-30T18:00:00-07:00", "2026-07-01T09:00:00-07:00",
@@ -324,48 +324,48 @@
 
         window.bracketStructure = {
             r32: [
-                { home: "德國", away: "3A/B/C/D/F", d: "6月29日", t: "下午01:30" }, 
-                { home: "1I", away: "3C/D/F/G/H", d: "6月30日", t: "下午02:00" }, 
-                { home: "南非", away: "加拿大", d: "6月28日", t: "下午12:00" }, 
-                { home: "荷蘭", away: "摩洛哥", d: "6月29日", t: "下午06:00" }, 
-                { home: "2K", away: "2L", d: "7月2日", t: "下午04:00" }, 
-                { home: "1H", away: "2J", d: "7月2日", t: "下午12:00" }, 
-                { home: "美國", away: "波斯尼亞", d: "7月1日", t: "下午05:00" }, 
-                { home: "1G", away: "3A/E/H/I/J", d: "7月1日", t: "下午01:00" }, 
-                { home: "巴西", away: "日本", d: "6月29日", t: "上午10:00" }, 
-                { home: "科特迪瓦", away: "2I", d: "6月30日", t: "上午10:00" }, 
-                { home: "墨西哥", away: "3C/E/F/H/I", d: "6月30日", t: "下午06:00" }, 
-                { home: "1L", away: "3E/H/I/J/K", d: "7月1日", t: "上午09:00" }, 
-                { home: "阿根廷", away: "2H", d: "7月3日", t: "下午03:00" }, 
-                { home: "2D", away: "2G", d: "7月3日", t: "上午11:00" }, 
-                { home: "瑞士", away: "3E/F/G/I/J", d: "7月2日", t: "下午08:00" }, 
-                { home: "1K", away: "3D/E/I/J/L", d: "7月3日", t: "下午06:30" }  
+                { id: "R32_1", home: "德國", away: "3A/B/C/D/F", iso: "2026-06-29T13:30:00-07:00" }, 
+                { id: "R32_2", home: "1I", away: "3C/D/F/G/H", iso: "2026-06-30T14:00:00-07:00" }, 
+                { id: "R32_3", home: "南非", away: "加拿大", iso: "2026-06-28T12:00:00-07:00" }, 
+                { id: "R32_4", home: "荷蘭", away: "摩洛哥", iso: "2026-06-29T18:00:00-07:00" }, 
+                { id: "R32_5", home: "2K", away: "2L", iso: "2026-07-02T16:00:00-07:00" }, 
+                { id: "R32_6", home: "1H", away: "2J", iso: "2026-07-02T12:00:00-07:00" }, 
+                { id: "R32_7", home: "美國", away: "波斯尼亞", iso: "2026-07-01T17:00:00-07:00" }, 
+                { id: "R32_8", home: "1G", away: "3A/E/H/I/J", iso: "2026-07-01T13:00:00-07:00" }, 
+                { id: "R32_9", home: "巴西", away: "日本", iso: "2026-06-29T10:00:00-07:00" }, 
+                { id: "R32_10", home: "科特迪瓦", away: "2I", iso: "2026-06-30T10:00:00-07:00" }, 
+                { id: "R32_11", home: "墨西哥", away: "3C/E/F/H/I", iso: "2026-06-30T18:00:00-07:00" }, 
+                { id: "R32_12", home: "1L", away: "3E/H/I/J/K", iso: "2026-07-01T09:00:00-07:00" }, 
+                { id: "R32_13", home: "阿根廷", away: "2H", iso: "2026-07-03T15:00:00-07:00" }, 
+                { id: "R32_14", home: "2D", away: "2G", iso: "2026-07-03T11:00:00-07:00" }, 
+                { id: "R32_15", home: "瑞士", away: "3E/F/G/I/J", iso: "2026-07-02T20:00:00-07:00" }, 
+                { id: "R32_16", home: "1K", away: "3D/E/I/J/L", iso: "2026-07-03T18:30:00-07:00" }  
             ],
             r16: [
-                { home: "TBD", away: "TBD", d: "7月4日", t: "下午02:00" },
-                { home: "TBD", away: "TBD", d: "7月4日", t: "上午10:00" },
-                { home: "TBD", away: "TBD", d: "7月5日", t: "下午05:00" },
-                { home: "TBD", away: "TBD", d: "7月5日", t: "下午01:00" },
-                { home: "TBD", away: "TBD", d: "7月6日", t: "下午05:00" },
-                { home: "TBD", away: "TBD", d: "7月6日", t: "下午12:00" },
-                { home: "TBD", away: "TBD", d: "7月7日", t: "下午01:00" },
-                { home: "TBD", away: "TBD", d: "7月7日", t: "上午09:00" }
+                { id: "R16_1", home: "TBD", away: "TBD", iso: "2026-07-04T14:00:00-07:00" },
+                { id: "R16_2", home: "TBD", away: "TBD", iso: "2026-07-04T10:00:00-07:00" },
+                { id: "R16_3", home: "TBD", away: "TBD", iso: "2026-07-06T12:00:00-07:00" },
+                { id: "R16_4", home: "TBD", away: "TBD", iso: "2026-07-06T17:00:00-07:00" },
+                { id: "R16_5", home: "TBD", away: "TBD", iso: "2026-07-05T17:00:00-07:00" },
+                { id: "R16_6", home: "TBD", away: "TBD", iso: "2026-07-05T13:00:00-07:00" },
+                { id: "R16_7", home: "TBD", away: "TBD", iso: "2026-07-07T09:00:00-07:00" },
+                { id: "R16_8", home: "TBD", away: "TBD", iso: "2026-07-07T13:00:00-07:00" }
             ],
             qf: [
-                { home: "TBD", away: "TBD", d: "7月9日", t: "下午05:00" }, 
-                { home: "TBD", away: "TBD", d: "7月10日", t: "下午01:00" },
-                { home: "TBD", away: "TBD", d: "7月10日", t: "下午05:00" },
-                { home: "TBD", away: "TBD", d: "7月11日", t: "下午05:00" }
+                { id: "QF_1", home: "TBD", away: "TBD", iso: "2026-07-09T17:00:00-07:00" }, 
+                { id: "QF_2", home: "TBD", away: "TBD", iso: "2026-07-10T13:00:00-07:00" },
+                { id: "QF_3", home: "TBD", away: "TBD", iso: "2026-07-10T17:00:00-07:00" },
+                { id: "QF_4", home: "TBD", away: "TBD", iso: "2026-07-11T17:00:00-07:00" }
             ],
             sf: [
-                { home: "TBD", away: "TBD", d: "7月14日", t: "下午05:00" },
-                { home: "TBD", away: "TBD", d: "7月15日", t: "下午05:00" }
-            ],
-            f: [
-                { home: "TBD", away: "TBD", d: "7月19日", t: "下午12:00" }
+                { id: "SF_1", home: "TBD", away: "TBD", iso: "2026-07-14T17:00:00-07:00" },
+                { id: "SF_2", home: "TBD", away: "TBD", iso: "2026-07-15T17:00:00-07:00" }
             ],
             third: [
-                { home: "TBD", away: "TBD", d: "7月18日", t: "下午05:00" }
+                { id: "TH_1", home: "TBD", away: "TBD", iso: "2026-07-18T17:00:00-07:00" }
+            ],
+            f: [
+                { id: "F_1", home: "TBD", away: "TBD", iso: "2026-07-19T12:00:00-07:00" }
             ]
         };
 
@@ -721,7 +721,7 @@
 
                         let mDate = item.fixture?.date;
                         
-                        if (!mDate || mDate.includes("00:00:00")) {
+                        if (!mDate || String(mDate).includes("00:00:00")) {
                             if (index >= 72 && kIndex < 32) {
                                 mDate = window.kDates[kIndex];
                             }
@@ -792,15 +792,15 @@
                                     let bestPair = null;
                                     let minDiff = 999;
 
-                                    let homeOptions = handicapBet.values.filter(v => v.value.startsWith("Home"));
-                                    let awayOptions = handicapBet.values.filter(v => v.value.startsWith("Away"));
+                                    let homeOptions = handicapBet.values.filter(v => String(v.value).startsWith("Home"));
+                                    let awayOptions = handicapBet.values.filter(v => String(v.value).startsWith("Away"));
 
                                     homeOptions.forEach(h => {
-                                        let hcapNumStr = h.value.replace("Home", "").trim();
+                                        let hcapNumStr = String(h.value).replace("Home", "").trim();
                                         let hcapNum = parseFloat(hcapNumStr) || 0;
 
                                         let a = awayOptions.find(opt => {
-                                            let aNumStr = opt.value.replace("Away", "").trim();
+                                            let aNumStr = String(opt.value).replace("Away", "").trim();
                                             let aNum = parseFloat(aNumStr) || 0;
                                             return aNumStr === hcapNumStr || (aNum === -hcapNum);
                                         });
@@ -839,12 +839,12 @@
 
         window.betOnTeam = (teamName) => {
             if (!teamName) return; 
-            let match = window.globalMatches.find(m => m.home && m.away && (m.home.includes(teamName) || m.away.includes(teamName)) && !['FT', 'AET', 'PEN'].includes(m.status));
-            if (!match) match = window.globalMatches.find(m => m.home && m.away && (m.home.includes(teamName) || m.away.includes(teamName)));
+            let match = window.globalMatches.find(m => m.home && m.away && (String(m.home).includes(teamName) || String(m.away).includes(teamName)) && !['FT', 'AET', 'PEN'].includes(m.status));
+            if (!match) match = window.globalMatches.find(m => m.home && m.away && (String(m.home).includes(teamName) || String(m.away).includes(teamName)));
             
             if(match) {
-                let odds = match.home.includes(teamName) ? match.odds.home : match.odds.away;
-                let actualTeamName = match.home.includes(teamName) ? match.home : match.away;
+                let odds = String(match.home).includes(teamName) ? match.odds.home : match.odds.away;
+                let actualTeamName = String(match.home).includes(teamName) ? match.home : match.away;
                 if (odds > 0) {
                     window.placeBet(match.id, actualTeamName, odds);
                 } else {
@@ -871,9 +871,10 @@
             } catch (e) { console.error(e); alert("❌ 清除失敗：" + e.message); }
         };
 
+        // 🚨 安全型國旗生成器
         window.getFlag = (teamName) => {
-            if (!teamName) return "⚽"; 
-            let tName = window.teamMap[teamName] || teamName; 
+            if (!teamName || typeof teamName !== 'string') return "⚽"; 
+            let tName = String(window.teamMap[teamName] || teamName); 
             const flags = { 
                 "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦",
                 "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿",
@@ -890,398 +891,389 @@
         };
 
         window.renderDateFilter = () => {
-            let uniqueDatesMap = new Map();
-            window.globalMatches.forEach(m => { 
-                if(!m.dateStr) return; 
-                if(!uniqueDatesMap.has(m.dateStr)) { uniqueDatesMap.set(m.dateStr, { dateStr: m.dateStr, dateNum: m.dateNum, month: m.month, weekday: m.weekday }); }
-            });
-            const uniqueDates = Array.from(uniqueDatesMap.values());
-            
-            if (!window.selectedDate && uniqueDates.length > 0) {
-                let now = new Date();
-                let todayStr = now.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' });
+            try {
+                let uniqueDatesMap = new Map();
+                window.globalMatches.forEach(m => { 
+                    if(!m.dateStr) return; 
+                    if(!uniqueDatesMap.has(m.dateStr)) { uniqueDatesMap.set(m.dateStr, { dateStr: m.dateStr, dateNum: m.dateNum, month: m.month, weekday: m.weekday }); }
+                });
+                const uniqueDates = Array.from(uniqueDatesMap.values());
                 
-                if (uniqueDates.some(d => d.dateStr === todayStr)) {
-                    window.selectedDate = todayStr;
-                } else {
-                    let todayMidnight = new Date();
-                    todayMidnight.setHours(0,0,0,0);
-                    let upcomingMatch = window.globalMatches.find(m => new Date(m.date) >= todayMidnight);
-                    if (upcomingMatch) {
-                        window.selectedDate = upcomingMatch.dateStr;
+                if (!window.selectedDate && uniqueDates.length > 0) {
+                    let now = new Date();
+                    let todayStr = now.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' });
+                    
+                    if (uniqueDates.some(d => d.dateStr === todayStr)) {
+                        window.selectedDate = todayStr;
                     } else {
-                        window.selectedDate = uniqueDates[uniqueDates.length - 1].dateStr;
+                        let todayMidnight = new Date();
+                        todayMidnight.setHours(0,0,0,0);
+                        let upcomingMatch = window.globalMatches.find(m => new Date(m.date) >= todayMidnight);
+                        if (upcomingMatch) {
+                            window.selectedDate = upcomingMatch.dateStr;
+                        } else {
+                            window.selectedDate = uniqueDates[uniqueDates.length - 1].dateStr;
+                        }
                     }
                 }
-            }
-            
-            const selectorContainer = document.getElementById('date-selector'); selectorContainer.innerHTML = '';
-            const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+                
+                const selectorContainer = document.getElementById('date-selector'); 
+                if(!selectorContainer) return;
+                selectorContainer.innerHTML = '';
+                const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
-            uniqueDates.forEach((dateObj, idx) => {
-                const isActive = dateObj.dateStr === window.selectedDate;
-                let monthEng = monthNames[dateObj.month - 1] || 'MTH';
-                let btnClass = isActive ? "bg-green-600 text-white shadow-md shadow-green-900/40 border-green-500" : "bg-[#1a1a1c] text-gray-500 hover:bg-[#2c2c2e] border-gray-800";
-                selectorContainer.innerHTML += `
-                    <button onclick="window.filterByDate('${dateObj.dateStr}')" class="flex flex-col items-center justify-center min-w-[65px] px-2 py-2 rounded-xl border transition-all duration-200 cursor-pointer flex-shrink-0 touch-manipulation ${btnClass}">
-                        <span class="text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-green-100' : 'text-gray-600'}">${monthEng}</span>
-                        <span class="text-xl font-black leading-none my-1 ${isActive ? 'text-white' : 'text-gray-300'}">${dateObj.dateNum}</span>
-                        <span class="text-[11px] font-medium ${isActive ? 'text-white' : 'text-gray-500'}">${dateObj.weekday}</span>
-                    </button>
-                `;
-            });
+                uniqueDates.forEach((dateObj, idx) => {
+                    const isActive = dateObj.dateStr === window.selectedDate;
+                    let monthEng = monthNames[dateObj.month - 1] || 'MTH';
+                    let btnClass = isActive ? "bg-green-600 text-white shadow-md shadow-green-900/40 border-green-500" : "bg-[#1a1a1c] text-gray-500 hover:bg-[#2c2c2e] border-gray-800";
+                    selectorContainer.innerHTML += `
+                        <button onclick="window.filterByDate('${dateObj.dateStr}')" class="flex flex-col items-center justify-center min-w-[65px] px-2 py-2 rounded-xl border transition-all duration-200 cursor-pointer flex-shrink-0 touch-manipulation ${btnClass}">
+                            <span class="text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-green-100' : 'text-gray-600'}">${monthEng}</span>
+                            <span class="text-xl font-black leading-none my-1 ${isActive ? 'text-white' : 'text-gray-300'}">${dateObj.dateNum}</span>
+                            <span class="text-[11px] font-medium ${isActive ? 'text-white' : 'text-gray-500'}">${dateObj.weekday}</span>
+                        </button>
+                    `;
+                });
 
-            setTimeout(() => {
-                const activeBtn = selectorContainer.querySelector('.bg-green-600');
-                if (activeBtn) {
-                    activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                }
-            }, 100);
+                setTimeout(() => {
+                    const activeBtn = selectorContainer.querySelector('.bg-green-600');
+                    if (activeBtn) {
+                        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                }, 100);
+            } catch (e) { console.error("Render Date Error", e); }
         };
 
         window.renderMatches = () => {
-            const container = document.getElementById('match-container'), adminSelect = document.getElementById('admin-match-select');
-            container.innerHTML = ''; adminSelect.innerHTML = ''; 
-            
-            if (window.globalMatches.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500 py-10">資料庫目前無賽事，請管理員進行同步。</p>';
-                return;
-            }
-            
-            const matchesToShow = window.globalMatches.filter(m => m.dateStr === window.selectedDate);
-            if(matchesToShow.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 py-10">此日無賽事</p>'; return; }
-            
-            const now = new Date();
-
-            matchesToShow.forEach(match => {
-                if (!match) return; 
+            try {
+                const container = document.getElementById('match-container'), adminSelect = document.getElementById('admin-match-select');
+                if(!container || !adminSelect) return;
+                container.innerHTML = ''; adminSelect.innerHTML = ''; 
                 
-                let displayHome = (match.home && match.home !== 'null' && match.home.trim() !== '') ? (window.teamMap[match.home] || match.home) : 'TBD';
-                let displayAway = (match.away && match.away !== 'null' && match.away.trim() !== '') ? (window.teamMap[match.away] || match.away) : 'TBD';
-                
-                adminSelect.innerHTML += `<option value="${match.id}">${displayHome} VS ${displayAway}</option>`;
-                
-                let matchDateObj = new Date(match.date);
-                let isOddsReady = match.odds && match.odds.home > 0;
-                let isStarted = (match.status !== 'NS' && match.status !== 'TBD') || (now >= matchDateObj);
-                let isFinished = ['FT', 'AET', 'PEN'].includes(match.status);
-                let canBet = isOddsReady && !isStarted && !isFinished;
-
-                let dynamicCalendarIcon = `
-                    <div class="flex flex-col items-center justify-start w-3.5 h-4 bg-[#1c1c1e] rounded-[3px] border border-gray-600 overflow-hidden mr-1.5 flex-shrink-0">
-                        <div class="bg-red-600 w-full h-1.5"></div>
-                        <div class="flex-1 flex items-center justify-center">
-                            <span class="text-[9px] font-bold text-white leading-none tracking-tighter">${match.dateNum}</span>
-                        </div>
-                    </div>
-                `;
-
-                let matchLabelHtml = `<span class="text-gray-400 text-xs font-semibold tracking-wide uppercase">UPCOMING</span>`;
-                if (isFinished) {
-                    matchLabelHtml = `<span class="text-gray-500 text-xs font-semibold tracking-wide uppercase">FINISHED</span>`;
-                } else if (isStarted) {
-                    matchLabelHtml = `<span class="text-red-500 text-xs font-bold tracking-wide uppercase animate-pulse">LIVE / IN-PLAY</span>`;
-                }
-
-                let isViuTV = [
-                    ['墨西哥', '南非'], ['加拿大', '波斯尼亞'], ['美國', '巴拉圭'], 
-                    ['法國', '塞內加爾'], ['烏茲別克', '哥倫比亞'], ['墨西哥', '韓國'], 
-                    ['美國', '澳洲'], ['突尼西亞', '日本'], ['新西蘭', '埃及'], 
-                    ['挪威', '塞內加爾'], ['約旦', '阿爾及利亞'], ['巴拿馬', '克羅地亞'], 
-                    ['哥倫比亞', '剛果'], ['南非', '韓國'], ['土耳其', '美國'], 
-                    ['新西蘭', '比利時']
-                ].some(pair => 
-                    (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
-                    (displayHome.includes(pair[1]) && displayAway.includes(pair[0]))
-                ) || ["2101", "2102", "2103", "2104"].includes(match.id);
-
-                let isFS1 = window.fs1Pairs.some(pair => 
-                    (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
-                    (displayHome.includes(pair[1]) && displayAway.includes(pair[0]))
-                ) || ["2079", "2084"].includes(match.id);
-
-                let viuTvSvg = `<svg class="w-3.5 h-3.5 mr-1 drop-shadow-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#3B82F6"/><circle cx="12" cy="12" r="7" stroke="white" stroke-width="2.5"/><path d="M10 8L15 12L10 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-                let viuTvBadge = isViuTV ? `<span class="bg-blue-900/40 text-blue-400 border border-blue-700/50 text-[9px] font-bold px-1.5 py-0.5 rounded ml-2 uppercase tracking-wider flex items-center">${viuTvSvg}免費直播</span>` : '';
-
-                let fs1Svg = `<svg class="w-6 h-3 mr-0.5 inline-block" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="24" rx="4" fill="#002D72"/><text x="30" y="17" fill="white" font-size="14" font-family="sans-serif" font-weight="900" text-anchor="middle">FS1</text></svg>`;
-                let fs1Badge = isFS1 ? `<span class="bg-blue-900/40 text-blue-200 border border-blue-800/50 text-[9px] font-bold px-1.5 py-0.5 rounded ml-1 uppercase tracking-wider flex items-center">${fs1Svg}直播</span>` : '';
-
-                let statusBadge = '', statusText = '';
-                if (isFinished) { 
-                    statusBadge = '<span class="bg-gray-700/50 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">LOCKED</span>'; 
-                    statusText = `<div class="flex items-center text-gray-400"><span class="mr-1.5 text-[12px]">🚫</span><span class="pt-[1px]">賽事已完結</span></div>`; 
-                } 
-                else if (isStarted) { 
-                    statusBadge = '<span class="bg-gray-700/50 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">LOCKED</span>'; 
-                    statusText = `<div class="flex items-center text-red-500 animate-pulse"><span class="mr-1.5 text-[12px]">🚩</span><span class="pt-[1px]">賽事進行中或已截飛 (LOCKED)</span></div>`; 
-                } 
-                else if (isOddsReady) { 
-                    statusBadge = '<span class="bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">ACTIVE</span>'; 
-                    statusText = `<div class="flex items-center text-gray-400">${dynamicCalendarIcon} <span class="pt-[1px]">${match.kickoff} 準時截飛</span></div>`; 
-                } 
-                else { 
-                    statusBadge = '<span class="bg-yellow-500/20 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">WAITING</span>'; 
-                    statusText = `<div class="flex items-center text-gray-400">${dynamicCalendarIcon} <span class="pt-[1px]">${match.kickoff} 開賽 | 盤口未開</span></div>`; 
+                if (window.globalMatches.length === 0) {
+                    container.innerHTML = '<p class="text-center text-gray-500 py-10">資料庫目前無賽事，請管理員進行同步。</p>';
+                    return;
                 }
                 
-                let homeHandicapStr = (match.odds && match.odds.handicapStr) ? match.odds.handicapStr : "", awayHandicapStr = "";
-                if(homeHandicapStr && homeHandicapStr !== "[0]") {
-                    let parts = homeHandicapStr.replace('[','').replace(']','').split('/');
-                    awayHandicapStr = "[" + parts.map(p => { let n = parseFloat(p) * -1; return n > 0 ? "+" + n : n.toString(); }).join('/') + "]";
-                } else if (homeHandicapStr === "[0]") { awayHandicapStr = "[0]"; }
-
-                let homeHandicapDisplay = homeHandicapStr ? `<span class="text-[10px] text-yellow-500 font-mono mt-0.5">${homeHandicapStr}</span>` : '';
-                let awayHandicapDisplay = awayHandicapStr ? `<span class="text-[10px] text-yellow-500 font-mono mt-0.5">${awayHandicapStr}</span>` : '';
+                const matchesToShow = window.globalMatches.filter(m => m.dateStr === window.selectedDate);
+                if(matchesToShow.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 py-10">此日無賽事</p>'; return; }
                 
-                let flagH = window.getFlag(displayHome), flagA = window.getFlag(displayAway);
+                const now = new Date();
 
-                let middleElement = `<div class="w-1/5 text-center text-gray-500 text-lg font-black uppercase tracking-wider">VS</div>`;
-                if (match.scoreHome !== null && match.scoreAway !== null) {
-                    let scoreColor = isFinished ? 'text-yellow-500' : 'text-red-500';
-                    middleElement = `<div class="w-1/5 text-center ${scoreColor} text-xl font-black tracking-widest">${match.scoreHome} - ${match.scoreAway}</div>`;
-                }
+                matchesToShow.forEach(match => {
+                    if (!match) return; 
+                    
+                    // 🚨 防彈安全字串處理
+                    let hNameStr = String(match.home || '');
+                    let aNameStr = String(match.away || '');
+                    let displayHome = (hNameStr !== 'null' && hNameStr.trim() !== '') ? (window.teamMap[hNameStr] || hNameStr) : 'TBD';
+                    let displayAway = (aNameStr !== 'null' && aNameStr.trim() !== '') ? (window.teamMap[aNameStr] || aNameStr) : 'TBD';
+                    
+                    displayHome = String(displayHome);
+                    displayAway = String(displayAway);
+                    
+                    adminSelect.innerHTML += `<option value="${match.id}">${displayHome} VS ${displayAway}</option>`;
+                    
+                    let matchDateObj = new Date(match.date);
+                    let isOddsReady = match.odds && match.odds.home > 0;
+                    let isStarted = (match.status !== 'NS' && match.status !== 'TBD') || (now >= matchDateObj);
+                    let isFinished = ['FT', 'AET', 'PEN'].includes(match.status);
+                    let canBet = isOddsReady && !isStarted && !isFinished;
 
-                let btnClass = canBet ? "bg-[#2c2c2e] hover:bg-[#3c3c3e] cursor-pointer" : "bg-[#1a1a1c] text-gray-600 cursor-not-allowed";
-                let oddsColor = canBet ? "text-white" : "text-gray-600";
-                
-                let safeHome = displayHome.replace(/'/g, "\\'");
-                let safeAway = displayAway.replace(/'/g, "\\'");
-                
-                let homeClick = (match.odds && match.odds.home > 0 && displayHome !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
-                let awayClick = (match.odds && match.odds.away > 0 && displayAway !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
-
-                container.innerHTML += `
-                    <div class="glass-panel rounded-2xl p-4 relative overflow-hidden transition-all">
-                        <div class="flex justify-between items-center mb-4">
-                            <div class="flex items-center flex-wrap gap-y-1">
-                                ${matchLabelHtml}
-                                ${viuTvBadge}
-                                ${fs1Badge}
-                            </div>
-                            ${statusBadge}
-                        </div>
-                        <div class="flex justify-between items-center mb-3">
-                            <div class="flex items-center space-x-2 w-2/5">
-                                <span class="text-2xl">${flagH}</span>
-                                <span class="font-bold text-lg ${displayHome === 'TBD' ? 'text-gray-600' : 'text-white'} whitespace-nowrap">${displayHome}</span>
-                            </div>
-                            ${middleElement}
-                            <div class="flex items-center justify-end space-x-2 w-2/5">
-                                <span class="font-bold text-lg ${displayAway === 'TBD' ? 'text-gray-600' : 'text-white'} whitespace-nowrap">${displayAway}</span>
-                                <span class="text-2xl">${flagA}</span>
+                    let dynamicCalendarIcon = `
+                        <div class="flex flex-col items-center justify-start w-3.5 h-4 bg-[#1c1c1e] rounded-[3px] border border-gray-600 overflow-hidden mr-1.5 flex-shrink-0">
+                            <div class="bg-red-600 w-full h-1.5"></div>
+                            <div class="flex-1 flex items-center justify-center">
+                                <span class="text-[9px] font-bold text-white leading-none tracking-tighter">${match.dateNum}</span>
                             </div>
                         </div>
-                        <div class="text-xs mb-3 space-y-1">
-                            ${statusText}
-                        </div>
-                        <div class="bg-[#111] p-1 rounded-xl flex space-x-1 mb-2">
-                            <button ${homeClick} class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
-                                <span class="font-bold ${oddsColor} text-lg">${match.odds && match.odds.home > 0 ? match.odds.home.toFixed(2) : '-'}</span>
-                                <div class="flex flex-col items-start leading-none">
-                                    <span class="text-[11px] ${canBet?'text-gray-400':'text-gray-600'}">${flagH} 勝</span>
-                                    ${homeHandicapDisplay}
+                    `;
+
+                    let matchLabelHtml = `<span class="text-gray-400 text-xs font-semibold tracking-wide uppercase">UPCOMING</span>`;
+                    if (isFinished) {
+                        matchLabelHtml = `<span class="text-gray-500 text-xs font-semibold tracking-wide uppercase">FINISHED</span>`;
+                    } else if (isStarted) {
+                        matchLabelHtml = `<span class="text-red-500 text-xs font-bold tracking-wide uppercase animate-pulse">LIVE / IN-PLAY</span>`;
+                    }
+
+                    let isViuTV = window.fs1Pairs.some(pair => 
+                        (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
+                        (displayHome.includes(pair[1]) && displayAway.includes(pair[0]))
+                    ) || ["2101", "2102", "2103", "2104"].includes(String(match.id)); // 🚨 安全轉換
+
+                    let isFS1 = window.fs1Pairs.some(pair => 
+                        (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
+                        (displayHome.includes(pair[1]) && displayAway.includes(pair[0]))
+                    ) || ["2079", "2084"].includes(String(match.id));
+
+                    let viuTvSvg = `<svg class="w-3.5 h-3.5 mr-1 drop-shadow-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#3B82F6"/><circle cx="12" cy="12" r="7" stroke="white" stroke-width="2.5"/><path d="M10 8L15 12L10 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+                    let viuTvBadge = isViuTV ? `<span class="bg-blue-900/40 text-blue-400 border border-blue-700/50 text-[9px] font-bold px-1.5 py-0.5 rounded ml-2 uppercase tracking-wider flex items-center">${viuTvSvg}免費直播</span>` : '';
+
+                    let fs1Svg = `<svg class="w-6 h-3 mr-0.5 inline-block" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="24" rx="4" fill="#002D72"/><text x="30" y="17" fill="white" font-size="14" font-family="sans-serif" font-weight="900" text-anchor="middle">FS1</text></svg>`;
+                    let fs1Badge = isFS1 ? `<span class="bg-blue-900/40 text-blue-200 border border-blue-800/50 text-[9px] font-bold px-1.5 py-0.5 rounded ml-1 uppercase tracking-wider flex items-center">${fs1Svg}直播</span>` : '';
+
+                    let statusBadge = '', statusText = '';
+                    if (isFinished) { 
+                        statusBadge = '<span class="bg-gray-700/50 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">LOCKED</span>'; 
+                        statusText = `<div class="flex items-center text-gray-400"><span class="mr-1.5 text-[12px]">🚫</span><span class="pt-[1px]">賽事已完結</span></div>`; 
+                    } 
+                    else if (isStarted) { 
+                        statusBadge = '<span class="bg-gray-700/50 text-gray-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">LOCKED</span>'; 
+                        statusText = `<div class="flex items-center text-red-500 animate-pulse"><span class="mr-1.5 text-[12px]">🚩</span><span class="pt-[1px]">賽事進行中或已截飛 (LOCKED)</span></div>`; 
+                    } 
+                    else if (isOddsReady) { 
+                        statusBadge = '<span class="bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">ACTIVE</span>'; 
+                        statusText = `<div class="flex items-center text-gray-400">${dynamicCalendarIcon} <span class="pt-[1px]">${match.kickoff} 準時截飛</span></div>`; 
+                    } 
+                    else { 
+                        statusBadge = '<span class="bg-yellow-500/20 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">WAITING</span>'; 
+                        statusText = `<div class="flex items-center text-gray-400">${dynamicCalendarIcon} <span class="pt-[1px]">${match.kickoff} 開賽 | 盤口未開</span></div>`; 
+                    }
+                    
+                    let homeHandicapStr = (match.odds && match.odds.handicapStr) ? String(match.odds.handicapStr) : "", awayHandicapStr = "";
+                    if(homeHandicapStr && homeHandicapStr !== "[0]") {
+                        let parts = homeHandicapStr.replace('[','').replace(']','').split('/');
+                        awayHandicapStr = "[" + parts.map(p => { let n = parseFloat(p) * -1; return n > 0 ? "+" + n : String(n); }).join('/') + "]";
+                    } else if (homeHandicapStr === "[0]") { awayHandicapStr = "[0]"; }
+
+                    let homeHandicapDisplay = homeHandicapStr ? `<span class="text-[10px] text-yellow-500 font-mono mt-0.5">${homeHandicapStr}</span>` : '';
+                    let awayHandicapDisplay = awayHandicapStr ? `<span class="text-[10px] text-yellow-500 font-mono mt-0.5">${awayHandicapStr}</span>` : '';
+                    
+                    let flagHome = displayHome === 'TBD' ? '⚽' : window.getFlag(displayHome);
+                    let flagAway = displayAway === 'TBD' ? '⚽' : window.getFlag(displayAway);
+
+                    let middleElement = `<div class="w-1/5 text-center text-gray-500 text-lg font-black uppercase tracking-wider">VS</div>`;
+                    if (match.scoreHome !== null && match.scoreAway !== null) {
+                        let scoreColor = isFinished ? 'text-yellow-500' : 'text-red-500';
+                        middleElement = `<div class="w-1/5 text-center ${scoreColor} text-xl font-black tracking-widest">${match.scoreHome} - ${match.scoreAway}</div>`;
+                    }
+
+                    let btnClass = canBet ? "bg-[#2c2c2e] hover:bg-[#3c3c3e] cursor-pointer" : "bg-[#1a1a1c] text-gray-600 cursor-not-allowed";
+                    let oddsColor = canBet ? "text-white" : "text-gray-600";
+                    
+                    // 🚨 防彈替換
+                    let safeHome = displayHome.replace(/'/g, "\\'");
+                    let safeAway = displayAway.replace(/'/g, "\\'");
+                    
+                    let homeClick = (match.odds && match.odds.home > 0 && displayHome !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
+                    let awayClick = (match.odds && match.odds.away > 0 && displayAway !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
+
+                    container.innerHTML += `
+                        <div class="glass-panel rounded-2xl p-4 relative overflow-hidden transition-all">
+                            <div class="flex justify-between items-center mb-4">
+                                <div class="flex items-center flex-wrap gap-y-1">
+                                    ${matchLabelHtml}
+                                    ${viuTvBadge}
+                                    ${fs1Badge}
                                 </div>
-                            </button>
-                            <button ${awayClick} class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
-                                <span class="font-bold ${oddsColor} text-lg">${match.odds && match.odds.away > 0 ? match.odds.away.toFixed(2) : '-'}</span>
-                                <div class="flex flex-col items-start leading-none">
-                                    <span class="text-[11px] ${canBet?'text-gray-400':'text-gray-600'}">${flagA} 勝</span>
-                                    ${awayHandicapDisplay}
+                                ${statusBadge}
+                            </div>
+                            <div class="flex justify-between items-center mb-3">
+                                <div class="flex items-center space-x-2 w-2/5">
+                                    <span class="text-2xl">${flagHome}</span>
+                                    <span class="font-bold text-lg ${displayHome === 'TBD' ? 'text-gray-600' : 'text-white'} whitespace-nowrap">${displayHome}</span>
                                 </div>
-                            </button>
-                        </div>
-                    </div>`;
-            });
+                                ${middleElement}
+                                <div class="flex items-center justify-end space-x-2 w-2/5">
+                                    <span class="font-bold text-lg ${displayAway === 'TBD' ? 'text-gray-600' : 'text-white'} whitespace-nowrap">${displayAway}</span>
+                                    <span class="text-2xl">${flagAway}</span>
+                                </div>
+                            </div>
+                            <div class="text-xs mb-3 space-y-1">
+                                ${statusText}
+                            </div>
+                            <div class="bg-[#111] p-1 rounded-xl flex space-x-1 mb-2">
+                                <button ${homeClick} class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
+                                    <span class="font-bold ${oddsColor} text-lg">${match.odds && match.odds.home > 0 ? match.odds.home.toFixed(2) : '-'}</span>
+                                    <div class="flex flex-col items-start leading-none">
+                                        <span class="text-[11px] ${canBet?'text-gray-400':'text-gray-600'}">${displayHome === 'TBD' ? '⚽' : flagHome} 勝</span>
+                                        ${homeHandicapDisplay}
+                                    </div>
+                                </button>
+                                <button ${awayClick} class="flex-1 ${btnClass} rounded-lg py-2.5 flex justify-center items-center space-x-2 transition-colors touch-manipulation">
+                                    <span class="font-bold ${oddsColor} text-lg">${match.odds && match.odds.away > 0 ? match.odds.away.toFixed(2) : '-'}</span>
+                                    <div class="flex flex-col items-start leading-none">
+                                        <span class="text-[11px] ${canBet?'text-gray-400':'text-gray-600'}">${displayAway === 'TBD' ? '⚽' : flagAway} 勝</span>
+                                        ${awayHandicapDisplay}
+                                    </div>
+                                </button>
+                            </div>
+                        </div>`;
+                });
+            } catch (e) { console.error("Render Matches Error", e); }
         };
 
         window.renderBracket = () => {
-            const bracketDiv = document.getElementById('bracket-content');
-            let html = '<div class="flex flex-row gap-6 min-w-max p-4">';
+            try {
+                const bracketDiv = document.getElementById('bracket-content');
+                if(!bracketDiv) return;
+                let html = '<div class="flex flex-row gap-6 min-w-max p-4">';
 
-            html += '<div class="flex flex-col w-72 pr-6 border-r border-gray-800">';
-            html += '<div class="text-sm font-black text-gray-300 text-center mb-4 uppercase tracking-widest">分組賽積分榜</div>';
-            
-            const groupTeams = {
-                'A': ['墨西哥', '南非', '韓國', '捷克'], 
-                'B': ['瑞士', '加拿大', '波斯尼亞', '卡塔爾'],
-                'C': ['巴西', '摩洛哥', '蘇格蘭', '海地'], 
-                'D': ['美國', '澳洲', '巴拉圭', '土耳其'],
-                'E': ['德國', '科特迪瓦', '厄瓜多爾', '庫拉索'], 
-                'F': ['荷蘭', '日本', '瑞典', '突尼西亞'],
-                'G': ['西班牙', '埃及', '佛得角', '比利時'], 
-                'H': ['烏拉圭', '伊朗', '新西蘭', '沙特'],
-                'I': ['法國', '挪威', '塞內加爾', '伊拉克'], 
-                'J': ['阿根廷', '奧地利', '阿爾及利亞', '約旦'],
-                'K': ['哥倫比亞', '葡萄牙', '剛果', '烏茲別克'], 
-                'L': ['英格蘭', '加納', '克羅地亞', '巴拿馬']
-            };
+                html += '<div class="flex flex-col w-72 pr-6 border-r border-gray-800">';
+                html += '<div class="text-sm font-black text-gray-300 text-center mb-4 uppercase tracking-widest">分組賽積分榜</div>';
+                
+                const groupTeams = {
+                    'A': ['墨西哥', '南非', '韓國', '捷克'], 
+                    'B': ['瑞士', '加拿大', '波斯尼亞', '卡塔爾'],
+                    'C': ['巴西', '摩洛哥', '蘇格蘭', '海地'], 
+                    'D': ['美國', '澳洲', '巴拉圭', '土耳其'],
+                    'E': ['德國', '科特迪瓦', '厄瓜多爾', '庫拉索'], 
+                    'F': ['荷蘭', '日本', '瑞典', '突尼西亞'],
+                    'G': ['西班牙', '埃及', '佛得角', '比利時'], 
+                    'H': ['烏拉圭', '伊朗', '新西蘭', '沙特'],
+                    'I': ['法國', '挪威', '塞內加爾', '伊拉克'], 
+                    'J': ['阿根廷', '奧地利', '阿爾及利亞', '約旦'],
+                    'K': ['哥倫比亞', '葡萄牙', '剛果', '烏茲別克'], 
+                    'L': ['英格蘭', '加納', '克羅地亞', '巴拿馬']
+                };
 
-            Object.keys(groupTeams).forEach(g => {
-                let teamStats = groupTeams[g].map(team => {
-                    let stats = { team: team, p:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0 };
-                    window.globalMatches.forEach(m => {
-                        if (!m.home || !m.away) return;
-                        
-                        let hName = window.teamMap[m.home] || m.home;
-                        let aName = window.teamMap[m.away] || m.away;
+                Object.keys(groupTeams).forEach(g => {
+                    let teamStats = groupTeams[g].map(team => {
+                        let stats = { team: team, p:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0 };
+                        window.globalMatches.forEach(m => {
+                            if (!m.home || !m.away) return;
+                            
+                            let hName = String(window.teamMap[m.home] || m.home);
+                            let aName = String(window.teamMap[m.away] || m.away);
 
-                        if (['FT', 'AET', 'PEN'].includes(m.status)) {
-                            let isHome = hName.includes(team);
-                            let isAway = aName.includes(team);
-                            if (isHome || isAway) {
-                                stats.p++;
-                                let scored = isHome ? m.scoreHome : m.scoreAway;
-                                let conceded = isHome ? m.scoreAway : m.scoreHome;
-                                stats.gf += scored;
-                                stats.ga += conceded;
-                                stats.gd += (scored - conceded);
-                                if (scored > conceded) { stats.w++; stats.pts += 3; }
-                                else if (scored === conceded) { stats.d++; stats.pts += 1; }
-                                else { stats.l++; }
+                            if (['FT', 'AET', 'PEN'].includes(m.status)) {
+                                let isHome = hName.includes(team);
+                                let isAway = aName.includes(team);
+                                if (isHome || isAway) {
+                                    stats.p++;
+                                    let scored = isHome ? m.scoreHome : m.scoreAway;
+                                    let conceded = isHome ? m.scoreAway : m.scoreHome;
+                                    stats.gf += scored;
+                                    stats.ga += conceded;
+                                    stats.gd += (scored - conceded);
+                                    if (scored > conceded) { stats.w++; stats.pts += 3; }
+                                    else if (scored === conceded) { stats.d++; stats.pts += 1; }
+                                    else { stats.l++; }
+                                }
                             }
-                        }
+                        });
+                        return stats;
                     });
-                    return stats;
+
+                    teamStats.sort((a,b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+
+                    let trs = teamStats.map(s => `
+                        <tr class="border-b border-gray-700/50 last:border-0 hover:bg-gray-800/30 transition-colors">
+                            <td class="py-2 flex items-center space-x-2">
+                                <span class="text-[12px]">${window.getFlag(s.team)}</span>
+                                <span class="font-bold text-xs text-white">${s.team}</span>
+                            </td>
+                            <td class="py-2 text-center text-gray-400 text-xs">${s.p}</td>
+                            <td class="py-2 text-center text-green-500 text-xs">${s.w}</td>
+                            <td class="py-2 text-center text-gray-400 text-xs">${s.d}</td>
+                            <td class="py-2 text-center text-red-500 text-xs">${s.l}</td>
+                            <td class="py-2 text-center text-gray-300 text-xs">${s.gf}</td>
+                            <td class="py-2 text-center text-gray-300 text-xs">${s.ga}</td>
+                            <td class="py-2 text-center text-blue-400 text-xs">${s.gd > 0 ? '+'+s.gd : s.gd}</td>
+                            <td class="py-2 text-right font-bold text-yellow-500 text-xs">${s.pts}</td>
+                        </tr>
+                    `).join('');
+
+                    html += `<div class="rounded-lg border border-gray-700 bg-[#1c1c1e] px-3 py-2 mb-6 shadow-sm w-full">
+                                <div class="text-gray-400 text-[10px] font-bold mb-2 border-b border-gray-700 pb-1 text-center uppercase tracking-widest">Group ${g}</div>
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="text-gray-600 text-[10px] border-b border-gray-800">
+                                            <th class="pb-1 font-normal w-3/12">隊伍</th>
+                                            <th class="pb-1 text-center font-normal">賽</th>
+                                            <th class="pb-1 text-center font-normal">勝</th>
+                                            <th class="pb-1 text-center font-normal">和</th>
+                                            <th class="pb-1 text-center font-normal">負</th>
+                                            <th class="pb-1 text-center font-normal">得</th>
+                                            <th class="pb-1 text-center font-normal">失</th>
+                                            <th class="pb-1 text-center font-normal">差</th>
+                                            <th class="pb-1 text-right font-normal">分</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${trs}</tbody>
+                                </table>
+                             </div>`;
                 });
+                html += '</div>';
 
-                teamStats.sort((a,b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
+                const b = window.bracketStructure;
 
-                let trs = teamStats.map(s => `
-                    <tr class="border-b border-gray-700/50 last:border-0 hover:bg-gray-800/30 transition-colors">
-                        <td class="py-2 flex items-center space-x-2">
-                            <span class="text-[12px]">${window.getFlag(s.team)}</span>
-                            <span class="font-bold text-xs text-white">${s.team}</span>
-                        </td>
-                        <td class="py-2 text-center text-gray-400 text-xs">${s.p}</td>
-                        <td class="py-2 text-center text-green-500 text-xs">${s.w}</td>
-                        <td class="py-2 text-center text-gray-400 text-xs">${s.d}</td>
-                        <td class="py-2 text-center text-red-500 text-xs">${s.l}</td>
-                        <td class="py-2 text-center text-gray-300 text-xs">${s.gf}</td>
-                        <td class="py-2 text-center text-gray-300 text-xs">${s.ga}</td>
-                        <td class="py-2 text-center text-blue-400 text-xs">${s.gd > 0 ? '+'+s.gd : s.gd}</td>
-                        <td class="py-2 text-right font-bold text-yellow-500 text-xs">${s.pts}</td>
-                    </tr>
-                `).join('');
+                html += '<div class="flex space-x-12 pt-8 lg:pt-4">';
+                
+                // R32
+                html += `<div class="flex flex-col justify-around w-60 pl-6 relative">`;
+                html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">32 強 (R32)</div>`;
+                for (let i = 0; i < 16; i += 2) {
+                    html += `<div class="bracket-pair">`;
+                    html += window.generateBracketCard(b.r32[i], false);
+                    html += window.generateBracketCard(b.r32[i+1], false);
+                    html += `</div>`;
+                }
+                html += `</div>`;
 
-                html += `<div class="rounded-lg border border-gray-700 bg-[#1c1c1e] px-3 py-2 mb-6 shadow-sm w-full">
-                            <div class="text-gray-400 text-[10px] font-bold mb-2 border-b border-gray-700 pb-1 text-center uppercase tracking-widest">Group ${g}</div>
-                            <table class="w-full text-left">
-                                <thead>
-                                    <tr class="text-gray-600 text-[10px] border-b border-gray-800">
-                                        <th class="pb-1 font-normal w-3/12">隊伍</th>
-                                        <th class="pb-1 text-center font-normal">賽</th>
-                                        <th class="pb-1 text-center font-normal">勝</th>
-                                        <th class="pb-1 text-center font-normal">和</th>
-                                        <th class="pb-1 text-center font-normal">負</th>
-                                        <th class="pb-1 text-center font-normal">得</th>
-                                        <th class="pb-1 text-center font-normal">失</th>
-                                        <th class="pb-1 text-center font-normal">差</th>
-                                        <th class="pb-1 text-right font-normal">分</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${trs}</tbody>
-                            </table>
+                // R16
+                html += `<div class="flex flex-col justify-around w-60 pl-6 relative">`;
+                html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">16 強 (R16)</div>`;
+                for (let i = 0; i < 8; i += 2) {
+                    html += `<div class="bracket-pair">`;
+                    html += window.generateBracketCard(b.r16[i], false);
+                    html += window.generateBracketCard(b.r16[i+1], false);
+                    html += `</div>`;
+                }
+                html += `</div>`;
+
+                // QF
+                html += `<div class="flex flex-col justify-around w-60 pl-6 relative">`;
+                html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">8 強 (QF)</div>`;
+                for (let i = 0; i < 4; i += 2) {
+                    html += `<div class="bracket-pair">`;
+                    html += window.generateBracketCard(b.qf[i], false);
+                    html += window.generateBracketCard(b.qf[i+1], false);
+                    html += `</div>`;
+                }
+                html += `</div>`;
+
+                // SF
+                html += `<div class="flex flex-col justify-around w-60 pl-6 relative">`;
+                html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">4 強 (SF)</div>`;
+                for (let i = 0; i < 2; i += 2) {
+                    html += `<div class="bracket-pair">`;
+                    html += window.generateBracketCard(b.sf[i], false);
+                    html += window.generateBracketCard(b.sf[i+1], false);
+                    html += `</div>`;
+                }
+                html += `</div>`;
+
+                // F
+                html += `<div class="flex flex-col justify-around w-60 pl-6 relative">`;
+                html += `<div class="text-xs font-bold text-yellow-500 text-center absolute -top-4 w-full">決賽 (Final)</div>`;
+                html += window.generateBracketCard(b.f[0], true);
+                
+                html += `<div class="mt-8">
+                            <div class="text-xs font-bold text-gray-500 text-center mb-2 border-t border-gray-800 pt-3">季軍戰</div>
+                            ${window.generateBracketCard(b.third[0], false)}
                          </div>`;
-            });
-            html += '</div>';
-
-            const b = window.bracketStructure;
-
-            html += '<div class="flex space-x-12 pt-8 lg:pt-4">';
-            
-            // R32
-            html += `<div class="flex flex-col justify-around w-60 pl-6 relative">`;
-            html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">32 強 (R32)</div>`;
-            for (let i = 0; i < 16; i += 2) {
-                html += `<div class="bracket-pair">`;
-                html += window.generateBracketCard(b.r32[i], false);
-                html += window.generateBracketCard(b.r32[i+1], false);
                 html += `</div>`;
-            }
-            html += `</div>`;
 
-            // R16
-            html += `<div class="flex flex-col justify-around w-60 pl-6 relative">`;
-            html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">16 強 (R16)</div>`;
-            for (let i = 0; i < 8; i += 2) {
-                html += `<div class="bracket-pair">`;
-                html += window.generateBracketCard(b.r16[i], false);
-                html += window.generateBracketCard(b.r16[i+1], false);
-                html += `</div>`;
-            }
-            html += `</div>`;
-
-            // QF
-            html += `<div class="flex flex-col justify-around w-60 pl-6 relative">`;
-            html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">8 強 (QF)</div>`;
-            for (let i = 0; i < 4; i += 2) {
-                html += `<div class="bracket-pair">`;
-                html += window.generateBracketCard(b.qf[i], false);
-                html += window.generateBracketCard(b.qf[i+1], false);
-                html += `</div>`;
-            }
-            html += `</div>`;
-
-            // SF
-            html += `<div class="flex flex-col justify-around w-60 pl-6 relative">`;
-            html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">4 強 (SF)</div>`;
-            for (let i = 0; i < 2; i += 2) {
-                html += `<div class="bracket-pair">`;
-                html += window.generateBracketCard(b.sf[i], false);
-                html += window.generateBracketCard(b.sf[i+1], false);
-                html += `</div>`;
-            }
-            html += `</div>`;
-
-            // F
-            html += `<div class="flex flex-col justify-around w-60 pl-6 relative">`;
-            html += `<div class="text-xs font-bold text-yellow-500 text-center absolute -top-4 w-full">決賽 (Final)</div>`;
-            html += window.generateBracketCard(b.f[0], true);
-            
-            html += `<div class="mt-8">
-                        <div class="text-xs font-bold text-gray-500 text-center mb-2 border-t border-gray-800 pt-3">季軍戰</div>
-                        ${window.generateBracketCard(b.third[0], false)}
-                     </div>`;
-            html += `</div>`;
-
-            html += '</div></div>';
-            bracketDiv.innerHTML = html;
+                html += '</div></div>';
+                bracketDiv.innerHTML = html;
+            } catch (e) { console.error("Render Bracket Error", e); }
         };
 
         window.generateBracketCard = (slotData, isFinal = false) => {
             let borderClass = isFinal ? 'border-yellow-600 shadow-lg shadow-yellow-900/30 bg-yellow-900/10' : 'border-gray-700 hover:bg-gray-800';
 
-            let match = null;
-            let isKnownTeam = (t) => t && t !== 'TBD' && !t.match(/^[1-3][A-L]/);
-
-            if (isKnownTeam(slotData.home)) {
-                match = window.globalMatches.find(m => (m.home === slotData.home || m.away === slotData.home) && m.dateStr === slotData.d);
-            }
-            if (!match && isKnownTeam(slotData.away)) {
-                match = window.globalMatches.find(m => (m.home === slotData.away || m.away === slotData.away) && m.dateStr === slotData.d);
-            }
-            if (!match) {
-                match = window.globalMatches.find(m => m.dateStr === slotData.d && m.kickoff === slotData.t);
-            }
-
-            let displayHome = slotData.home;
-            let displayAway = slotData.away;
-
-            if (match && isKnownTeam(match.home)) displayHome = window.teamMap[match.home] || match.home;
-            if (match && isKnownTeam(match.away)) displayAway = window.teamMap[match.away] || match.away;
-
-            let isViuTV = false, isFS1 = false;
+            // 🚨 強制對接：用 ID 或者 官方日期+隊名
+            let match = window.globalMatches.find(m => m.id === slotData.id || (m.date === slotData.iso && (m.home === slotData.home || m.away === slotData.home)));
             
-            isViuTV = [
-                ['墨西哥', '南非'], ['加拿大', '波斯尼亞'], ['美國', '巴拉圭'], 
-                ['法國', '塞內加爾'], ['烏茲別克', '哥倫比亞'], ['墨西哥', '韓國'], 
-                ['美國', '澳洲'], ['突尼西亞', '日本'], ['新西蘭', '埃及'], 
-                ['挪威', '塞內加爾'], ['約旦', '阿爾及利亞'], ['巴拿馬', '克羅地亞'], 
-                ['哥倫比亞', '剛果'], ['南非', '韓國'], ['土耳其', '美國'], 
-                ['新西蘭', '比利時']
-            ].some(pair => (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || (displayHome.includes(pair[1]) && displayAway.includes(pair[0])));
+            let displayHome = match ? String(match.home) : String(slotData.home);
+            let displayAway = match ? String(match.away) : String(slotData.away);
+            
+            // 🚨 穩陣過濾器
+            let isKnownTeam = (t) => t && typeof t === 'string' && t !== 'TBD' && !t.match(/^[1-3][A-L]/);
 
-            isFS1 = window.fs1Pairs.some(pair => (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || (displayHome.includes(pair[1]) && displayAway.includes(pair[0])));
+            let isViuTV = window.fs1Pairs.some(pair => (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || (displayHome.includes(pair[1]) && displayAway.includes(pair[0])));
+            let isFS1 = window.fs1Pairs.some(pair => (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || (displayHome.includes(pair[1]) && displayAway.includes(pair[0])));
 
             let viuTvSvg = `<svg class="w-2.5 h-2.5 mr-0.5 inline-block" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#3B82F6"/><circle cx="12" cy="12" r="7" stroke="white" stroke-width="2.5"/><path d="M10 8L15 12L10 16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
             let viuTvBadge = isViuTV ? `<span class="bg-blue-900/60 text-blue-400 border border-blue-700/50 text-[7px] font-bold px-1 py-0.5 rounded ml-1.5 uppercase tracking-wider flex items-center">${viuTvSvg}免費直播</span>` : '';
@@ -1289,7 +1281,9 @@
             let fs1SvgBracket = `<svg class="w-5 h-2.5 mr-0.5 inline-block" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="24" rx="4" fill="#002D72"/><text x="30" y="17" fill="white" font-size="14" font-family="sans-serif" font-weight="900" text-anchor="middle">FS1</text></svg>`;
             let fs1BadgeBracket = isFS1 ? `<span class="bg-blue-900/60 text-blue-200 border border-blue-800/50 text-[7px] font-bold px-1 py-0.5 rounded ml-1.5 uppercase tracking-wider flex items-center">${fs1SvgBracket}</span>` : '';
 
-            let dateBadge = `<div class="absolute -top-2.5 left-1/2 transform -translate-x-1/2 flex items-center bg-[#0d0d0d] px-1.5 py-0.5 text-[9px] text-gray-500 font-mono tracking-tighter whitespace-nowrap rounded z-20 border border-gray-800 shadow-sm">${slotData.d} ${slotData.t}${viuTvBadge}${fs1BadgeBracket}</div>`;
+            let dateObj = new Date(slotData.iso);
+            let displayDateStr = dateObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' }) + ' ' + dateObj.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' });
+            let dateBadge = `<div class="absolute -top-2.5 left-1/2 transform -translate-x-1/2 flex items-center bg-[#0d0d0d] px-1.5 py-0.5 text-[9px] text-gray-500 font-mono tracking-tighter whitespace-nowrap rounded z-20 border border-gray-800 shadow-sm">${displayDateStr}${viuTvBadge}${fs1BadgeBracket}</div>`;
 
             let textClass = isFinal ? 'text-yellow-500' : 'text-white';
             let scoreClass = isFinal ? 'text-yellow-700' : 'text-yellow-500';
@@ -1309,7 +1303,6 @@
             let homeTextStyle = isKnownTeam(displayHome) ? textClass : 'text-gray-600';
             let awayTextStyle = isKnownTeam(displayAway) ? textClass : 'text-gray-600';
 
-            // 🚨 強制呼叫 getFlag，如果係真國家隊就出國旗
             let homeFlag = isKnownTeam(displayHome) ? window.getFlag(displayHome) + ' ' : '';
             let awayFlag = isKnownTeam(displayAway) ? window.getFlag(displayAway) + ' ' : '';
 
@@ -1331,46 +1324,76 @@
 
         window.initMatches = () => {
             onSnapshot(collection(db, "matches_2026"), (snapshot) => {
-                let apiMatches = [];
-                if (!snapshot.empty) {
-                    snapshot.forEach((docSnap) => {
-                        const data = docSnap.data();
-                        if (!data || !data.date) return; 
+                let rawApiMatches = [];
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    if (!data || !data.date) return;
+                    
+                    let existingOdds = { handicapStr: "", home: 0, away: 0 };
+                    let existingMatch = window.globalMatches.find(m => m.id === data.id);
+                    if (existingMatch && existingMatch.odds) { existingOdds = existingMatch.odds; }
+                    data.odds = existingOdds;
+                    
+                    rawApiMatches.push(data);
+                });
 
-                        const dateObj = new Date(data.date);
-                        
-                        let existingOdds = { handicapStr: "", home: 0.00, away: 0.00 };
-                        let existingMatch = window.globalMatches.find(m => m.id === data.id);
-                        if (existingMatch && existingMatch.odds) { existingOdds = existingMatch.odds; }
-                        
-                        apiMatches.push({
-                            id: data.id, home: data.home, away: data.away, date: data.date, status: data.status, 
-                            scoreHome: data.scoreHome !== undefined ? data.scoreHome : null, 
-                            scoreAway: data.scoreAway !== undefined ? data.scoreAway : null,
-                            dateStr: dateObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' }), month: dateObj.getMonth() + 1,
-                            dateNum: dateObj.getDate(), weekday: '星期' + weekdaysCH[dateObj.getDay()],
-                            kickoff: dateObj.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' }),
-                            odds: existingOdds
-                        });
-                    });
-                }
+                let finalMatches = [];
+                const b = window.bracketStructure;
+                const allSlots = [...b.r32, ...b.r16, ...b.qf, ...b.sf, ...b.third, ...b.f];
+                let isKnown = (t) => t && typeof t === 'string' && t !== 'TBD' && !t.match(/^[1-3][A-L]/);
 
-                let knockoutsFound = apiMatches.length > 72 ? (apiMatches.length - 72) : 0;
-                if (knockoutsFound < 32) {
-                    for (let i = knockoutsFound; i < 32; i++) {
-                        let dObj = new Date(window.kDates[i]);
-                        apiMatches.push({
-                            id: "KO_PLACEHOLDER_" + i, home: "TBD", away: "TBD", date: window.kDates[i], status: "NS", 
-                            scoreHome: null, scoreAway: null,
-                            dateStr: dObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' }), month: dObj.getMonth() + 1,
-                            dateNum: dObj.getDate(), weekday: '星期' + weekdaysCH[dObj.getDay()],
-                            kickoff: dObj.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' }),
-                            odds: { handicapStr: "", home: 0, away: 0 }
+                // 🚨 1. 小組賽：只取 6月28日之前 (嚴格 PDT 隔離)
+                rawApiMatches.forEach(m => {
+                    let d = new Date(m.date);
+                    if (d.getMonth() < 5 || (d.getMonth() === 5 && d.getDate() < 28)) { 
+                        let dStr = d.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' });
+                        let tStr = d.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' });
+                        finalMatches.push({
+                            id: m.id, home: m.home, away: m.away, date: m.date, status: m.status,
+                            scoreHome: m.scoreHome, scoreAway: m.scoreAway,
+                            dateStr: dStr, month: d.getMonth() + 1, dateNum: d.getDate(),
+                            weekday: '星期' + weekdaysCH[d.getDay()], kickoff: tStr, odds: m.odds
                         });
+                        m.used = true;
                     }
-                }
+                });
 
-                window.globalMatches = apiMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+                // 🚨 2. 淘汰賽：以上帝視角 Slot 為主，由 Slot 去反向捕捉 API 數據 (杜絕幽靈賽事)
+                allSlots.forEach(slot => {
+                    let dObj = new Date(slot.iso);
+                    let dStr = dObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' });
+                    let tStr = dObj.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' });
+
+                    let koMatch = {
+                        id: slot.id, home: slot.home, away: slot.away, date: slot.iso, status: 'NS',
+                        scoreHome: null, scoreAway: null, dateStr: dStr, month: dObj.getMonth() + 1,
+                        dateNum: dObj.getDate(), weekday: '星期' + weekdaysCH[dObj.getDay()],
+                        kickoff: tStr, odds: { handicapStr: "", home: 0, away: 0 }
+                    };
+
+                    let matchFound = null;
+                    if (isKnown(slot.home) && isKnown(slot.away)) {
+                        matchFound = rawApiMatches.find(m => !m.used && ((m.home === slot.home && m.away === slot.away) || (m.home === slot.away && m.away === slot.home)));
+                    } else if (isKnown(slot.home)) {
+                        matchFound = rawApiMatches.find(m => !m.used && (m.home === slot.home || m.away === slot.home));
+                    } else if (isKnown(slot.away)) {
+                        matchFound = rawApiMatches.find(m => !m.used && (m.home === slot.away || m.away === slot.away));
+                    }
+
+                    if (matchFound) {
+                        koMatch.id = matchFound.id;
+                        koMatch.home = matchFound.home; 
+                        koMatch.away = matchFound.away;
+                        koMatch.status = matchFound.status;
+                        koMatch.scoreHome = matchFound.scoreHome;
+                        koMatch.scoreAway = matchFound.scoreAway;
+                        koMatch.odds = matchFound.odds;
+                        matchFound.used = true;
+                    }
+                    finalMatches.push(koMatch);
+                });
+
+                window.globalMatches = finalMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
                 window.renderDateFilter(); 
                 window.renderMatches(); 
                 window.renderBracket();
@@ -1397,129 +1420,135 @@
         }); 
 
         onSnapshot(query(collection(db, "bets"), orderBy("timestamp", "desc")), (snapshot) => {
-            const betsList = document.getElementById('bets-list'), leaderboardDiv = document.getElementById('leaderboard');
-            betsList.innerHTML = ''; 
-            
-            window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
-            
-            if (snapshot.empty) { 
-                betsList.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; 
-                leaderboardDiv.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; 
-                window.updateHeaderBalance(); 
-                return; 
-            }
-            
-            let matchGroupMap = new Map();
-            let allBetsArray = [];
-            
-            snapshot.forEach((docSnap) => {
-                const bet = docSnap.data();
-                bet.docId = docSnap.id; 
-                allBetsArray.push(bet);
+            try {
+                const betsList = document.getElementById('bets-list'), leaderboardDiv = document.getElementById('leaderboard');
+                if(!betsList || !leaderboardDiv) return;
+                betsList.innerHTML = ''; 
                 
-                if (bet.settled && window.playerBalances[bet.player] !== undefined) {
-                    window.playerBalances[bet.player] += bet.profit;
+                window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
+                
+                if (snapshot.empty) { 
+                    betsList.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; 
+                    leaderboardDiv.innerHTML = '<p class="text-gray-600 text-sm text-center">無紀錄</p>'; 
+                    window.updateHeaderBalance(); 
+                    return; 
                 }
                 
-                if (!matchGroupMap.has(bet.matchId)) {
-                    matchGroupMap.set(bet.matchId, []);
-                }
-                matchGroupMap.get(bet.matchId).push(bet);
-            });
-            
-            matchGroupMap.forEach((bets, matchId) => {
-                let match = window.globalMatches.find(m => m.id === matchId);
-                let matchHeaderHtml = '';
+                let matchGroupMap = new Map();
+                let allBetsArray = [];
                 
-                if (match) {
-                    let hName = window.teamMap[match.home] || match.home;
-                    let aName = window.teamMap[match.away] || match.away;
-                    let scoreTxt = (match.scoreHome !== null && match.scoreAway !== null) ? ` (${match.scoreHome}:${match.scoreAway})` : '';
-                    matchHeaderHtml = `
-                        <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-3">
-                            <div class="flex items-center space-x-2 text-xs font-bold text-gray-400 tracking-wide uppercase">
-                                <span>⚽ ${window.getFlag(hName)} ${hName} VS ${window.getFlag(aName)} ${aName}${scoreTxt}</span>
-                            </div>
-                            <span class="text-[10px] bg-gray-800 text-gray-500 font-mono px-1.5 py-0.5 rounded">${match.dateStr || ''}</span>
-                        </div>
-                    `;
-                } else {
-                    matchHeaderHtml = `
-                        <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-3">
-                            <div class="text-xs font-bold text-gray-500 tracking-wide uppercase">
-                                <span>⚽ 賽事 ID: ${matchId}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                let betsItemsHtml = bets.map(bet => {
-                    let resTxt = "等待開彩", resCol = "text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded";
-                    if (bet.settled) {
-                        if (bet.profit > 0 && bet.profit < (bet.amount * (bet.odds - 1))) { resTxt = `贏半 +$${bet.profit.toFixed(1)}`; resCol = "text-green-400 bg-green-500/10 px-2 py-1 rounded"; }
-                        else if (bet.profit > 0) { resTxt = `贏全 +$${bet.profit.toFixed(1)}`; resCol = "text-green-500 font-bold bg-green-500/10 px-2 py-1 rounded"; }
-                        else if (bet.profit === 0) { resTxt = `走水 $0`; resCol = "text-gray-400 bg-gray-600/20 px-2 py-1 rounded"; }
-                        else if (bet.profit < 0 && bet.profit > -bet.amount) { resTxt = `輸半 -$${Math.abs(bet.profit).toFixed(1)}`; resCol = "text-red-400 bg-red-500/10 px-2 py-1 rounded"; }
-                        else { resTxt = `輸全 -$${Math.abs(bet.profit).toFixed(1)}`; resCol = "text-red-500 font-bold bg-red-500/10 px-2 py-1 rounded"; }
+                snapshot.forEach((docSnap) => {
+                    const bet = docSnap.data();
+                    bet.docId = docSnap.id; 
+                    allBetsArray.push(bet);
+                    
+                    if (bet.settled && window.playerBalances[bet.player] !== undefined) {
+                        window.playerBalances[bet.player] += bet.profit;
                     }
                     
-                    let betAvatarColor = window.avatarColors[bet.player] || 'bg-gray-600';
-                    let displaySelection = window.teamMap[bet.selection] || bet.selection;
+                    if (!matchGroupMap.has(bet.matchId)) {
+                        matchGroupMap.set(bet.matchId, []);
+                    }
+                    matchGroupMap.get(bet.matchId).push(bet);
+                });
+                
+                matchGroupMap.forEach((bets, matchId) => {
+                    let match = window.globalMatches.find(m => m.id === matchId);
+                    let matchHeaderHtml = '';
                     
-                    let deleteBtn = `<button onclick="window.deleteBet('${bet.docId}')" style="display: ${window.authenticatedUser === 'Dennis' ? 'flex' : 'none'};" class="admin-only-btn ml-3 text-red-500 hover:text-red-400 transition-colors bg-red-900/20 rounded p-1.5 flex-shrink-0 touch-manipulation items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>`;
-                    
-                    return `
-                        <div class="flex justify-between items-center py-2 last:pb-0 border-b border-gray-800/40 last:border-0">
-                            <div class="flex items-center space-x-3 overflow-hidden">
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm border border-gray-700 flex-shrink-0 ${betAvatarColor}">${bet.player.charAt(0)}</div>
-                                <div class="truncate">
-                                    <p class="font-bold text-gray-200 text-sm mb-0.5">${bet.player}</p>
-                                    <p class="text-xs text-gray-400 truncate">買: <span class="text-yellow-500 font-semibold">${displaySelection}</span> <span class="font-mono text-gray-500">($${bet.amount})</span></p>
+                    if (match) {
+                        let hName = String(window.teamMap[match.home] || match.home);
+                        let aName = String(window.teamMap[match.away] || match.away);
+                        let scoreTxt = (match.scoreHome !== null && match.scoreAway !== null) ? ` (${match.scoreHome}:${match.scoreAway})` : '';
+                        matchHeaderHtml = `
+                            <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-3">
+                                <div class="flex items-center space-x-2 text-xs font-bold text-gray-400 tracking-wide uppercase">
+                                    <span>⚽ ${window.getFlag(hName)} ${hName} VS ${window.getFlag(aName)} ${aName}${scoreTxt}</span>
+                                </div>
+                                <span class="text-[10px] bg-gray-800 text-gray-500 font-mono px-1.5 py-0.5 rounded">${match.dateStr || ''}</span>
+                            </div>
+                        `;
+                    } else {
+                        matchHeaderHtml = `
+                            <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-3">
+                                <div class="text-xs font-bold text-gray-500 tracking-wide uppercase">
+                                    <span>⚽ 賽事 ID: ${matchId}</span>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-end flex-shrink-0 ml-2">
-                                <div class="text-right">
-                                    <span class="text-xs ${resCol} inline-block">${resTxt}</span>
-                                    <span class="block text-[9px] text-gray-500 mt-1 font-mono tracking-tighter">${bet.settleDetail||''}</span>
+                        `;
+                    }
+                    
+                    let betsItemsHtml = bets.map(bet => {
+                        let resTxt = "等待開彩", resCol = "text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded";
+                        if (bet.settled) {
+                            if (bet.profit > 0 && bet.profit < (bet.amount * (bet.odds - 1))) { resTxt = `贏半 +$${bet.profit.toFixed(1)}`; resCol = "text-green-400 bg-green-500/10 px-2 py-1 rounded"; }
+                            else if (bet.profit > 0) { resTxt = `贏全 +$${bet.profit.toFixed(1)}`; resCol = "text-green-500 font-bold bg-green-500/10 px-2 py-1 rounded"; }
+                            else if (bet.profit === 0) { resTxt = `走水 $0`; resCol = "text-gray-400 bg-gray-600/20 px-2 py-1 rounded"; }
+                            else if (bet.profit < 0 && bet.profit > -bet.amount) { resTxt = `輸半 -$${Math.abs(bet.profit).toFixed(1)}`; resCol = "text-red-400 bg-red-500/10 px-2 py-1 rounded"; }
+                            else { resTxt = `輸全 -$${Math.abs(bet.profit).toFixed(1)}`; resCol = "text-red-500 font-bold bg-red-500/10 px-2 py-1 rounded"; }
+                        }
+                        
+                        let playerStr = bet.player ? String(bet.player) : '?';
+                        let initial = playerStr.charAt(0).toUpperCase();
+                        let betAvatarColor = window.avatarColors[playerStr] || 'bg-gray-600';
+                        let displaySelection = window.teamMap[bet.selection] || bet.selection;
+                        
+                        let deleteBtn = `<button onclick="window.deleteBet('${bet.docId}')" style="display: ${window.authenticatedUser === 'Dennis' ? 'flex' : 'none'};" class="admin-only-btn ml-3 text-red-500 hover:text-red-400 transition-colors bg-red-900/20 rounded p-1.5 flex-shrink-0 touch-manipulation items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>`;
+                        
+                        return `
+                            <div class="flex justify-between items-center py-2 last:pb-0 border-b border-gray-800/40 last:border-0">
+                                <div class="flex items-center space-x-3 overflow-hidden">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm border border-gray-700 flex-shrink-0 ${betAvatarColor}">${initial}</div>
+                                    <div class="truncate">
+                                        <p class="font-bold text-gray-200 text-sm mb-0.5">${playerStr}</p>
+                                        <p class="text-xs text-gray-400 truncate">買: <span class="text-yellow-500 font-semibold">${displaySelection}</span> <span class="font-mono text-gray-500">($${bet.amount})</span></p>
+                                    </div>
                                 </div>
-                                ${deleteBtn}
+                                <div class="flex items-center justify-end flex-shrink-0 ml-2">
+                                    <div class="text-right">
+                                        <span class="text-xs ${resCol} inline-block">${resTxt}</span>
+                                        <span class="block text-[9px] text-gray-500 mt-1 font-mono tracking-tighter">${bet.settleDetail||''}</span>
+                                    </div>
+                                    ${deleteBtn}
+                                </div>
                             </div>
+                        `;
+                    }).join('');
+                    
+                    betsList.innerHTML += `
+                        <div class="glass-panel p-4 rounded-2xl shadow-lg">
+                            ${matchHeaderHtml}
+                            <div class="space-y-1.5">${betsItemsHtml}</div>
                         </div>
                     `;
-                }).join('');
+                });
                 
-                betsList.innerHTML += `
-                    <div class="glass-panel p-4 rounded-2xl shadow-lg">
-                        ${matchHeaderHtml}
-                        <div class="space-y-1.5">${betsItemsHtml}</div>
-                    </div>
-                `;
-            });
-            
-            leaderboardDiv.innerHTML = '';
-            window.updateHeaderBalance(); 
+                leaderboardDiv.innerHTML = '';
+                
+                let sortedPlayers = Object.keys(window.playerBalances).sort((a, b) => window.playerBalances[b] - window.playerBalances[a]);
+                let uniqueBalances = [...new Set(Object.values(window.playerBalances))].sort((a, b) => b - a);
 
-            let sortedPlayers = Object.keys(window.playerBalances).sort((a, b) => window.playerBalances[b] - window.playerBalances[a]);
-            let uniqueBalances = [...new Set(Object.values(window.playerBalances))].sort((a, b) => b - a);
-
-            sortedPlayers.forEach((p) => {
-                let bal = window.playerBalances[p], cClass = bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400');
-                
-                let denseRank = uniqueBalances.indexOf(bal);
-                let rankMedal = denseRank === 0 ? '🥇' : (denseRank === 1 ? '🥈' : (denseRank === 2 ? '🥉' : '<span class="w-[18px] inline-block"></span>'));
-                
-                let boardAvatarColor = window.avatarColors[p] || 'bg-gray-600';
-                
-                leaderboardDiv.innerHTML += `
-                    <div class="flex justify-between items-center py-3 border-b border-gray-800 last:border-0">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-lg mr-1">${rankMedal}</span>
-                            <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm border border-gray-700 ${boardAvatarColor}">${p.charAt(0)}</div>
-                            <span class="text-gray-200 text-sm font-semibold tracking-wide">${p}</span>
-                        </div>
-                        <span class="font-bold font-mono ${cClass}">${bal>0?'+':''}$${bal.toFixed(1)}</span>
-                    </div>`;
-            });
+                sortedPlayers.forEach((p) => {
+                    let bal = window.playerBalances[p], cClass = bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400');
+                    
+                    let denseRank = uniqueBalances.indexOf(bal);
+                    let rankMedal = denseRank === 0 ? '🥇' : (denseRank === 1 ? '🥈' : (denseRank === 2 ? '🥉' : '<span class="w-[18px] inline-block"></span>'));
+                    
+                    let boardAvatarColor = window.avatarColors[p] || 'bg-gray-600';
+                    
+                    leaderboardDiv.innerHTML += `
+                        <div class="flex justify-between items-center py-3 border-b border-gray-800 last:border-0">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-lg mr-1">${rankMedal}</span>
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm border border-gray-700 ${boardAvatarColor}">${String(p).charAt(0).toUpperCase()}</div>
+                                <span class="text-gray-200 text-sm font-semibold tracking-wide">${p}</span>
+                            </div>
+                            <span class="font-bold font-mono ${cClass}">${bal>0?'+':''}$${bal.toFixed(1)}</span>
+                        </div>`;
+                });
+            } catch(e) { console.error("Bets Error:", e); } finally {
+                window.updateHeaderBalance(); 
+            }
         });
 
     </script>
