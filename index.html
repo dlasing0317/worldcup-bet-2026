@@ -214,7 +214,7 @@
             </p>
 
             <div class="bg-[#0a0a0c] rounded-2xl p-5 mb-6 border border-gray-800 shadow-inner">
-                <label class="block text-center text-gray-500 text-[11px] font-bold uppercase tracking-widest mb-4">輸入注碼 ($5 - $100)</label>
+                <label class="block text-center text-gray-500 text-[11px] font-bold uppercase tracking-widest mb-4">輸入注碼 ($5 - $250)</label>
                 <div class="flex items-center justify-between px-2">
                     <button onclick="window.adjustBet(-5)" class="w-12 h-12 flex-shrink-0 rounded-full bg-gray-800 text-gray-300 font-bold text-3xl flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 active:scale-90 transition-all border border-gray-600 shadow-lg touch-manipulation">&minus;</button>
                     
@@ -582,7 +582,7 @@
             let current = parseInt(input.innerText) || 10; 
             current += amount;
             if (current < 5) current = 5;
-            if (current > 100) current = 100;
+            if (current > 250) current = 250; 
             input.innerText = current; 
         };
 
@@ -597,7 +597,7 @@
         window.confirmBet = () => {
             if (!window.pendingBet) return;
             const amount = parseInt(document.getElementById('bet-amount-input').innerText);
-            if (amount >= 5 && amount <= 100) {
+            if (amount >= 5 && amount <= 250) {
                 document.getElementById('custom-confirm-detail').innerHTML = `確定畀 <span class="text-white font-black">$${amount}</span> 買 <span class="text-white font-black">${window.pendingBet.selection}</span>？`;
                 const modal = document.getElementById('custom-confirm-modal');
                 const modalContent = document.getElementById('custom-confirm-content');
@@ -719,17 +719,9 @@
                         let mScoreH = item.goals?.home !== undefined && item.goals?.home !== null ? item.goals.home : null;
                         let mScoreA = item.goals?.away !== undefined && item.goals?.away !== null ? item.goals.away : null;
 
-                        let mDate = item.fixture?.date;
-                        
-                        if (!mDate || String(mDate).includes("00:00:00")) {
-                            if (index >= 72 && kIndex < 32) {
-                                mDate = window.kDates[kIndex];
-                            }
-                        }
-                        if (index >= 72) kIndex++;
-
+                        // 原封不動 Save 落 Firebase，UI 嗰邊有 God-Mode 攔截！
                         await setDoc(doc(db, "matches_2026", mId), { 
-                            id: mId, home: hTC, away: aTC, date: mDate,
+                            id: mId, home: hTC, away: aTC, date: item.fixture?.date,
                             status: mStatus, scoreHome: mScoreH, scoreAway: mScoreA, 
                             updatedAt: serverTimestamp() 
                         }, { merge: true });
@@ -871,7 +863,6 @@
             } catch (e) { console.error(e); alert("❌ 清除失敗：" + e.message); }
         };
 
-        // 🚨 安全型國旗生成器
         window.getFlag = (teamName) => {
             if (!teamName || typeof teamName !== 'string') return "⚽"; 
             let tName = String(window.teamMap[teamName] || teamName); 
@@ -881,9 +872,9 @@
                 "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺",
                 "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭",
                 "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪",
-                "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹",
-                "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴", "意大利":"🇮🇹", "智利":"🇨🇱", "秘魯":"🇵🇪", "委內瑞拉":"🇻🇪", "玻利維亞":"🇧🇴",
-                "馬里":"🇲🇱", "布基納法索":"🇧🇫", "幾內亞":"🇬🇳", "尼日利亞":"🇳🇬", "安哥拉":"🇦🇴", "阿聯酋":"🇦🇪", "阿曼":"🇴🇲", "巴林":"🇧🇭", "敘利亞":"🇸🇾", "中國":"🇨🇳",
+                "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "Norway":"挪威", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹",
+                "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴", "意大利":"🇮🇹", "智利":"🇨🇱", "秘魯":"🇵🇪", "Venezuela":"委內瑞拉", "Bolivia":"玻利維亞",
+                "馬里":"🇲🇱", "布基納法索":"🇧🇫", "幾內亞":"🇬🇳", "尼日利亞":"🇳🇬", "安哥拉":"🇦🇴", "阿聯酋":"🇦🇪", "阿曼":"🇴🇲", "巴林":"🇧🇭", "敘立亞":"🇸🇾", "中國":"🇨🇳",
                 "牙買加":"🇯🇲", "薩爾瓦多":"🇸🇻", "洪都拉斯":"🇭🇳", "危地馬拉":"🇬🇹", "千里達":"🇹🇹"
             };
             for(let key in flags) { if(tName.includes(key)) return flags[key]; }
@@ -963,7 +954,6 @@
                 matchesToShow.forEach(match => {
                     if (!match) return; 
                     
-                    // 🚨 防彈安全字串處理
                     let hNameStr = String(match.home || '');
                     let aNameStr = String(match.away || '');
                     let displayHome = (hNameStr !== 'null' && hNameStr.trim() !== '') ? (window.teamMap[hNameStr] || hNameStr) : 'TBD';
@@ -979,6 +969,13 @@
                     let isStarted = (match.status !== 'NS' && match.status !== 'TBD') || (now >= matchDateObj);
                     let isFinished = ['FT', 'AET', 'PEN'].includes(match.status);
                     let canBet = isOddsReady && !isStarted && !isFinished;
+
+                    // 🚨 終極改造：主畫面感應 R32 賽事專屬藍框
+                    // 根據官方賽程：6月28日至7月3日進行 R32 淘汰賽
+                    let isR32 = (match.month === 6 && match.dateNum >= 28) || (match.month === 7 && match.dateNum <= 3);
+                    let cardWrapperClass = isR32 
+                        ? "bg-[#1c1c1e] border border-blue-500 shadow-md shadow-blue-900/30 rounded-2xl p-4 relative overflow-hidden transition-all" 
+                        : "glass-panel rounded-2xl p-4 relative overflow-hidden transition-all";
 
                     let dynamicCalendarIcon = `
                         <div class="flex flex-col items-center justify-start w-3.5 h-4 bg-[#1c1c1e] rounded-[3px] border border-gray-600 overflow-hidden mr-1.5 flex-shrink-0">
@@ -999,7 +996,7 @@
                     let isViuTV = window.fs1Pairs.some(pair => 
                         (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
                         (displayHome.includes(pair[1]) && displayAway.includes(pair[0]))
-                    ) || ["2101", "2102", "2103", "2104"].includes(String(match.id)); // 🚨 安全轉換
+                    ) || ["2101", "2102", "2103", "2104"].includes(String(match.id));
 
                     let isFS1 = window.fs1Pairs.some(pair => 
                         (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || 
@@ -1051,7 +1048,6 @@
                     let btnClass = canBet ? "bg-[#2c2c2e] hover:bg-[#3c3c3e] cursor-pointer" : "bg-[#1a1a1c] text-gray-600 cursor-not-allowed";
                     let oddsColor = canBet ? "text-white" : "text-gray-600";
                     
-                    // 🚨 防彈替換
                     let safeHome = displayHome.replace(/'/g, "\\'");
                     let safeAway = displayAway.replace(/'/g, "\\'");
                     
@@ -1059,7 +1055,7 @@
                     let awayClick = (match.odds && match.odds.away > 0 && displayAway !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
 
                     container.innerHTML += `
-                        <div class="glass-panel rounded-2xl p-4 relative overflow-hidden transition-all">
+                        <div class="${cardWrapperClass}">
                             <div class="flex justify-between items-center mb-4">
                                 <div class="flex items-center flex-wrap gap-y-1">
                                     ${matchLabelHtml}
@@ -1205,8 +1201,8 @@
                 html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">32 強 (R32)</div>`;
                 for (let i = 0; i < 16; i += 2) {
                     html += `<div class="bracket-pair">`;
-                    html += window.generateBracketCard(b.r32[i], false);
-                    html += window.generateBracketCard(b.r32[i+1], false);
+                    html += window.generateBracketCard(b.r32[i], false, i);
+                    html += window.generateBracketCard(b.r32[i+1], false, i + 1);
                     html += `</div>`;
                 }
                 html += `</div>`;
@@ -1216,8 +1212,8 @@
                 html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">16 強 (R16)</div>`;
                 for (let i = 0; i < 8; i += 2) {
                     html += `<div class="bracket-pair">`;
-                    html += window.generateBracketCard(b.r16[i], false);
-                    html += window.generateBracketCard(b.r16[i+1], false);
+                    html += window.generateBracketCard(b.r16[i], false, 16 + i);
+                    html += window.generateBracketCard(b.r16[i+1], false, 16 + i + 1);
                     html += `</div>`;
                 }
                 html += `</div>`;
@@ -1227,8 +1223,8 @@
                 html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">8 強 (QF)</div>`;
                 for (let i = 0; i < 4; i += 2) {
                     html += `<div class="bracket-pair">`;
-                    html += window.generateBracketCard(b.qf[i], false);
-                    html += window.generateBracketCard(b.qf[i+1], false);
+                    html += window.generateBracketCard(b.qf[i], false, 24 + i);
+                    html += window.generateBracketCard(b.qf[i+1], false, 24 + i + 1);
                     html += `</div>`;
                 }
                 html += `</div>`;
@@ -1238,8 +1234,8 @@
                 html += `<div class="text-xs font-bold text-gray-500 text-center absolute -top-4 w-full">4 強 (SF)</div>`;
                 for (let i = 0; i < 2; i += 2) {
                     html += `<div class="bracket-pair">`;
-                    html += window.generateBracketCard(b.sf[i], false);
-                    html += window.generateBracketCard(b.sf[i+1], false);
+                    html += window.generateBracketCard(b.sf[i], false, 28 + i);
+                    html += window.generateBracketCard(b.sf[i+1], false, 28 + i + 1);
                     html += `</div>`;
                 }
                 html += `</div>`;
@@ -1247,11 +1243,11 @@
                 // F
                 html += `<div class="flex flex-col justify-around w-60 pl-6 relative">`;
                 html += `<div class="text-xs font-bold text-yellow-500 text-center absolute -top-4 w-full">決賽 (Final)</div>`;
-                html += window.generateBracketCard(b.f[0], true);
+                html += window.generateBracketCard(b.f[0], true, 31);
                 
                 html += `<div class="mt-8">
                             <div class="text-xs font-bold text-gray-500 text-center mb-2 border-t border-gray-800 pt-3">季軍戰</div>
-                            ${window.generateBracketCard(b.third[0], false)}
+                            ${window.generateBracketCard(b.third[0], false, 30)}
                          </div>`;
                 html += `</div>`;
 
@@ -1260,16 +1256,17 @@
             } catch (e) { console.error("Render Bracket Error", e); }
         };
 
-        window.generateBracketCard = (slotData, isFinal = false) => {
+        window.generateBracketCard = (slotData, isFinal = false, matchIndex = 0) => {
             let borderClass = isFinal ? 'border-yellow-600 shadow-lg shadow-yellow-900/30 bg-yellow-900/10' : 'border-gray-700 hover:bg-gray-800';
+            if (!isFinal && matchIndex < 16) {
+                borderClass = 'border-blue-500 shadow-md shadow-blue-900/30 hover:bg-gray-800';
+            }
 
-            // 🚨 強制對接：用 ID 或者 官方日期+隊名
             let match = window.globalMatches.find(m => m.id === slotData.id || (m.date === slotData.iso && (m.home === slotData.home || m.away === slotData.home)));
             
             let displayHome = match ? String(match.home) : String(slotData.home);
             let displayAway = match ? String(match.away) : String(slotData.away);
             
-            // 🚨 穩陣過濾器
             let isKnownTeam = (t) => t && typeof t === 'string' && t !== 'TBD' && !t.match(/^[1-3][A-L]/);
 
             let isViuTV = window.fs1Pairs.some(pair => (displayHome.includes(pair[0]) && displayAway.includes(pair[1])) || (displayHome.includes(pair[1]) && displayAway.includes(pair[0])));
@@ -1342,7 +1339,6 @@
                 const allSlots = [...b.r32, ...b.r16, ...b.qf, ...b.sf, ...b.third, ...b.f];
                 let isKnown = (t) => t && typeof t === 'string' && t !== 'TBD' && !t.match(/^[1-3][A-L]/);
 
-                // 🚨 1. 小組賽：只取 6月28日之前 (嚴格 PDT 隔離)
                 rawApiMatches.forEach(m => {
                     let d = new Date(m.date);
                     if (d.getMonth() < 5 || (d.getMonth() === 5 && d.getDate() < 28)) { 
@@ -1358,7 +1354,6 @@
                     }
                 });
 
-                // 🚨 2. 淘汰賽：以上帝視角 Slot 為主，由 Slot 去反向捕捉 API 數據 (杜絕幽靈賽事)
                 allSlots.forEach(slot => {
                     let dObj = new Date(slot.iso);
                     let dStr = dObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' });
