@@ -202,6 +202,7 @@
 
     </main>
 
+    <!-- 落注視窗 -->
     <div id="bet-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="bet-modal-content">
             <h3 class="text-white font-black text-xl mb-2 flex items-center tracking-wide"><span class="mr-2 text-2xl">⚽</span> 確認落注</h3>
@@ -231,6 +232,7 @@
         </div>
     </div>
 
+    <!-- 自訂霸氣買定離手 Confirm 彈窗 -->
     <div id="custom-confirm-modal" class="hidden fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 backdrop-blur-md opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-8 shadow-2xl border border-yellow-600/50 transform scale-95 transition-transform duration-300 flex flex-col items-center text-center" id="custom-confirm-content">
             <span class="text-5xl mb-4">⚠️</span>
@@ -253,7 +255,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 🚨 終極防彈鎖定：強制綁定所有核心變數及函數到 window，永不 Crash!
         window.globalMatches = [];
         window.selectedDate = null; 
         window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
@@ -306,7 +307,6 @@
             ['剛果', '烏茲別克'], ['阿爾及利亞', '奧地利']
         ];
 
-        // 🚨 終極 R32 上帝視角：100% 強制匹配 Apple Sports 賽程與美西 PDT 時間！
         window.kDates = [
             "2026-06-28T12:00:00-07:00", "2026-06-29T10:00:00-07:00", "2026-06-29T13:30:00-07:00", "2026-06-29T18:00:00-07:00",
             "2026-06-30T10:00:00-07:00", "2026-06-30T14:00:00-07:00", "2026-06-30T18:00:00-07:00", "2026-07-01T09:00:00-07:00",
@@ -366,23 +366,25 @@
         };
 
         window.switchTab = (tabName) => {
-            const tabs = ['matches', 'bracket', 'leaderboard', 'bets', 'admin'];
-            tabs.forEach(t => {
-                const view = document.getElementById('view-' + t);
-                const tab = document.getElementById('tab-' + t);
-                if (view) view.classList.add('hidden');
-                if (tab) {
-                    tab.classList.remove('text-green-500');
-                    tab.classList.add('text-gray-500');
+            try {
+                const tabs = ['matches', 'bracket', 'leaderboard', 'bets', 'admin'];
+                tabs.forEach(t => {
+                    const view = document.getElementById('view-' + t);
+                    const tab = document.getElementById('tab-' + t);
+                    if (view) view.classList.add('hidden');
+                    if (tab) {
+                        tab.classList.remove('text-green-500');
+                        tab.classList.add('text-gray-500');
+                    }
+                });
+                const activeView = document.getElementById('view-' + tabName);
+                const activeTab = document.getElementById('tab-' + tabName);
+                if (activeView) activeView.classList.remove('hidden');
+                if (activeTab) {
+                    activeTab.classList.remove('text-gray-500');
+                    activeTab.classList.add('text-green-500');
                 }
-            });
-            const activeView = document.getElementById('view-' + tabName);
-            const activeTab = document.getElementById('tab-' + tabName);
-            if (activeView) activeView.classList.remove('hidden');
-            if (activeTab) {
-                activeTab.classList.remove('text-gray-500');
-                activeTab.classList.add('text-green-500');
-            }
+            } catch (e) { console.error("Tab Switch Error", e); }
         };
 
         window.filterByDate = (dateStr) => { 
@@ -562,8 +564,22 @@
             } catch (e) { console.error("Header Balance Error:", e); }
         };
 
+        // 🚨 雙重防盜鎖：入閘前做最後一次 Server Time Validation 
         window.placeBet = async (matchId, selection, odds) => {
             if(odds === 0) { alert("⚠️ 莊家尚未開盤，暫時無法落注。"); return; }
+            
+            let match = window.globalMatches.find(m => m.id === matchId);
+            if (match) {
+                let now = new Date();
+                let matchDateObj = new Date(match.date);
+                let isStarted = (match.status !== 'NS' && match.status !== 'TBD') || (now >= matchDateObj);
+                if (isStarted || ['FT', 'AET', 'PEN'].includes(match.status)) {
+                    alert("⛔ 莊家已截飛！賽事已經開始或完結，唔可以再落注！");
+                    window.renderMatches(); // 強制更新畫面
+                    return;
+                }
+            }
+
             const currentPlayer = document.getElementById('player-select').value;
             
             if (window.authenticatedUser !== currentPlayer) { alert("❌ 安全異常：帳號狀態不符，請重新登入！"); return; }
@@ -579,7 +595,6 @@
             setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); }, 10);
         };
 
-        // 🚨 更新：放寬注碼調整上限至 250
         window.adjustBet = (amount) => {
             const input = document.getElementById('bet-amount-input');
             let current = parseInt(input.innerText) || 10; 
@@ -600,7 +615,6 @@
         window.confirmBet = () => {
             if (!window.pendingBet) return;
             const amount = parseInt(document.getElementById('bet-amount-input').innerText);
-            // 🚨 更新：放寬驗證邊界至 250
             if (amount >= 5 && amount <= 250) {
                 document.getElementById('custom-confirm-detail').innerHTML = `確定畀 <span class="text-white font-black">$${amount}</span> 買 <span class="text-white font-black">${window.pendingBet.selection}</span>？`;
                 const modal = document.getElementById('custom-confirm-modal');
@@ -876,7 +890,6 @@
             } catch (e) { console.error(e); alert("❌ 清除失敗：" + e.message); }
         };
 
-        // 🚨 終極不死國旗生成器
         window.getFlag = (teamName) => {
             if (!teamName || typeof teamName !== 'string') return "⚽"; 
             let tName = String(window.teamMap[teamName] || teamName); 
@@ -982,9 +995,10 @@
                     let isOddsReady = match.odds && match.odds.home > 0;
                     let isStarted = (match.status !== 'NS' && match.status !== 'TBD') || (now >= matchDateObj);
                     let isFinished = ['FT', 'AET', 'PEN'].includes(match.status);
+                    
+                    // 🚨 終極 UI 鎖定：定義 canBet 狀態
                     let canBet = isOddsReady && !isStarted && !isFinished;
 
-                    // 🚨 主畫面 R32 專屬發光藍框
                     let isR32 = (match.month === 6 && match.dateNum >= 28) || (match.month === 7 && match.dateNum <= 3);
                     let cardWrapperClass = isR32 
                         ? "bg-[#1c1c1e] border border-blue-500 shadow-md shadow-blue-900/30 rounded-2xl p-4 relative overflow-hidden transition-all" 
@@ -1064,8 +1078,9 @@
                     let safeHome = displayHome.replace(/'/g, "\\'");
                     let safeAway = displayAway.replace(/'/g, "\\'");
                     
-                    let homeClick = (match.odds && match.odds.home > 0 && displayHome !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
-                    let awayClick = (match.odds && match.odds.away > 0 && displayAway !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
+                    // 🚨 第一重防偷雞鎖：將 canBet 狀態與 onclick 事件掛鉤
+                    let homeClick = (canBet && displayHome !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ 賽事已截飛或未開盤，無法落注。');"`;
+                    let awayClick = (canBet && displayAway !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 賽事已截飛或未開盤，無法落注。');"`;
 
                     container.innerHTML += `
                         <div class="${cardWrapperClass}">
@@ -1301,14 +1316,22 @@
             let homeScore = (match && match.scoreHome !== null) ? match.scoreHome : (match && match.odds && match.odds.home ? match.odds.home.toFixed(2) : '-');
             let awayScore = (match && match.scoreAway !== null) ? match.scoreAway : (match && match.odds && match.odds.away ? match.odds.away.toFixed(2) : '-');
 
-            let canBetHome = match && match.odds && match.odds.home > 0 && isKnownTeam(displayHome);
-            let canBetAway = match && match.odds && match.odds.away > 0 && isKnownTeam(displayAway);
+            // 🚨 終極 UI 防偷雞鎖定：確保時間未過
+            let now = new Date();
+            let matchDateObj = new Date(slotData.iso);
+            let isStarted = match ? ((match.status !== 'NS' && match.status !== 'TBD') || (now >= matchDateObj)) : (now >= matchDateObj);
+            let isFinished = match ? ['FT', 'AET', 'PEN'].includes(match.status) : false;
+            let isOddsReady = match && match.odds && match.odds.home > 0;
+            let canBet = isOddsReady && !isStarted && !isFinished;
+
+            let canBetHome = canBet && isKnownTeam(displayHome);
+            let canBetAway = canBet && isKnownTeam(displayAway);
 
             let safeHome = displayHome.replace(/'/g, "\\'");
             let safeAway = displayAway.replace(/'/g, "\\'");
 
-            let homeClick = canBetHome ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
-            let awayClick = canBetAway ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 對手未定或尚未開盤。');"`;
+            let homeClick = canBetHome ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ 賽事已截飛或未開盤。');"`;
+            let awayClick = canBetAway ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 賽事已截飛或未開盤。');"`;
 
             let homeTextStyle = isKnownTeam(displayHome) ? textClass : 'text-gray-600';
             let awayTextStyle = isKnownTeam(displayAway) ? textClass : 'text-gray-600';
@@ -1353,7 +1376,6 @@
                     const allSlots = [...b.r32, ...b.r16, ...b.qf, ...b.sf, ...b.third, ...b.f];
                     let isKnown = (t) => t && typeof t === 'string' && t !== 'TBD' && !t.match(/^[1-3][A-L]/);
 
-                    // 1. Group Stage
                     rawApiMatches.forEach(m => {
                         if (!m.date) return;
                         let d = new Date(m.date);
@@ -1372,7 +1394,6 @@
                         }
                     });
 
-                    // 2. Knockouts (God Mode Matcher)
                     let koApiMatches = rawApiMatches.filter(m => !m.used);
                     koApiMatches.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime() || a.id - b.id);
 
