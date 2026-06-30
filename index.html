@@ -147,7 +147,6 @@
             <div class="glass-panel rounded-xl p-5 space-y-6">
                 <div class="bg-yellow-900/10 border border-yellow-800/50 p-4 rounded-xl shadow-inner">
                     <label class="block text-sm text-yellow-500 font-bold mb-2">🔍 測試員專用：API 賠率數據透視鏡</label>
-                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">直接截取 API-Sports 傳返嚟嘅最原始 (Raw JSON) 數據，核對賠率結構有冇變更。</p>
                     <button onclick="window.debugAPI()" class="w-full bg-yellow-600 text-black font-black py-3 rounded-lg hover:bg-yellow-500 shadow-lg shadow-yellow-900/50 transition-all touch-manipulation">
                         顯示原始 API 賠率數據
                     </button>
@@ -158,7 +157,6 @@
 
                 <div class="bg-blue-900/10 border border-blue-800/50 p-4 rounded-xl shadow-inner">
                     <label class="block text-sm text-blue-400 font-bold mb-2">🤖 全自動 API 同步 (賽程/比數/賠率)</label>
-                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">一鍵連接 API 獲取全球最新賽況及盤口，並快取至 Firebase 供所有人讀取。支援完場自動派彩。</p>
                     <button onclick="window.autoSyncAPI()" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-lg hover:bg-blue-500 shadow-lg shadow-blue-900/50 transition-all touch-manipulation flex items-center justify-center">
                         <span class="mr-2 text-lg">⚡</span> 一鍵同步至資料庫
                     </button>
@@ -204,7 +202,6 @@
 
     </main>
 
-    <!-- 落注視窗 -->
     <div id="bet-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="bet-modal-content">
             <h3 class="text-white font-black text-xl mb-2 flex items-center tracking-wide"><span class="mr-2 text-2xl">⚽</span> 確認落注</h3>
@@ -234,7 +231,6 @@
         </div>
     </div>
 
-    <!-- 自訂霸氣買定離手 Confirm 彈窗 -->
     <div id="custom-confirm-modal" class="hidden fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 backdrop-blur-md opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-8 shadow-2xl border border-yellow-600/50 transform scale-95 transition-transform duration-300 flex flex-col items-center text-center" id="custom-confirm-content">
             <span class="text-5xl mb-4">⚠️</span>
@@ -257,7 +253,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 🚨 全域綁定確保永不白屏 (100% Crash-Proof Scope)
+        // 🚨 終極防彈鎖定：強制綁定所有核心變數及函數到 window，永不 Crash!
         window.globalMatches = [];
         window.selectedDate = null; 
         window.playerBalances = { "Dennis": 0, "Samuel": 0, "Charles": 0, "Michael": 0, "Sha": 0, "Travis": 0 };
@@ -310,7 +306,7 @@
             ['剛果', '烏茲別克'], ['阿爾及利亞', '奧地利']
         ];
 
-        // 🚨 終極 R32 上帝視角：100% 強制匹配 Apple Sports 賽程與美西時間！
+        // 🚨 終極 R32 上帝視角：100% 強制匹配 Apple Sports 賽程與美西 PDT 時間！
         window.kDates = [
             "2026-06-28T12:00:00-07:00", "2026-06-29T10:00:00-07:00", "2026-06-29T13:30:00-07:00", "2026-06-29T18:00:00-07:00",
             "2026-06-30T10:00:00-07:00", "2026-06-30T14:00:00-07:00", "2026-06-30T18:00:00-07:00", "2026-07-01T09:00:00-07:00",
@@ -536,28 +532,34 @@
         };
 
         window.updateHeaderBalance = () => {
-            let currentUser = document.getElementById('player-select').value;
-            let bal = window.playerBalances[currentUser] || 0;
-            let headerBal = document.getElementById('header-balance');
-            headerBal.innerText = `${bal > 0 ? '+' : ''}$${bal.toFixed(1)} HKD`;
-            headerBal.className = `text-sm font-bold ${bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400')}`;
-            
-            let avatarEl = document.getElementById('header-avatar');
-            let newColor = window.avatarColors[currentUser] || 'bg-gray-600';
-            avatarEl.className = `w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md border border-gray-700 transition-colors duration-300 ${newColor}`;
-            avatarEl.innerText = currentUser.charAt(0);
+            try {
+                let currentUser = document.getElementById('player-select').value;
+                let bal = window.playerBalances[currentUser] || 0;
+                let headerBal = document.getElementById('header-balance');
+                if (headerBal) {
+                    headerBal.innerText = `${bal > 0 ? '+' : ''}$${bal.toFixed(1)} HKD`;
+                    headerBal.className = `text-sm font-bold ${bal > 0 ? 'text-green-500' : (bal < 0 ? 'text-red-500' : 'text-gray-400')}`;
+                }
+                
+                let avatarEl = document.getElementById('header-avatar');
+                let newColor = window.avatarColors[currentUser] || 'bg-gray-600';
+                if (avatarEl) {
+                    avatarEl.className = `w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md border border-gray-700 transition-colors duration-300 ${newColor}`;
+                    avatarEl.innerText = String(currentUser).charAt(0).toUpperCase();
+                }
 
-            let adminTab = document.getElementById('tab-admin');
-            let adminBtns = document.querySelectorAll('.admin-only-btn');
-            
-            if (currentUser === 'Dennis') { 
-                if (adminTab) { adminTab.classList.remove('hidden'); adminTab.classList.add('flex'); }
-                adminBtns.forEach(btn => btn.style.display = 'flex');
-            } else { 
-                if (adminTab) { adminTab.classList.add('hidden'); adminTab.classList.remove('flex'); }
-                adminBtns.forEach(btn => btn.style.display = 'none');
-                if (!document.getElementById('view-admin').classList.contains('hidden')) { window.switchTab('matches'); }
-            }
+                let adminTab = document.getElementById('tab-admin');
+                let adminBtns = document.querySelectorAll('.admin-only-btn');
+                
+                if (currentUser === 'Dennis') { 
+                    if (adminTab) { adminTab.classList.remove('hidden'); adminTab.classList.add('flex'); }
+                    adminBtns.forEach(btn => btn.style.display = 'flex');
+                } else { 
+                    if (adminTab) { adminTab.classList.add('hidden'); adminTab.classList.remove('flex'); }
+                    adminBtns.forEach(btn => btn.style.display = 'none');
+                    if (document.getElementById('view-admin') && !document.getElementById('view-admin').classList.contains('hidden')) { window.switchTab('matches'); }
+                }
+            } catch (e) { console.error("Header Balance Error:", e); }
         };
 
         window.placeBet = async (matchId, selection, odds) => {
@@ -577,6 +579,7 @@
             setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); }, 10);
         };
 
+        // 🚨 更新：放寬注碼調整上限至 250
         window.adjustBet = (amount) => {
             const input = document.getElementById('bet-amount-input');
             let current = parseInt(input.innerText) || 10; 
@@ -597,6 +600,7 @@
         window.confirmBet = () => {
             if (!window.pendingBet) return;
             const amount = parseInt(document.getElementById('bet-amount-input').innerText);
+            // 🚨 更新：放寬驗證邊界至 250
             if (amount >= 5 && amount <= 250) {
                 document.getElementById('custom-confirm-detail').innerHTML = `確定畀 <span class="text-white font-black">$${amount}</span> 買 <span class="text-white font-black">${window.pendingBet.selection}</span>？`;
                 const modal = document.getElementById('custom-confirm-modal');
@@ -708,20 +712,28 @@
                     let kIndex = 0;
 
                     const promises = sortedAPI.map(async (item, index) => {
-                        let mId = item.fixture?.id?.toString();
+                        let mId = String(item.fixture?.id || '');
                         if (!mId) return;
                         
-                        let hEng = item.teams?.home?.name || "TBD";
-                        let aEng = item.teams?.away?.name || "TBD";
+                        let hEng = String(item.teams?.home?.name || "TBD");
+                        let aEng = String(item.teams?.away?.name || "TBD");
                         let hTC = window.teamMap[hEng] || hEng;
                         let aTC = window.teamMap[aEng] || aEng;
-                        let mStatus = item.fixture?.status?.short || "NS";
+                        let mStatus = String(item.fixture?.status?.short || "NS");
                         let mScoreH = item.goals?.home !== undefined && item.goals?.home !== null ? item.goals.home : null;
                         let mScoreA = item.goals?.away !== undefined && item.goals?.away !== null ? item.goals.away : null;
 
-                        // 原封不動 Save 落 Firebase，UI 嗰邊有 God-Mode 攔截！
+                        let mDate = String(item.fixture?.date || '');
+                        
+                        if (!mDate || mDate.includes("00:00:00") || mDate === 'null' || mDate === 'undefined') {
+                            if (index >= 72 && kIndex < 32) {
+                                mDate = window.kDates[kIndex];
+                            }
+                        }
+                        if (index >= 72) kIndex++;
+
                         await setDoc(doc(db, "matches_2026", mId), { 
-                            id: mId, home: hTC, away: aTC, date: item.fixture?.date,
+                            id: mId, home: hTC, away: aTC, date: mDate,
                             status: mStatus, scoreHome: mScoreH, scoreAway: mScoreA, 
                             updatedAt: serverTimestamp() 
                         }, { merge: true });
@@ -730,7 +742,7 @@
                             const oddsDoc = await getDoc(doc(db, "odds_2026", mId));
                             let hcapStr = "[0]";
                             if (oddsDoc.exists()) {
-                                hcapStr = oddsDoc.data().handicapStr || "[0]";
+                                hcapStr = String(oddsDoc.data().handicapStr || "[0]");
                             }
                             await window.autoSettleMatch(mId, mScoreH, mScoreA, hcapStr, hTC);
                             autoSettledCount++;
@@ -763,7 +775,7 @@
                     if (pageData.response && pageData.response.length > 0) {
                         for (const item of pageData.response) {
                             oddsCount++;
-                            let mId = item.fixture.id.toString();
+                            let mId = String(item.fixture.id);
                             let bookmaker = item.bookmakers[0];
                             
                             if (bookmaker && bookmaker.bets) {
@@ -817,7 +829,7 @@
                                 }
                                 
                                 if (homeOdd > 0 && awayOdd > 0) {
-                                    await setDoc(doc(db, "odds_2026", mId), { handicapStr: hcapStr, home: homeOdd, away: awayOdd, updatedAt: serverTimestamp() }, { merge: true });
+                                    await setDoc(doc(db, "odds_2026", mId), { handicapStr: String(hcapStr), home: homeOdd, away: awayOdd, updatedAt: serverTimestamp() }, { merge: true });
                                 }
                             }
                         }
@@ -831,19 +843,20 @@
 
         window.betOnTeam = (teamName) => {
             if (!teamName) return; 
-            let match = window.globalMatches.find(m => m.home && m.away && (String(m.home).includes(teamName) || String(m.away).includes(teamName)) && !['FT', 'AET', 'PEN'].includes(m.status));
-            if (!match) match = window.globalMatches.find(m => m.home && m.away && (String(m.home).includes(teamName) || String(m.away).includes(teamName)));
+            let tSearch = String(teamName);
+            let match = window.globalMatches.find(m => m.home && m.away && (String(m.home).includes(tSearch) || String(m.away).includes(tSearch)) && !['FT', 'AET', 'PEN'].includes(m.status));
+            if (!match) match = window.globalMatches.find(m => m.home && m.away && (String(m.home).includes(tSearch) || String(m.away).includes(tSearch)));
             
             if(match) {
-                let odds = String(match.home).includes(teamName) ? match.odds.home : match.odds.away;
-                let actualTeamName = String(match.home).includes(teamName) ? match.home : match.away;
+                let odds = String(match.home).includes(tSearch) ? match.odds.home : match.odds.away;
+                let actualTeamName = String(match.home).includes(tSearch) ? match.home : match.away;
                 if (odds > 0) {
                     window.placeBet(match.id, actualTeamName, odds);
                 } else {
                     alert("⚠️ " + actualTeamName + " 下一場賽事莊家尚未開盤，暫時無法落注。");
                 }
             } else {
-                alert("⚠️ 系統暫時找不到 " + teamName + " 的賽程資料。");
+                alert("⚠️ 系統暫時找不到 " + tSearch + " 的賽程資料。");
             }
         };
 
@@ -863,6 +876,7 @@
             } catch (e) { console.error(e); alert("❌ 清除失敗：" + e.message); }
         };
 
+        // 🚨 終極不死國旗生成器
         window.getFlag = (teamName) => {
             if (!teamName || typeof teamName !== 'string') return "⚽"; 
             let tName = String(window.teamMap[teamName] || teamName); 
@@ -874,7 +888,7 @@
                 "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪",
                 "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "Norway":"挪威", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹",
                 "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴", "意大利":"🇮🇹", "智利":"🇨🇱", "秘魯":"🇵🇪", "Venezuela":"委內瑞拉", "Bolivia":"玻利維亞",
-                "馬里":"🇲🇱", "布基納法索":"🇧🇫", "幾內亞":"🇬🇳", "尼日利亞":"🇳🇬", "安哥拉":"🇦🇴", "阿聯酋":"🇦🇪", "阿曼":"🇴🇲", "巴林":"🇧🇭", "敘立亞":"🇸🇾", "中國":"🇨🇳",
+                "馬里":"🇲🇱", "布基納法索":"🇧🇫", "幾內亞":"🇬🇳", "尼日利亞":"🇳🇬", "安哥拉":"🇦🇴", "阿聯酋":"🇦🇪", "阿曼":"🇴🇲", "巴林":"🇧🇭", "敘利亞":"🇸🇾", "中國":"🇨🇳",
                 "牙買加":"🇯🇲", "薩爾瓦多":"🇸🇻", "洪都拉斯":"🇭🇳", "危地馬拉":"🇬🇹", "千里達":"🇹🇹"
             };
             for(let key in flags) { if(tName.includes(key)) return flags[key]; }
@@ -970,8 +984,7 @@
                     let isFinished = ['FT', 'AET', 'PEN'].includes(match.status);
                     let canBet = isOddsReady && !isStarted && !isFinished;
 
-                    // 🚨 終極改造：主畫面感應 R32 賽事專屬藍框
-                    // 根據官方賽程：6月28日至7月3日進行 R32 淘汰賽
+                    // 🚨 主畫面 R32 專屬發光藍框
                     let isR32 = (match.month === 6 && match.dateNum >= 28) || (match.month === 7 && match.dateNum <= 3);
                     let cardWrapperClass = isR32 
                         ? "bg-[#1c1c1e] border border-blue-500 shadow-md shadow-blue-900/30 rounded-2xl p-4 relative overflow-hidden transition-all" 
@@ -1321,77 +1334,88 @@
 
         window.initMatches = () => {
             onSnapshot(collection(db, "matches_2026"), (snapshot) => {
-                let rawApiMatches = [];
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    if (!data || !data.date) return;
-                    
-                    let existingOdds = { handicapStr: "", home: 0, away: 0 };
-                    let existingMatch = window.globalMatches.find(m => m.id === data.id);
-                    if (existingMatch && existingMatch.odds) { existingOdds = existingMatch.odds; }
-                    data.odds = existingOdds;
-                    
-                    rawApiMatches.push(data);
-                });
+                try {
+                    let rawApiMatches = [];
+                    snapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        if (!data || !data.date) return;
+                        
+                        let existingOdds = { handicapStr: "", home: 0, away: 0 };
+                        let existingMatch = window.globalMatches.find(m => m.id === data.id);
+                        if (existingMatch && existingMatch.odds) { existingOdds = existingMatch.odds; }
+                        data.odds = existingOdds;
+                        
+                        rawApiMatches.push(data);
+                    });
 
-                let finalMatches = [];
-                const b = window.bracketStructure;
-                const allSlots = [...b.r32, ...b.r16, ...b.qf, ...b.sf, ...b.third, ...b.f];
-                let isKnown = (t) => t && typeof t === 'string' && t !== 'TBD' && !t.match(/^[1-3][A-L]/);
+                    let finalMatches = [];
+                    const b = window.bracketStructure;
+                    const allSlots = [...b.r32, ...b.r16, ...b.qf, ...b.sf, ...b.third, ...b.f];
+                    let isKnown = (t) => t && typeof t === 'string' && t !== 'TBD' && !t.match(/^[1-3][A-L]/);
 
-                rawApiMatches.forEach(m => {
-                    let d = new Date(m.date);
-                    if (d.getMonth() < 5 || (d.getMonth() === 5 && d.getDate() < 28)) { 
-                        let dStr = d.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' });
-                        let tStr = d.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' });
-                        finalMatches.push({
-                            id: m.id, home: m.home, away: m.away, date: m.date, status: m.status,
-                            scoreHome: m.scoreHome, scoreAway: m.scoreAway,
-                            dateStr: dStr, month: d.getMonth() + 1, dateNum: d.getDate(),
-                            weekday: '星期' + weekdaysCH[d.getDay()], kickoff: tStr, odds: m.odds
-                        });
-                        m.used = true;
-                    }
-                });
+                    // 1. Group Stage
+                    rawApiMatches.forEach(m => {
+                        if (!m.date) return;
+                        let d = new Date(m.date);
+                        if (isNaN(d.getTime())) return; 
 
-                allSlots.forEach(slot => {
-                    let dObj = new Date(slot.iso);
-                    let dStr = dObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' });
-                    let tStr = dObj.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' });
+                        if (d.getMonth() < 5 || (d.getMonth() === 5 && d.getDate() < 28)) { 
+                            let dStr = d.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' });
+                            let tStr = d.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' });
+                            finalMatches.push({
+                                id: m.id, home: m.home, away: m.away, date: m.date, status: m.status,
+                                scoreHome: m.scoreHome, scoreAway: m.scoreAway,
+                                dateStr: dStr, month: d.getMonth() + 1, dateNum: d.getDate(),
+                                weekday: '星期' + weekdaysCH[d.getDay()], kickoff: tStr, odds: m.odds
+                            });
+                            m.used = true;
+                        }
+                    });
 
-                    let koMatch = {
-                        id: slot.id, home: slot.home, away: slot.away, date: slot.iso, status: 'NS',
-                        scoreHome: null, scoreAway: null, dateStr: dStr, month: dObj.getMonth() + 1,
-                        dateNum: dObj.getDate(), weekday: '星期' + weekdaysCH[dObj.getDay()],
-                        kickoff: tStr, odds: { handicapStr: "", home: 0, away: 0 }
-                    };
+                    // 2. Knockouts (God Mode Matcher)
+                    let koApiMatches = rawApiMatches.filter(m => !m.used);
+                    koApiMatches.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime() || a.id - b.id);
 
-                    let matchFound = null;
-                    if (isKnown(slot.home) && isKnown(slot.away)) {
-                        matchFound = rawApiMatches.find(m => !m.used && ((m.home === slot.home && m.away === slot.away) || (m.home === slot.away && m.away === slot.home)));
-                    } else if (isKnown(slot.home)) {
-                        matchFound = rawApiMatches.find(m => !m.used && (m.home === slot.home || m.away === slot.home));
-                    } else if (isKnown(slot.away)) {
-                        matchFound = rawApiMatches.find(m => !m.used && (m.home === slot.away || m.away === slot.away));
-                    }
+                    allSlots.forEach(slot => {
+                        let dObj = new Date(slot.iso);
+                        if (isNaN(dObj.getTime())) return; 
+                        let dStr = dObj.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' });
+                        let tStr = dObj.toLocaleTimeString('zh-HK', { hour: '2-digit', minute:'2-digit' });
 
-                    if (matchFound) {
-                        koMatch.id = matchFound.id;
-                        koMatch.home = matchFound.home; 
-                        koMatch.away = matchFound.away;
-                        koMatch.status = matchFound.status;
-                        koMatch.scoreHome = matchFound.scoreHome;
-                        koMatch.scoreAway = matchFound.scoreAway;
-                        koMatch.odds = matchFound.odds;
-                        matchFound.used = true;
-                    }
-                    finalMatches.push(koMatch);
-                });
+                        let koMatch = {
+                            id: slot.id, home: slot.home, away: slot.away, date: slot.iso, status: 'NS',
+                            scoreHome: null, scoreAway: null, dateStr: dStr, month: dObj.getMonth() + 1,
+                            dateNum: dObj.getDate(), weekday: '星期' + weekdaysCH[dObj.getDay()],
+                            kickoff: tStr, odds: { handicapStr: "", home: 0, away: 0 }
+                        };
 
-                window.globalMatches = finalMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
-                window.renderDateFilter(); 
-                window.renderMatches(); 
-                window.renderBracket();
+                        let kIndex = window.kDates.indexOf(slot.iso);
+                        let matchFound = (kIndex !== -1 && kIndex < koApiMatches.length) ? koApiMatches[kIndex] : null;
+
+                        if (matchFound) {
+                            koMatch.id = matchFound.id;
+                            let apiHome = String(matchFound.home);
+                            let apiAway = String(matchFound.away);
+                            
+                            koMatch.home = isKnown(apiHome) ? window.teamMap[apiHome] || apiHome : slot.home;
+                            koMatch.away = isKnown(apiAway) ? window.teamMap[apiAway] || apiAway : slot.away;
+                            
+                            koMatch.status = matchFound.status;
+                            koMatch.scoreHome = matchFound.scoreHome;
+                            koMatch.scoreAway = matchFound.scoreAway;
+                            koMatch.odds = matchFound.odds;
+                            matchFound.used = true;
+                        }
+                        finalMatches.push(koMatch);
+                    });
+
+                    window.globalMatches = finalMatches.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                    window.renderDateFilter(); 
+                    window.renderMatches(); 
+                    window.renderBracket();
+                } catch (e) {
+                    console.error("Critical Matches Sync Error:", e);
+                }
             });
         };
 
@@ -1402,16 +1426,18 @@
         // 5. Firebase 事件監聽器 (Odds and Bets)
         // ==========================================
         onSnapshot(collection(db, "odds_2026"), (snapshot) => { 
-            let needsRender = false; 
-            snapshot.forEach((doc) => { 
-                const newOdds = doc.data(); 
-                const matchIndex = window.globalMatches.findIndex(m => m.id === doc.id); 
-                if(matchIndex !== -1) { 
-                    window.globalMatches[matchIndex].odds = { handicapStr: newOdds.handicapStr || "", home: newOdds.home, away: newOdds.away }; 
-                    needsRender = true; 
-                } 
-            }); 
-            if(needsRender) { window.renderMatches(); window.renderBracket(); }
+            try {
+                let needsRender = false; 
+                snapshot.forEach((doc) => { 
+                    const newOdds = doc.data(); 
+                    const matchIndex = window.globalMatches.findIndex(m => m.id === doc.id); 
+                    if(matchIndex !== -1) { 
+                        window.globalMatches[matchIndex].odds = { handicapStr: newOdds.handicapStr || "", home: newOdds.home, away: newOdds.away }; 
+                        needsRender = true; 
+                    } 
+                }); 
+                if(needsRender) { window.renderMatches(); window.renderBracket(); }
+            } catch (e) { console.error("Odds Snapshot Error", e); }
         }); 
 
         onSnapshot(query(collection(db, "bets"), orderBy("timestamp", "desc")), (snapshot) => {
@@ -1430,12 +1456,11 @@
                 }
                 
                 let matchGroupMap = new Map();
-                let allBetsArray = [];
                 
                 snapshot.forEach((docSnap) => {
                     const bet = docSnap.data();
+                    if(!bet) return;
                     bet.docId = docSnap.id; 
-                    allBetsArray.push(bet);
                     
                     if (bet.settled && window.playerBalances[bet.player] !== undefined) {
                         window.playerBalances[bet.player] += bet.profit;
