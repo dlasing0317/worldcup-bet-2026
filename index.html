@@ -298,7 +298,7 @@
         window.fs1Pairs = [
             ['澳洲', '土耳其'], ['科特迪瓦', '厄瓜多爾'], ['瑞典', '突尼西亞'],
             ['沙特', '烏拉圭'], ['伊朗', '新西蘭'], ['奧地利', '約旦'],
-            ['加納', '巴拿馬'], ['烏茲別克', '哥倫比亞'], ['加拿大', '卡塔爾'],
+            ['加納', '巴拿馬'], ['烏茲別克', '哥聯比亞'], ['加拿大', '卡塔爾'],
             ['土耳其', '巴拉圭'], ['厄瓜多爾', '庫拉索'], ['突尼西亞', '日本'],
             ['約旦', '阿爾及利亞'], ['哥倫比亞', '剛果'], ['波斯尼亞', '卡塔爾'],
             ['摩洛哥', '海地'], ['韓國', '南非'], ['庫拉索', '科特迪瓦'],
@@ -307,6 +307,7 @@
             ['剛果', '烏茲別克'], ['阿爾及利亞', '奧地利']
         ];
 
+        // 🎯 修正 QF 系列賽事日期的硬編碼 ISO 映射
         window.kDates = [
             "2026-06-28T12:00:00-07:00", "2026-06-29T10:00:00-07:00", "2026-06-29T13:30:00-07:00", "2026-06-29T18:00:00-07:00",
             "2026-06-30T10:00:00-07:00", "2026-06-30T14:00:00-07:00", "2026-06-30T18:00:00-07:00", "2026-07-01T09:00:00-07:00",
@@ -314,7 +315,10 @@
             "2026-07-02T20:00:00-07:00", "2026-07-03T11:00:00-07:00", "2026-07-03T15:00:00-07:00", "2026-07-03T18:30:00-07:00",
             "2026-07-04T10:00:00-07:00", "2026-07-04T14:00:00-07:00", "2026-07-05T13:00:00-07:00", "2026-07-05T17:00:00-07:00",
             "2026-07-06T12:00:00-07:00", "2026-07-06T17:00:00-07:00", "2026-07-07T09:00:00-07:00", "2026-07-07T13:00:00-07:00",
-            "2026-07-09T17:00:00-07:00", "2026-07-10T13:00:00-07:00", "2026-07-10T17:00:00-07:00", "2026-07-11T17:00:00-07:00",
+            "2026-07-09T13:00:00-07:00", // QF_1 (Thu, Jul 9 13:00)
+            "2026-07-10T12:00:00-07:00", // QF_2 (Fri, Jul 10 12:00)
+            "2026-07-11T14:00:00-07:00", // QF_3 (Sat, Jul 11 14:00) -> 挪威 vs 英格蘭
+            "2026-07-11T18:00:00-07:00", // QF_4 (Sat, Jul 11 18:00) -> TBD vs TBD
             "2026-07-14T17:00:00-07:00", "2026-07-15T17:00:00-07:00", "2026-07-18T17:00:00-07:00", "2026-07-19T12:00:00-07:00"
         ];
 
@@ -347,11 +351,12 @@
                 { id: "R16_7", home: "TBD", away: "TBD", iso: "2026-07-07T09:00:00-07:00" },
                 { id: "R16_8", home: "TBD", away: "TBD", iso: "2026-07-07T13:00:00-07:00" }
             ],
+            // 🎯 修正 QF 晉級硬骨架的結構時間，避免被 Merging Engine 扯到前一日
             qf: [
-                { id: "QF_1", home: "TBD", away: "TBD", iso: "2026-07-09T17:00:00-07:00" }, 
-                { id: "QF_2", home: "TBD", away: "TBD", iso: "2026-07-10T13:00:00-07:00" },
-                { id: "QF_3", home: "TBD", away: "TBD", iso: "2026-07-10T17:00:00-07:00" },
-                { id: "QF_4", home: "TBD", away: "TBD", iso: "2026-07-11T17:00:00-07:00" }
+                { id: "QF_1", home: "TBD", away: "TBD", iso: "2026-07-09T13:00:00-07:00" }, 
+                { id: "QF_2", home: "TBD", away: "TBD", iso: "2026-07-10T12:00:00-07:00" },
+                { id: "QF_3", home: "TBD", away: "TBD", iso: "2026-07-11T14:00:00-07:00" }, // 完美對上 7/11 14:00
+                { id: "QF_4", home: "TBD", away: "TBD", iso: "2026-07-11T18:00:00-07:00" }  // 完美對上 7/11 18:00
             ],
             sf: [
                 { id: "SF_1", home: "TBD", away: "TBD", iso: "2026-07-14T17:00:00-07:00" },
@@ -564,7 +569,6 @@
             } catch (e) { console.error("Header Balance Error:", e); }
         };
 
-        // 🚨 雙重防盜鎖：入閘前做最後一次 Server Time Validation 
         window.placeBet = async (matchId, selection, odds) => {
             if(odds === 0) { alert("⚠️ 莊家尚未開盤，暫時無法落注。"); return; }
             
@@ -575,7 +579,7 @@
                 let isStarted = (match.status !== 'NS' && match.status !== 'TBD') || (now >= matchDateObj);
                 if (isStarted || ['FT', 'AET', 'PEN'].includes(match.status)) {
                     alert("⛔ 莊家已截飛！賽事已經開始或完結，唔可以再落注！");
-                    window.renderMatches(); // 強制更新畫面
+                    window.renderMatches(); 
                     return;
                 }
             }
@@ -893,15 +897,16 @@
         window.getFlag = (teamName) => {
             if (!teamName || typeof teamName !== 'string') return "⚽"; 
             let tName = String(window.teamMap[teamName] || teamName); 
+            // 🎯 修正挪威的國旗映射 Bug
             const flags = { 
                 "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦",
                 "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿",
                 "巴拉圭":"🇵🇾", "克羅地亞":"🇭🇷", "摩洛哥":"🇲🇦", "卡塔爾":"🇶🇦", "塞內加爾":"🇸🇳", "喀麥隆":"🇨🇲", "厄瓜多爾":"🇪🇨", "澳洲":"🇦🇺",
                 "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭",
                 "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪",
-                "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "Norway":"挪威", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹",
+                "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹",
                 "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴", "意大利":"🇮🇹", "智利":"🇨🇱", "秘魯":"🇵🇪", "Venezuela":"委內瑞拉", "Bolivia":"玻利維亞",
-                "馬里":"🇲🇱", "布基納法索":"🇧🇫", "幾內亞":"🇬🇳", "尼日利亞":"🇳🇬", "安哥拉":"🇦🇴", "阿聯酋":"🇦🇪", "阿曼":"🇴🇲", "巴林":"🇧🇭", "敘利亞":"🇸🇾", "中國":"🇨🇳",
+                "馬里":"🇲🇱", "布基納法索":"🇧🇫", "幾內亞":"幾內亞", "尼日利亞":"🇳🇬", "安哥拉":"🇦🇴", "阿聯酋":"🇦🇪", "阿曼":"🇴🇲", "巴林":"🇧🇭", "敘利亞":"🇸🇾", "中國":"🇨🇳",
                 "牙買加":"🇯🇲", "薩爾瓦多":"🇸🇻", "洪都拉斯":"🇭🇳", "危地馬拉":"🇬🇹", "千里達":"🇹🇹"
             };
             for(let key in flags) { if(tName.includes(key)) return flags[key]; }
@@ -996,7 +1001,6 @@
                     let isStarted = (match.status !== 'NS' && match.status !== 'TBD') || (now >= matchDateObj);
                     let isFinished = ['FT', 'AET', 'PEN'].includes(match.status);
                     
-                    // 🚨 終極 UI 鎖定：定義 canBet 狀態
                     let canBet = isOddsReady && !isStarted && !isFinished;
 
                     let isR32 = (match.month === 6 && match.dateNum >= 28) || (match.month === 7 && match.dateNum <= 3);
@@ -1078,7 +1082,6 @@
                     let safeHome = displayHome.replace(/'/g, "\\'");
                     let safeAway = displayAway.replace(/'/g, "\\'");
                     
-                    // 🚨 第一重防偷雞鎖：將 canBet 狀態與 onclick 事件掛鉤
                     let homeClick = (canBet && displayHome !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeHome}', ${match.odds.home})"` : `onclick="alert('⚠️ 賽事已截飛或未開盤，無法落注。');"`;
                     let awayClick = (canBet && displayAway !== 'TBD') ? `onclick="window.placeBet('${match.id}', '${safeAway}', ${match.odds.away})"` : `onclick="alert('⚠️ 賽事已截飛或未開盤，無法落注。');"`;
 
@@ -1316,7 +1319,6 @@
             let homeScore = (match && match.scoreHome !== null) ? match.scoreHome : (match && match.odds && match.odds.home ? match.odds.home.toFixed(2) : '-');
             let awayScore = (match && match.scoreAway !== null) ? match.scoreAway : (match && match.odds && match.odds.away ? match.odds.away.toFixed(2) : '-');
 
-            // 🚨 終極 UI 防偷雞鎖定：確保時間未過
             let now = new Date();
             let matchDateObj = new Date(slotData.iso);
             let isStarted = match ? ((match.status !== 'NS' && match.status !== 'TBD') || (now >= matchDateObj)) : (now >= matchDateObj);
@@ -1443,9 +1445,6 @@
         window.initMatches(); 
         window.updateHeaderBalance();
 
-        // ==========================================
-        // 5. Firebase 事件監聽器 (Odds and Bets)
-        // ==========================================
         onSnapshot(collection(db, "odds_2026"), (snapshot) => { 
             try {
                 let needsRender = false; 
