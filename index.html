@@ -202,7 +202,6 @@
 
     </main>
 
-    <!-- 落注視窗 -->
     <div id="bet-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-gray-700 transform scale-95 transition-transform duration-300" id="bet-modal-content">
             <h3 class="text-white font-black text-xl mb-2 flex items-center tracking-wide"><span class="mr-2 text-2xl">⚽</span> 確認落注</h3>
@@ -212,16 +211,16 @@
             </p>
 
             <div class="bg-[#0a0a0c] rounded-2xl p-5 mb-6 border border-gray-800 shadow-inner">
-                <label class="block text-center text-gray-500 text-[11px] font-bold uppercase tracking-widest mb-4">輸入注碼 ($5 - $250)</label>
+                <label id="bet-limit-label" class="block text-center text-gray-500 text-[11px] font-bold uppercase tracking-widest mb-4">輸入注碼 ($5 - $250)</label>
                 <div class="flex items-center justify-between px-2">
-                    <button onclick="window.adjustBet(-5)" class="w-12 h-12 flex-shrink-0 rounded-full bg-gray-800 text-gray-300 font-bold text-3xl flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 active:scale-90 transition-all border border-gray-600 shadow-lg touch-manipulation">&minus;</button>
+                    <button onclick="window.adjustBet(-1)" class="w-12 h-12 flex-shrink-0 rounded-full bg-gray-800 text-gray-300 font-bold text-3xl flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 active:scale-90 transition-all border border-gray-600 shadow-lg touch-manipulation">&minus;</button>
                     
                     <div class="flex-1 flex items-baseline justify-center">
                         <span class="text-gray-500 font-bold text-2xl mr-1">$</span>
                         <span id="bet-amount-input" class="text-white text-[52px] tracking-tighter font-black">10</span>
                     </div>
 
-                    <button onclick="window.adjustBet(5)" class="w-12 h-12 flex-shrink-0 rounded-full bg-blue-600 text-white font-bold text-3xl flex items-center justify-center hover:bg-blue-500 active:bg-blue-400 active:scale-90 transition-all shadow-lg shadow-blue-900/50 touch-manipulation">+</button>
+                    <button onclick="window.adjustBet(1)" class="w-12 h-12 flex-shrink-0 rounded-full bg-blue-600 text-white font-bold text-3xl flex items-center justify-center hover:bg-blue-500 active:bg-blue-400 active:scale-90 transition-all shadow-lg shadow-blue-900/50 touch-manipulation">+</button>
                 </div>
             </div>
 
@@ -232,7 +231,6 @@
         </div>
     </div>
 
-    <!-- 自訂霸氣買定離手 Confirm 彈窗 -->
     <div id="custom-confirm-modal" class="hidden fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 backdrop-blur-md opacity-0 transition-opacity duration-300">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-8 shadow-2xl border border-yellow-600/50 transform scale-95 transition-transform duration-300 flex flex-col items-center text-center" id="custom-confirm-content">
             <span class="text-5xl mb-4">⚠️</span>
@@ -298,7 +296,7 @@
         window.fs1Pairs = [
             ['澳洲', '土耳其'], ['科特迪瓦', '厄瓜多爾'], ['瑞典', '突尼西亞'],
             ['沙特', '烏拉圭'], ['伊朗', '新西蘭'], ['奧地利', '約旦'],
-            ['加納', '巴拿馬'], ['烏茲別克', '哥聯比亞'], ['加拿大', '卡塔爾'],
+            ['加納', '巴拿馬'], ['烏茲別克', '哥倫比亞'], ['加拿大', '卡塔爾'],
             ['土耳其', '巴拉圭'], ['厄瓜多爾', '庫拉索'], ['突尼西亞', '日本'],
             ['約旦', '阿爾及利亞'], ['哥倫比亞', '剛果'], ['波斯尼亞', '卡塔爾'],
             ['摩洛哥', '海地'], ['韓國', '南非'], ['庫拉索', '科特迪瓦'],
@@ -307,7 +305,6 @@
             ['剛果', '烏茲別克'], ['阿爾及利亞', '奧地利']
         ];
 
-        // 🎯 修正 QF 系列賽事日期的硬編碼 ISO 映射
         window.kDates = [
             "2026-06-28T12:00:00-07:00", "2026-06-29T10:00:00-07:00", "2026-06-29T13:30:00-07:00", "2026-06-29T18:00:00-07:00",
             "2026-06-30T10:00:00-07:00", "2026-06-30T14:00:00-07:00", "2026-06-30T18:00:00-07:00", "2026-07-01T09:00:00-07:00",
@@ -315,10 +312,10 @@
             "2026-07-02T20:00:00-07:00", "2026-07-03T11:00:00-07:00", "2026-07-03T15:00:00-07:00", "2026-07-03T18:30:00-07:00",
             "2026-07-04T10:00:00-07:00", "2026-07-04T14:00:00-07:00", "2026-07-05T13:00:00-07:00", "2026-07-05T17:00:00-07:00",
             "2026-07-06T12:00:00-07:00", "2026-07-06T17:00:00-07:00", "2026-07-07T09:00:00-07:00", "2026-07-07T13:00:00-07:00",
-            "2026-07-09T13:00:00-07:00", // QF_1 (Thu, Jul 9 13:00)
-            "2026-07-10T12:00:00-07:00", // QF_2 (Fri, Jul 10 12:00)
-            "2026-07-11T14:00:00-07:00", // QF_3 (Sat, Jul 11 14:00) -> 挪威 vs 英格蘭
-            "2026-07-11T18:00:00-07:00", // QF_4 (Sat, Jul 11 18:00) -> TBD vs TBD
+            "2026-07-09T13:00:00-07:00", // QF_1
+            "2026-07-10T12:00:00-07:00", // QF_2
+            "2026-07-11T14:00:00-07:00", // QF_3
+            "2026-07-11T18:00:00-07:00", // QF_4
             "2026-07-14T17:00:00-07:00", "2026-07-15T17:00:00-07:00", "2026-07-18T17:00:00-07:00", "2026-07-19T12:00:00-07:00"
         ];
 
@@ -351,12 +348,11 @@
                 { id: "R16_7", home: "TBD", away: "TBD", iso: "2026-07-07T09:00:00-07:00" },
                 { id: "R16_8", home: "TBD", away: "TBD", iso: "2026-07-07T13:00:00-07:00" }
             ],
-            // 🎯 修正 QF 晉級硬骨架的結構時間，避免被 Merging Engine 扯到前一日
             qf: [
                 { id: "QF_1", home: "TBD", away: "TBD", iso: "2026-07-09T13:00:00-07:00" }, 
                 { id: "QF_2", home: "TBD", away: "TBD", iso: "2026-07-10T12:00:00-07:00" },
-                { id: "QF_3", home: "TBD", away: "TBD", iso: "2026-07-11T14:00:00-07:00" }, // 完美對上 7/11 14:00
-                { id: "QF_4", home: "TBD", away: "TBD", iso: "2026-07-11T18:00:00-07:00" }  // 完美對上 7/11 18:00
+                { id: "QF_3", home: "TBD", away: "TBD", iso: "2026-07-11T14:00:00-07:00" },
+                { id: "QF_4", home: "TBD", away: "TBD", iso: "2026-07-11T18:00:00-07:00" }
             ],
             sf: [
                 { id: "SF_1", home: "TBD", away: "TBD", iso: "2026-07-14T17:00:00-07:00" },
@@ -588,10 +584,27 @@
             
             if (window.authenticatedUser !== currentPlayer) { alert("❌ 安全異常：帳號狀態不符，請重新登入！"); return; }
 
-            window.pendingBet = { matchId, selection, odds, player: currentPlayer };
+            // 🎯 加入 R8 動態注碼限制
+            let minBet = 5;
+            let maxBet = 250;
+            let step = 5;
+
+            // 如果賽事喺 7月9日 或之後 (即 R8 及以後)
+            if (match && match.month === 7 && match.dateNum >= 9) {
+                minBet = 10;
+                maxBet = 500;
+                step = 10;
+            }
+
+            window.pendingBet = { matchId, selection, odds, player: currentPlayer, minBet, maxBet, step };
+            
             document.getElementById('bet-modal-player').innerText = currentPlayer;
             document.getElementById('bet-modal-selection').innerText = `${selection} (賠率 ${odds})`;
-            document.getElementById('bet-amount-input').innerText = "10"; 
+            
+            let limitLabel = document.getElementById('bet-limit-label');
+            if(limitLabel) limitLabel.innerText = `輸入注碼 ($${minBet} - $${maxBet})`;
+            
+            document.getElementById('bet-amount-input').innerText = String(minBet); 
             
             const modal = document.getElementById('bet-modal');
             const modalContent = document.getElementById('bet-modal-content');
@@ -599,12 +612,18 @@
             setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); }, 10);
         };
 
-        window.adjustBet = (amount) => {
+        window.adjustBet = (direction) => {
+            if (!window.pendingBet) return;
+            let { minBet, maxBet, step } = window.pendingBet;
+            
+            // 處理 HTML 傳入 1 或 -1 (作為正負方向)
+            let amountChange = direction > 0 ? step : -step;
+            
             const input = document.getElementById('bet-amount-input');
-            let current = parseInt(input.innerText) || 10; 
-            current += amount;
-            if (current < 5) current = 5;
-            if (current > 250) current = 250; 
+            let current = parseInt(input.innerText) || minBet; 
+            current += amountChange;
+            if (current < minBet) current = minBet;
+            if (current > maxBet) current = maxBet; 
             input.innerText = current; 
         };
 
@@ -619,7 +638,9 @@
         window.confirmBet = () => {
             if (!window.pendingBet) return;
             const amount = parseInt(document.getElementById('bet-amount-input').innerText);
-            if (amount >= 5 && amount <= 250) {
+            let { minBet, maxBet } = window.pendingBet;
+
+            if (amount >= minBet && amount <= maxBet) {
                 document.getElementById('custom-confirm-detail').innerHTML = `確定畀 <span class="text-white font-black">$${amount}</span> 買 <span class="text-white font-black">${window.pendingBet.selection}</span>？`;
                 const modal = document.getElementById('custom-confirm-modal');
                 const modalContent = document.getElementById('custom-confirm-content');
@@ -897,7 +918,6 @@
         window.getFlag = (teamName) => {
             if (!teamName || typeof teamName !== 'string') return "⚽"; 
             let tName = String(window.teamMap[teamName] || teamName); 
-            // 🎯 修正挪威的國旗映射 Bug
             const flags = { 
                 "美國":"🇺🇸", "英格蘭":"🏴󠁧󠁢󠁥󠁮󠁧󠁿", "德國":"🇩🇪", "法國":"🇫🇷", "巴西":"🇧🇷", "阿根廷":"🇦🇷", "墨西哥":"🇲🇽", "波蘭":"🇵🇱", "沙特":"🇸🇦",
                 "西班牙":"🇪🇸", "日本":"🇯🇵", "韓國":"🇰🇷", "葡萄牙":"🇵🇹", "荷蘭":"🇳🇱", "加拿大":"🇨🇦", "波斯尼亞":"🇧🇦", "南非":"🇿🇦", "捷克":"🇨🇿",
@@ -905,8 +925,8 @@
                 "丹麥":"🇩🇰", "突尼西亞":"🇹🇳", "哥斯達黎加":"🇨🇷", "比利時":"🇧🇪", "威爾斯":"🏴󠁧󠁢󠁷󠁬󠁳󠁿", "伊朗":"🇮🇷", "烏拉圭":"🇺🇾", "瑞士":"🇨🇭",
                 "塞爾維亞":"🇷🇸", "加納":"🇬🇭", "蘇格蘭":"🏴󠁧󠁢󠁳󠁣󠁴󠁿", "海地":"🇭🇹", "土耳其":"🇹🇷", "庫拉索":"🇨🇼", "科特迪瓦":"🇨🇮", "瑞典":"🇸🇪",
                 "佛得角":"🇨🇻", "埃及":"🇪🇬", "新西蘭":"🇳🇿", "挪威":"🇳🇴", "伊拉克":"🇮🇶", "阿爾及利亞":"🇩🇿", "約旦":"🇯🇴", "奧地利":"🇦🇹",
-                "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴", "意大利":"🇮🇹", "智利":"🇨🇱", "秘魯":"🇵🇪", "Venezuela":"委內瑞拉", "Bolivia":"玻利維亞",
-                "馬里":"🇲🇱", "布基納法索":"🇧🇫", "幾內亞":"幾內亞", "尼日利亞":"🇳🇬", "安哥拉":"🇦🇴", "阿聯酋":"🇦🇪", "阿曼":"🇴🇲", "巴林":"🇧🇭", "敘利亞":"🇸🇾", "中國":"🇨🇳",
+                "剛果":"🇨🇩", "巴拿馬":"🇵🇦", "烏茲別克":"🇺🇿", "哥倫比亞":"🇨🇴", "意大利":"🇮🇹", "智利":"🇨🇱", "秘魯":"🇵🇪", "Venezuela":"🇻🇪", "Bolivia":"🇧🇴",
+                "馬里":"🇲🇱", "布基納法索":"🇧🇫", "幾內亞":"🇬🇳", "尼日利亞":"🇳🇬", "安哥拉":"🇦🇴", "阿聯酋":"🇦🇪", "阿曼":"🇴🇲", "巴林":"🇧🇭", "敘利亞":"🇸🇾", "中國":"🇨🇳",
                 "牙買加":"🇯🇲", "薩爾瓦多":"🇸🇻", "洪都拉斯":"🇭🇳", "危地馬拉":"🇬🇹", "千里達":"🇹🇹"
             };
             for(let key in flags) { if(tName.includes(key)) return flags[key]; }
@@ -1004,9 +1024,14 @@
                     let canBet = isOddsReady && !isStarted && !isFinished;
 
                     let isR32 = (match.month === 6 && match.dateNum >= 28) || (match.month === 7 && match.dateNum <= 3);
-                    let cardWrapperClass = isR32 
-                        ? "bg-[#1c1c1e] border border-blue-500 shadow-md shadow-blue-900/30 rounded-2xl p-4 relative overflow-hidden transition-all" 
-                        : "glass-panel rounded-2xl p-4 relative overflow-hidden transition-all";
+                    let isR8  = (match.month === 7 && match.dateNum >= 9 && match.dateNum <= 11);
+
+                    let cardWrapperClass = "glass-panel rounded-2xl p-4 relative overflow-hidden transition-all";
+                    if (isR32) {
+                        cardWrapperClass = "bg-[#1c1c1e] border border-blue-500 shadow-md shadow-blue-900/30 rounded-2xl p-4 relative overflow-hidden transition-all";
+                    } else if (isR8) {
+                        cardWrapperClass = "bg-[#1c1c1e] border border-green-500 shadow-md shadow-green-900/30 rounded-2xl p-4 relative overflow-hidden transition-all";
+                    }
 
                     let dynamicCalendarIcon = `
                         <div class="flex flex-col items-center justify-start w-3.5 h-4 bg-[#1c1c1e] rounded-[3px] border border-gray-600 overflow-hidden mr-1.5 flex-shrink-0">
@@ -1289,8 +1314,12 @@
 
         window.generateBracketCard = (slotData, isFinal = false, matchIndex = 0) => {
             let borderClass = isFinal ? 'border-yellow-600 shadow-lg shadow-yellow-900/30 bg-yellow-900/10' : 'border-gray-700 hover:bg-gray-800';
-            if (!isFinal && matchIndex < 16) {
-                borderClass = 'border-blue-500 shadow-md shadow-blue-900/30 hover:bg-gray-800';
+            if (!isFinal) {
+                if (matchIndex < 16) {
+                    borderClass = 'border-blue-500 shadow-md shadow-blue-900/30 hover:bg-gray-800';
+                } else if (matchIndex >= 24 && matchIndex <= 27) { // 8強專屬綠框
+                    borderClass = 'border-green-500 shadow-md shadow-green-900/30 hover:bg-gray-800';
+                }
             }
 
             let match = window.globalMatches.find(m => m.id === slotData.id || (m.date === slotData.iso && (m.home === slotData.home || m.away === slotData.home)));
