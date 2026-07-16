@@ -581,19 +581,25 @@
             }
 
             const currentPlayer = document.getElementById('player-select').value;
-            
             if (window.authenticatedUser !== currentPlayer) { alert("❌ 安全異常：帳號狀態不符，請重新登入！"); return; }
 
-            // 🎯 加入 R8 動態注碼限制
+            // 🎯 設定預設注碼 (R32 及其他賽事)
             let minBet = 5;
             let maxBet = 250;
             let step = 5;
 
-            // 如果賽事喺 7月9日 或之後 (即 R8 及以後)
-            if (match && match.month === 7 && match.dateNum >= 9) {
+            // 🎯 8強 (R8) 及 4強 (SF) 設定
+            if (match && match.month === 7 && match.dateNum >= 9 && match.dateNum <= 15) {
                 minBet = 50;
-                maxBet = 1000;
+                maxBet = 500;
                 step = 50;
+            }
+
+            // 🏆 決賽 (Final Match) 設定 (F_1 ID 或 7月19日)
+            if (match && (match.id === 'F_1' || (match.month === 7 && match.dateNum === 19))) {
+                minBet = 1000;
+                maxBet = 50000;
+                step = 2500;
             }
 
             window.pendingBet = { matchId, selection, odds, player: currentPlayer, minBet, maxBet, step };
@@ -1025,13 +1031,20 @@
 
                     let isR32 = (match.month === 6 && match.dateNum >= 28) || (match.month === 7 && match.dateNum <= 3);
                     let isR8  = (match.month === 7 && match.dateNum >= 9 && match.dateNum <= 11);
+                    let isFinalMatch = (match.id === 'F_1' || (match.month === 7 && match.dateNum === 19)); // 🏆 決賽判定
 
+                    // 卡片外框與溢出設定 (決賽要 overflow-visible 畀皇冠凸出嚟)
                     let cardWrapperClass = "glass-panel rounded-2xl p-4 relative overflow-hidden transition-all";
-                    if (isR32) {
+                    if (isFinalMatch) {
+                        cardWrapperClass = "bg-yellow-900/10 border border-yellow-500 shadow-lg shadow-yellow-900/40 rounded-2xl p-4 relative overflow-visible transition-all mt-4"; // 決賽專屬金框
+                    } else if (isR32) {
                         cardWrapperClass = "bg-[#1c1c1e] border border-blue-500 shadow-md shadow-blue-900/30 rounded-2xl p-4 relative overflow-hidden transition-all";
                     } else if (isR8) {
                         cardWrapperClass = "bg-[#1c1c1e] border border-green-500 shadow-md shadow-green-900/30 rounded-2xl p-4 relative overflow-hidden transition-all";
                     }
+
+                    // 👑 決賽大皇冠 HTML
+                    let crownHtml = isFinalMatch ? `<span class="absolute -top-6 -left-3 text-[40px] z-30 transform -rotate-12 drop-shadow-[0_4px_6px_rgba(234,179,8,0.6)]">👑</span>` : '';
 
                     let dynamicCalendarIcon = `
                         <div class="flex flex-col items-center justify-start w-3.5 h-4 bg-[#1c1c1e] rounded-[3px] border border-gray-600 overflow-hidden mr-1.5 flex-shrink-0">
@@ -1112,7 +1125,8 @@
 
                     container.innerHTML += `
                         <div class="${cardWrapperClass}">
-                            <div class="flex justify-between items-center mb-4">
+                            ${crownHtml}
+                            <div class="flex justify-between items-center mb-4 ml-2">
                                 <div class="flex items-center flex-wrap gap-y-1">
                                     ${matchLabelHtml}
                                     ${viuTvBadge}
@@ -1154,6 +1168,7 @@
                 });
             } catch (e) { console.error("Render Matches Error", e); }
         };
+        
 
         window.renderBracket = () => {
             try {
@@ -1312,7 +1327,7 @@
             } catch (e) { console.error("Render Bracket Error", e); }
         };
 
-        window.generateBracketCard = (slotData, isFinal = false, matchIndex = 0) => {
+window.generateBracketCard = (slotData, isFinal = false, matchIndex = 0) => {
             let borderClass = isFinal ? 'border-yellow-600 shadow-lg shadow-yellow-900/30 bg-yellow-900/10' : 'border-gray-700 hover:bg-gray-800';
             if (!isFinal) {
                 if (matchIndex < 16) {
@@ -1322,7 +1337,13 @@
                 }
             }
 
-            let match = window.globalMatches.find(m => m.id === slotData.id || (m.date === slotData.iso && (m.home === slotData.home || m.away === slotData.home)));
+            // 使用 15 分鐘容錯時間匹配機制找尋 Bracket 顯示用的比賽
+            let targetTime = new Date(slotData.iso).getTime();
+            let match = window.globalMatches.find(m => {
+                if(m.id === slotData.id) return true;
+                let apiTime = new Date(m.date).getTime();
+                return Math.abs(apiTime - targetTime) <= 15 * 60 * 1000 && (m.home === slotData.home || m.away === slotData.home);
+            });
             
             let displayHome = match ? String(match.home) : String(slotData.home);
             let displayAway = match ? String(match.away) : String(slotData.away);
@@ -1370,8 +1391,12 @@
             let homeFlag = isKnownTeam(displayHome) ? window.getFlag(displayHome) + ' ' : '';
             let awayFlag = isKnownTeam(displayAway) ? window.getFlag(displayAway) + ' ' : '';
 
+            // ✨ 決賽專屬皇冠圖示 (定位於左上角向外凸出少少，加發光陰影)
+            let crownIcon = isFinal ? `<span class="absolute -top-3 -left-2.5 text-[18px] z-30 transform -rotate-12 drop-shadow-[0_2px_4px_rgba(234,179,8,0.8)]">👑</span>` : '';
+
             return `
             <div class="bracket-card rounded-lg border ${borderClass} flex flex-col justify-center px-2 ${(!canBetHome && !canBetAway) ? 'cursor-not-allowed bg-black/20' : 'cursor-pointer hover:bg-gray-700/50'} transition-colors touch-manipulation relative">
+                ${crownIcon}
                 ${dateBadge}
                 <div ${homeClick} class="flex justify-between items-center py-0.5 rounded px-1 touch-manipulation mt-1">
                     <span class="font-bold text-[11px] ${homeTextStyle} truncate w-24">${homeFlag}${displayHome}</span>
