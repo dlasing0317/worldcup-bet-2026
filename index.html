@@ -588,15 +588,15 @@
             let maxBet = 250;
             let step = 5;
 
-            // 🎯 8強 (R8) 及 4強 (SF) 設定
+            // 🎯 8強 (R8) 及 4強 (SF) 設定 (7月9日至 7月15日)
             if (match && match.month === 7 && match.dateNum >= 9 && match.dateNum <= 15) {
-                minBet = 50;
+                minBet = 10;
                 maxBet = 500;
-                step = 50;
+                step = 10;
             }
 
-            // 🏆 決賽 (Final Match) 設定 (F_1 ID 或 7月19日)
-            if (match && (match.id === 'F_1' || (match.month === 7 && match.dateNum === 19))) {
+            // 🏆 季軍戰 (7月18日) & 決賽 (7月19日) 大茶飯設定
+            if (match && (['F_1', 'TH_1'].includes(match.id) || (match.month === 7 && (match.dateNum === 18 || match.dateNum === 19)))) {
                 minBet = 1000;
                 maxBet = 50000;
                 step = 2500;
